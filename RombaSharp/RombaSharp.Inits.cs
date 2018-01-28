@@ -278,7 +278,31 @@ namespace RombaSharp
 		/// </summary>
 		private static void InitDbStats()
 		{
-			DisplayDBStats();
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Total number of CRCs
+			string query = "SELECT COUNT(*) FROM crc";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			Globals.Logger.User("Total CRCs: {0}", (long)slc.ExecuteScalar());
+
+			// Total number of MD5s
+			query = "SELECT COUNT(*) FROM md5";
+			slc = new SqliteCommand(query, dbc);
+			Globals.Logger.User("Total MD5s: {0}", (long)slc.ExecuteScalar());
+
+			// Total number of SHA1s
+			query = "SELECT COUNT(*) FROM sha1";
+			slc = new SqliteCommand(query, dbc);
+			Globals.Logger.User("Total SHA1s: {0}", (long)slc.ExecuteScalar());
+
+			// Total number of DATs
+			query = "SELECT COUNT(*) FROM dat";
+			slc = new SqliteCommand(query, dbc);
+			Globals.Logger.User("Total DATs: {0}", (long)slc.ExecuteScalar());
+
+			slc.Dispose();
+			dbc.Dispose();
 		}
 
 		/// <summary>
@@ -414,7 +438,35 @@ namespace RombaSharp
 		/// TODO: Verify implementation
 		private static void InitExport()
 		{
-			ExportDatabase();
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+			StreamWriter sw = new StreamWriter(Utilities.TryCreate("export.csv"));
+
+			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
+
+			string query = "SELECT dats.id, size, crc, md5, sha1, indepot, hash FROM data JOIN dats ON data.id=dats.id";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+
+			if (sldr.HasRows)
+			{
+				while (sldr.Read())
+				{
+					string line = "\"" + sldr.GetInt32(0) + "\","
+							+ "\"" + sldr.GetInt64(1) + "\","
+							+ "\"" + sldr.GetString(2) + "\","
+							+ "\"" + sldr.GetString(3) + "\","
+							+ "\"" + sldr.GetString(4) + "\","
+							+ "\"" + sldr.GetInt32(5) + "\","
+							+ "\"" + sldr.GetString(6) + "\"";
+					sw.WriteLine(line);
+				}
+			}
+
+			sldr.Dispose();
+			slc.Dispose();
+			sw.Dispose();
+			dbc.Dispose();
 		}
 
 		/// <summary>
@@ -646,7 +698,97 @@ namespace RombaSharp
 		{
 			Globals.Logger.Error("This feature is not yet implemented: refresh-dats");
 
-			RefreshDatabase();
+			// Make sure the db is set
+			if (String.IsNullOrWhiteSpace(_db))
+			{
+				_db = "db.sqlite";
+				_connectionString = "Data Source=" + _db + ";Version = 3;";
+			}
+
+			// Make sure the file exists
+			if (!File.Exists(_db))
+			{
+				DatabaseTools.EnsureDatabase(_dbSchema, _db, _connectionString);
+			}
+
+			// Make sure the dats dir is set
+			if (String.IsNullOrWhiteSpace(_dats))
+			{
+				_dats = "dats";
+			}
+
+			// Make sure the folder exists
+			if (!Directory.Exists(_dats))
+			{
+				Directory.CreateDirectory(_dats);
+			}
+
+			// First get a list of SHA-1's from the input DATs
+			DatFile datroot = new DatFile { Type = "SuperDAT", };
+			// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+			datroot.PopulateFromDir(_dats, Hash.DeepHashes, false, false, SkipFileType.None, false, false, _tmpdir, false, null, true);
+			datroot.BucketBy(SortedBy.SHA1, DedupeType.None);
+
+			// Create a List of dat hashes in the database (SHA-1)
+			List<string> databaseDats = new List<string>();
+			List<string> unneeded = new List<string>();
+
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Populate the List from the database
+			InternalStopwatch watch = new InternalStopwatch("Populating the list of existing DATs");
+
+			string query = "SELECT DISTINCT hash FROM dat";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+			if (sldr.HasRows)
+			{
+				sldr.Read();
+				string hash = sldr.GetString(0);
+				if (datroot.Contains(hash))
+				{
+					datroot.Remove(hash);
+					databaseDats.Add(hash);
+				}
+				else if (!databaseDats.Contains(hash))
+				{
+					unneeded.Add(hash);
+				}
+			}
+			datroot.BucketBy(SortedBy.Game, DedupeType.None, norename: true);
+
+			watch.Stop();
+
+			slc.Dispose();
+			sldr.Dispose();
+
+			// Loop through the Dictionary and add all data
+			watch.Start("Adding new DAT information");
+			foreach (string key in datroot.Keys)
+			{
+				foreach (Rom value in datroot[key])
+				{
+					AddDatToDatabase(value, dbc);
+				}
+			}
+
+			watch.Stop();
+
+			// Now loop through and remove all references to old Dats
+			watch.Start("Removing unmatched DAT information");
+
+			foreach (string dathash in unneeded)
+			{
+				query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
+				slc = new SqliteCommand(query, dbc);
+				slc.ExecuteNonQuery();
+				slc.Dispose();
+			}
+
+			watch.Stop();
+
+			dbc.Dispose();
 		}
 
 		/// <summary>
@@ -658,9 +800,136 @@ namespace RombaSharp
 		{
 			Globals.Logger.Error("This feature is not yet implemented: rescan-depots");
 
-			foreach (string depot in inputs)
+			foreach (string depotname in inputs)
 			{
-				Rescan(depot);
+				// Check that it's a valid depot first
+				if (!_depots.ContainsKey(depotname))
+				{
+					Globals.Logger.User("'{0}' is not a recognized depot. Please add it to your configuration file and try again", depotname);
+					return;
+				}
+
+				// Then check that the depot is online
+				if (!Directory.Exists(depotname))
+				{
+					Globals.Logger.User("'{0}' does not appear to be online. Please check its status and try again", depotname);
+					return;
+				}
+
+				// Open the database connection
+				SqliteConnection dbc = new SqliteConnection(_connectionString);
+				dbc.Open();
+
+				// If we have it, then check for all hashes that are in that depot
+				List<string> hashes = new List<string>();
+				string query = "SELECT sha1 FROM sha1 WHERE depot=\"" + depotname + "\"";
+				SqliteCommand slc = new SqliteCommand(query, dbc);
+				SqliteDataReader sldr = slc.ExecuteReader();
+				if (sldr.HasRows)
+				{
+					while (sldr.Read())
+					{
+						hashes.Add(sldr.GetString(0));
+					}
+				}
+
+				// Now rescan the depot itself
+				DatFile depot = new DatFile();
+				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+				depot.PopulateFromDir(depotname, Hash.DeepHashes, false, false, SkipFileType.None, false, false, _tmpdir, false, null, true);
+				depot.BucketBy(SortedBy.SHA1, DedupeType.None);
+
+				// Set the base queries to use
+				string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
+				string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
+				string sha1query = "INSERT OR IGNORE INTO sha1 (sha1, depot) VALUES";
+				string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
+				string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
+
+				// Once we have both, check for any new files
+				List<string> dupehashes = new List<string>();
+				List<string> keys = depot.Keys;
+				foreach (string key in keys)
+				{
+					List<DatItem> roms = depot[key];
+					foreach (Rom rom in roms)
+					{
+						if (hashes.Contains(rom.SHA1))
+						{
+							dupehashes.Add(rom.SHA1);
+							hashes.Remove(rom.SHA1);
+						}
+						else if (!dupehashes.Contains(rom.SHA1))
+						{
+							if (!String.IsNullOrWhiteSpace(rom.CRC))
+							{
+								crcquery += " (\"" + rom.CRC + "\"),";
+							}
+							if (!String.IsNullOrWhiteSpace(rom.MD5))
+							{
+								md5query += " (\"" + rom.MD5 + "\"),";
+							}
+							if (!String.IsNullOrWhiteSpace(rom.SHA1))
+							{
+								sha1query += " (\"" + rom.SHA1 + "\", \"" + depotname + "\"),";
+
+								if (!String.IsNullOrWhiteSpace(rom.CRC))
+								{
+									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+								}
+								if (!String.IsNullOrWhiteSpace(rom.MD5))
+								{
+									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+								}
+							}
+						}
+					}
+				}
+
+				// Now run the queries after fixing them
+				if (crcquery != "INSERT OR IGNORE INTO crc (crc) VALUES")
+				{
+					slc = new SqliteCommand(crcquery.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (md5query != "INSERT OR IGNORE INTO md5 (md5) VALUES")
+				{
+					slc = new SqliteCommand(md5query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1, depot) VALUES")
+				{
+					slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (crcsha1query != "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES")
+				{
+					slc = new SqliteCommand(crcsha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (md5sha1query != "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES")
+				{
+					slc = new SqliteCommand(md5sha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+
+				// Now that we've added the information, we get to remove all of the hashes that we want to
+				query = @"DELETE FROM sha1
+JOIN crcsha1
+	ON sha1.sha1=crcsha1.sha1
+JOIN md5sha1
+	ON sha1.sha1=md5sha1.sha1
+JOIN crc
+	ON crcsha1.crc=crc.crc
+JOIN md5
+	ON md5sha1.md5=md5.md5
+WHERE sha1.sha1 IN (""" + String.Join("\",\"", hashes) + "\")";
+				slc = new SqliteCommand(query, dbc);
+				slc.ExecuteNonQuery();
+
+				// Dispose of the database connection
+				slc.Dispose();
+				dbc.Dispose();
 			}
 		}
 
