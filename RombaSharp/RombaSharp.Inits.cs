@@ -257,7 +257,7 @@ namespace RombaSharp
 		/// </summary>
 		private static void InitCancel()
 		{
-			Globals.Logger.Error("This feature is not yet implemented: cancel");
+			Globals.Logger.User("This feature is obsolete: cancel");
 		}
 
 		/// <summary>
@@ -470,7 +470,7 @@ namespace RombaSharp
 		/// </summary>
 		private static void InitMemstats()
 		{
-			DisplayMemoryStats();
+			Globals.Logger.User("This feature is obsolete: cancel");
 		}
 
 		/// <summary>
@@ -506,7 +506,7 @@ namespace RombaSharp
 		/// </summary>
 		private static void InitProgress()
 		{
-			Globals.Logger.Error("This feature is not yet implemented: progress");
+			Globals.Logger.User("This feature is obsolete: progress");
 		}
 
 		/// <summary>
@@ -580,7 +580,7 @@ namespace RombaSharp
 		/// </summary>
 		private static void InitShutdown()
 		{
-			Globals.Logger.Error("This feature is not yet implemented: shutdown");
+			Globals.Logger.User("This feature is obsolete: shutdown");
 		}
 
 		/// <summary>
@@ -588,7 +588,7 @@ namespace RombaSharp
 		/// </summary>
 		private static void InitVersion()
 		{
-			Globals.Logger.Error("This feature is not yet implemented: version");
+			Globals.Logger.User("RombaSharp version: {0}", Constants.Version);
 		}
 
 		#endregion

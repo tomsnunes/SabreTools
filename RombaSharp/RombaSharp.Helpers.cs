@@ -58,25 +58,6 @@ namespace RombaSharp
 		}
 
 		/// <summary>
-		/// Display the current memory usage of the application
-		/// </summary>
-		private static void DisplayMemoryStats()
-		{
-			Process proc = Process.GetCurrentProcess();
-
-			Globals.Logger.User("Current Nonpaged Memory: {0}", Utilities.GetBytesReadable(proc.NonpagedSystemMemorySize64));
-			Globals.Logger.User("Current Paged Memory: {0}", Utilities.GetBytesReadable(proc.PagedMemorySize64));
-			Globals.Logger.User("Peak Paged Memory: {0}", Utilities.GetBytesReadable(proc.PeakPagedMemorySize64));
-			Globals.Logger.User("Peak Virtual Memory: {0}", Utilities.GetBytesReadable(proc.PeakVirtualMemorySize64));
-			Globals.Logger.User("Peak Working Memory: {0}", Utilities.GetBytesReadable(proc.PeakWorkingSet64));
-			Globals.Logger.User("Private Memory: {0}", Utilities.GetBytesReadable(proc.PrivateMemorySize64));
-			Globals.Logger.User("Virtual Memory: {0}", Utilities.GetBytesReadable(proc.VirtualMemorySize64));
-			Globals.Logger.User("Working Memory: {0}", Utilities.GetBytesReadable(proc.WorkingSet64));
-			Globals.Logger.User("Total Processor Time: {0}", proc.TotalProcessorTime);
-			Globals.Logger.User("User Processor Time: {0}", proc.UserProcessorTime);
-		}
-
-		/// <summary>
 		/// Export the current database to CSV
 		/// </summary>
 		/// <remarks>REDO</remarks>
