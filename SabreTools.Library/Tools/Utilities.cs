@@ -1426,6 +1426,29 @@ namespace SabreTools.Library.Tools
 			return infiles;
 		}
 
+		/// <summary>
+		/// Retrieve a list of directories from a directory recursively in proper order
+		/// </summary>
+		/// <param name="directory">Directory to parse</param>
+		/// <param name="infiles">List representing existing files</param>
+		/// <returns>List with all new files</returns>
+		public static List<string> RetrieveDirectories(string directory, List<string> infiles)
+		{
+			// Take care of the files in the top directory
+			List<string> toadd = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly).ToList();
+			toadd.Sort(new NaturalComparer());
+			infiles.AddRange(toadd);
+
+			// Then recurse through and add from the directories
+			foreach (string dir in toadd)
+			{
+				infiles = RetrieveDirectories(dir, infiles);
+			}
+
+			// Return the new list
+			return infiles;
+		}
+
 		#endregion
 
 		#region File Manipulation
@@ -1591,6 +1614,41 @@ namespace SabreTools.Library.Tools
 					catch (Exception ex)
 					{
 						Globals.Logger.Error(ex.ToString());
+					}
+				}
+			}
+
+			return outputs;
+		}
+
+		/// <summary>
+		/// Retrieve a list of just directories from inputs
+		/// </summary>
+		/// <param name="inputs">List of strings representing directories and files</param>
+		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise (default)</param>
+		/// <returns>List of strings representing just directories from the inputs</returns>
+		public static List<string> GetOnlyDirectoriesFromInputs(List<string> inputs, bool appendparent = false)
+		{
+			List<string> outputs = new List<string>();
+			foreach (string input in inputs)
+			{
+				if (Directory.Exists(input))
+				{
+					List<string> directories = RetrieveDirectories(input, new List<string>());
+					foreach (string dir in directories)
+					{
+						try
+						{
+							outputs.Add(Path.GetFullPath(dir) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+						}
+						catch (PathTooLongException)
+						{
+							Globals.Logger.Warning("The path for '{0}' was too long", dir);
+						}
+						catch (Exception ex)
+						{
+							Globals.Logger.Error(ex.ToString());
+						}
 					}
 				}
 			}

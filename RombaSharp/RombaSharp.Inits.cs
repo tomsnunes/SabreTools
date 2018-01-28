@@ -64,13 +64,7 @@ namespace RombaSharp
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				df.PopulateFromDir(dir, Hash.DeepHashes, false, false, SkipFileType.None, false, false, _tmpdir, false, null, true);
-
-				// If we're looking for only needed, consider the zipfiles themselves too
-				if (onlyNeeded)
-				{
-					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					df.PopulateFromDir(dir, Hash.DeepHashes, false, true, SkipFileType.None, false, false, _tmpdir, false, null, true);
-				}
+				df.PopulateFromDir(dir, Hash.DeepHashes, false, true, SkipFileType.None, false, false, _tmpdir, false, null, true);
 			}
 
 			// Create an empty Dat for files that need to be rebuilt
@@ -266,10 +260,17 @@ namespace RombaSharp
 		/// Wrap printing dat stats
 		/// </summary>
 		/// <param name="inputs">List of input DATs to get stats from</param>
-		/// TODO: Verify implementation
 		private static void InitDatStats(List<string> inputs)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: datstats");
+			// If we have no inputs listed, we want to use datroot
+			if (inputs == null || inputs.Count == 0)
+			{
+				inputs = new List<string>();
+				inputs.Add(Path.GetFullPath(_dats));
+			}
+
+			// Now output the stats for all inputs
+			DatFile.OutputStats(inputs, "rombasharp-datstats", null /* outDir */, true /* single */, true /* baddumpCol */, true /* nodumpCol */, StatReportFormat.Textfile);
 		}
 
 		/// <summary>
