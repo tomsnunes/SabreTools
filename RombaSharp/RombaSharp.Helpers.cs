@@ -432,6 +432,11 @@ namespace RombaSharp
 			dbc.Dispose();
 		}
 
+		/// <summary>
+		/// Add a new DAT to the database
+		/// </summary>
+		/// <param name="dat">DatFile hash information to add</param>
+		/// <param name="dbc">Database connection to use</param>
 		private static void AddDatToDatabase(Rom dat, SqliteConnection dbc)
 		{
 			// Get the dat full path
