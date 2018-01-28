@@ -337,14 +337,34 @@ namespace RombaSharp
 		/// <param name="source">Source directory</param>
 		/// <param name="name">Name value in DAT header</param>
 		/// <param name="description">Description value in DAT header</param>
-		/// TODO: Implement
 		private static void InitDir2Dat(
 			string outdat,
 			string source,
 			string name,
 			string description)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: dir2dat");
+			// Ensure the output directory
+			Utilities.EnsureOutputDirectory(outdat, create: true);
+
+			// Check that all required directories exist
+			if (!Directory.Exists(source))
+			{
+				Globals.Logger.Error("File '{0}' does not exist!", source);
+				return;
+			}
+
+			// Create the encapsulating datfile
+			DatFile datfile = new DatFile()
+			{
+				Name = (String.IsNullOrWhiteSpace(name) ? "untitled" : name),
+				Description = description,
+			};
+
+			// Now run the D2D on the input and write out
+			// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+			datfile.PopulateFromDir(source, Hash.DeepHashes, true /* bare */, false /* archivesAsFiles */, SkipFileType.None, false /* addBlanks */,
+				false /* addDate */, _tmpdir, false /* copyFiles */, null /* headerToCheckAgainst */, true /* chdsAsFiles */);
+			datfile.Write(outDir: outdat);
 		}
 
 		/// <summary>
