@@ -334,24 +334,6 @@ namespace RombaSharp
 		}
 
 		/// <summary>
-		/// Moves DAT index entries for orphaned DATs to backup folder
-		/// </summary>
-		/// <param name="logOnly">Only write out actions to log</param>
-		private static void PurgeBackup(bool logOnly)
-		{
-			Globals.Logger.User("This feature is not yet implemented: purge-backup");
-		}
-
-		/// <summary>
-		/// Deletes DAT index entries for orphaned DATs
-		/// </summary>
-		/// <param name="logOnly">Only write out actions to log</param>
-		private static void PurgeDelete(bool logOnly)
-		{
-			Globals.Logger.User("This feature is not yet implemented: purge-delete");
-		}
-
-		/// <summary>
 		/// Populate or refresh the database information
 		/// </summary>
 		/// <remarks>This has no link between Dat and file at all...</remarks>

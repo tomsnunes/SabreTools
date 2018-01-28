@@ -529,7 +529,7 @@ namespace RombaSharp
 		/// <param name="depot">List of depots to scan files in, empty means all</param>
 		/// <param name="dats">List of DATs to use as the basis of scanning, empty means all</param>
 		/// <param name="logOnly">True if only the output of the operation is shown, false to actually run</param>
-		/// TODO: Verify implementation
+		/// TODO: Implement
 		private static void InitPurgeBackup(
 			string backup,
 			int workers,
@@ -538,8 +538,6 @@ namespace RombaSharp
 			bool logOnly)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: purge-backup");
-
-			PurgeBackup(logOnly);
 		}
 
 		/// <summary>
@@ -549,7 +547,7 @@ namespace RombaSharp
 		/// <param name="depot">List of depots to scan files in, empty means all</param>
 		/// <param name="dats">List of DATs to use as the basis of scanning, empty means all</param>
 		/// <param name="logOnly">True if only the output of the operation is shown, false to actually run</param>
-		/// TODO: Verify implementation
+		/// TODO: Implement
 		private static void InitPurgeDelete(
 			int workers,
 			List<string> depot,
@@ -557,8 +555,6 @@ namespace RombaSharp
 			bool logOnly)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: purge-delete");
-
-			PurgeDelete(logOnly);
 		}
 
 		/// <summary>
