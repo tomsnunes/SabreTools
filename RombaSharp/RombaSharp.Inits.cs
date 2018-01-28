@@ -25,8 +25,28 @@ namespace RombaSharp
 		/// </summary>
 		/// <param name="inputs">List of input folders to use</param>
 		/// <param name="onlyNeeded">True if only files in the database and don't exist are added, false otherwise</param>
-		private static void InitArchive(List<string> inputs, bool onlyNeeded)
+		/// <param name="resume">Resume a previously interrupted operation from the specified path</param>
+		/// <param name="includeZips">flag value == 1 means: add Zip files themselves into the depot in addition to their contents, flag value > 1 means add Zip files themselves but don't add content</param>
+		/// <param name="workers">How many workers to launch for the job, default from config</param>
+		/// <param name="includeGZips">flag value == 1 means: add GZip files themselves into the depot in addition to their contents, flag value > 1 means add GZip files themselves but don't add content</param>
+		/// <param name="include7Zips">flag value == 1 means: add 7Zip files themselves into the depot in addition to their contents, flag value > 1 means add 7Zip files themselves but don't add content</param>
+		/// <param name="skipInitialScan">True to skip the initial scan of the files to determine amount of work, false otherwise</param>
+		/// <param name="useGolangZip">True to use go zip implementation instead of zlib, false otherwise</param>
+		/// <param name="noDb">True to archive into depot but do not touch DB index and ignore only-needed flag, false otherwise</param>
+		private static void InitArchive(
+			List<string> inputs,
+			bool onlyNeeded,
+			string resume,
+			int includeZips,
+			int workers,
+			int includeGZips,
+			int include7Zips,
+			bool skipInitialScan,
+			bool useGolangZip,
+			bool noDb)
 		{
+			Globals.Logger.Error("This feature is not yet implemented: archive");
+
 			// First we want to get just all directories from the inputs
 			List<string> onlyDirs = new List<string>();
 			foreach (string input in inputs)
@@ -185,8 +205,18 @@ namespace RombaSharp
 		/// Wrap building all files from a set of DATs
 		/// </summary>
 		/// <param name="inputs">List of input DATs to rebuild from</param>
+		/// <param name="outdat">Output file</param>
+		/// <paran name="fixdatOnly">True to only fix dats and don't generate torrentzips, false otherwise</paran>
 		/// <param name="copy">True if files should be copied to output, false for rebuild</param>
-		private static void InitBuild(List<string> inputs, bool copy)
+		/// <param name="workers">How many workers to launch for the job, default from config</param>
+		/// <param name="subworkers">How many subworkers to launch for each worker, default from config</param>
+		private static void InitBuild(
+			List<string> inputs,
+			string outdat,
+			bool fixdatOnly,
+			bool copy,
+			int workers,
+			int subworkers)
 		{
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
@@ -223,74 +253,126 @@ namespace RombaSharp
 		}
 
 		/// <summary>
-		/// Wrap finding all files that are in both the database and a new Dat
+		/// Wrap cancelling a long-running job
 		/// </summary>
-		/// <param name="newdat"></param>
-		private static void InitDiffDat(string newdat)
+		private static void InitCancel()
 		{
-			Globals.Logger.User("This feature is not yet implemented: diffdat");
-
-			// First, we want to read in the DAT. Then for each file listed in the DAT, we check if it's in there or not.
-			// If it is in there, we add it to an output DAT. If it's not, we skip. Then we output the DAT.
+			Globals.Logger.Error("This feature is not yet implemented: cancel");
 		}
 
 		/// <summary>
-		/// Wrap creating a Dat from a directory
+		/// Wrap printing dat stats
 		/// </summary>
-		/// <param name="inputs"></param>
-		private static void InitDir2Dat(List<string> inputs)
+		/// <param name="inputs">List of input DATs to get stats from</param>
+		private static void InitDatStats(List<string> inputs)
 		{
-			// Create a simple Dat output
-			DatFile datdata = new DatFile()
-			{
-				FileName = Path.GetFileName(inputs[0]) + " Dir2Dat",
-				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
-				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
-				DatFormat = DatFormat.Logiqx,
-			};
+			Globals.Logger.Error("This feature is not yet implemented: datstats");
+		}
 
-			foreach (string input in inputs)
-			{
-				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				datdata.PopulateFromDir(input, Hash.DeepHashes /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-					SkipFileType.None, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
-					null /* headerToCheckAgainst */, true /* chdsAsFiles */);
-				datdata.Write();
-			}
+		/// <summary>
+		/// Wrap printing db stats
+		/// </summary>
+		private static void InitDbStats()
+		{
+			DisplayDBStats();
+		}
+
+		/// <summary>
+		/// Wrap creating a diffdat for a given old and new dat
+		/// </summary>
+		/// <param name="outdat">Output file</param>
+		/// <param name="old">Old DAT file</param>
+		/// <param name="newdat">New DAT file</param>
+		/// <param name="name">Name value in DAT header</param>
+		/// <param name="description">Description value in DAT header</param>
+		private static void InitDiffDat(
+			string outdat,
+			string old,
+			string newdat,
+			string name,
+			string description)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: diffdat");
+		}
+
+		/// <summary>
+		/// Wrap creating a dir2dat from a given source
+		/// </summary>
+		/// <param name="outdat">Output file</param>
+		/// <param name="source">Source directory</param>
+		/// <param name="name">Name value in DAT header</param>
+		/// <param name="description">Description value in DAT header</param>
+		private static void InitDir2Dat(
+			string outdat,
+			string source,
+			string name,
+			string description)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: dir2dat");
+		}
+
+		/// <summary>
+		/// Wrap creating a diffdat for a given old and new dat
+		/// </summary>
+		/// <param name="outdat">Output file</param>
+		/// <param name="old">Old DAT file</param>
+		/// <param name="newdat">New DAT file</param>
+		private static void InitEDiffDat(
+			string outdat,
+			string old,
+			string newdat)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: ediffdat");
+		}
+
+		/// <summary>
+		/// Wrap exporting the database to CSV
+		/// </summary>
+		private static void InitExport()
+		{
+			ExportDatabase();
 		}
 
 		/// <summary>
 		/// Wrap creating a fixdat for each Dat
 		/// </summary>
-		/// <param name="inputs"></param>
-		private static void InitFixdat(List<string> inputs)
+		/// <param name="inputs">List of input DATs to get fixdats for</param>
+		/// <param name="outdat">Output directory</param>
+		/// <paran name="fixdatOnly">True to only fix dats and don't generate torrentzips, false otherwise</paran>
+		/// <param name = "workers" > How many workers to launch for the job, default from config</param>
+		/// <param name="subworkers">How many subworkers to launch for each worker, default from config</param>
+		private static void InitFixdat(
+			List<string> inputs,
+			string outdat,
+			bool fixdatOnly,
+			int workers,
+			int subworkers)
 		{
-			Globals.Logger.User("This feature is not yet implemented: fixdat");
-
-			// Verify the filenames
-			Dictionary<string, string> foundDats = GetValidDats(inputs);
-
-			// Once we have each DAT, look up each associated hash based on the hash of the DATs.
-			// Then, for each rom, check to see if they exist in the folder. If they don't, add it
-			// to the fixDAT. Then output when the DAT is done, processing, moving on to the next...
-			// NOTE: This might share code with InitMiss
+			Globals.Logger.Error("This feature is not yet implemented: fixdat");
 		}
 
 		/// <summary>
 		/// Wrap importing CSVs into the database
 		/// </summary>
-		/// <param name="inputs"></param>
+		/// <param name="inputs">List of input CSV files to import information from</param>
 		private static void InitImport(List<string> inputs)
 		{
-			Globals.Logger.User("This feature is not yet implemented: import");
+			Globals.Logger.Error("This feature is not yet implemented: import");
 		}
 
 		/// <summary>
 		/// Wrap looking up if hashes exist in the database
 		/// </summary>
 		/// <param name="inputs">List of input strings representing hashes to check for</param>
-		private static void InitLookup(List<string> inputs)
+		/// <param name="size">Size to limit hash by, -1 otherwise</param>
+		/// <param name="outdat">Output directory</param>
+		private static void InitLookup(
+			List<string> inputs,
+			long size,
+			string outdat)
 		{
+			Globals.Logger.Error("This feature is not yet implemented: lookup");
+
 			// First, try to figure out what type of hash each is by length and clean it
 			List<string> crc = new List<string>();
 			List<string> md5 = new List<string>();
@@ -384,32 +466,129 @@ namespace RombaSharp
 		}
 
 		/// <summary>
+		/// Wrap printing memory stats
+		/// </summary>
+		private static void InitMemstats()
+		{
+			DisplayMemoryStats();
+		}
+
+		/// <summary>
 		/// Wrap merging an external depot into an existing one
 		/// </summary>
-		/// <param name="inputs"></param>
-		/// <param name="depotPath"></param>
-		/// <param name="onlyNeeded"></param>
-		private static void InitMerge(List<string> inputs, string depotPath, bool onlyNeeded)
+		/// <param name="inputs">List of input depots to merge in</param>
+		/// <param name="onlyNeeded">True if only files in the database and don't exist are added, false otherwise</param>
+		/// <param name="resume">Resume a previously interrupted operation from the specified path</param>
+		/// <param name="workers">How many workers to launch for the job, default from config</param>
+		/// <param name="skipInitialScan">True to skip the initial scan of the files to determine amount of work, false otherwise</param>
+		/// TODO: Add way of specifying "current depot" since that's what Romba relies on
+		private static void InitMerge(
+			List<string> inputs,
+			bool onlyNeeded,
+			string resume,
+			int workers,
+			bool skipInitialscan)
 		{
-			Globals.Logger.User("This feature is not yet implemented: merge");
+			Globals.Logger.Error("This feature is not yet implemented: merge");
 		}
 
 		/// <summary>
 		/// Wrap creating a havefile and a missfile for each Dat
 		/// </summary>
-		/// <param name="inputs"></param>
+		/// <param name="inputs">List of DAT files to get a miss and have for</param>
 		private static void InitMiss(List<string> inputs)
 		{
-			Globals.Logger.User("This feature is not yet implemented: miss");
+			Globals.Logger.Error("This feature is not yet implemented: miss");
+		}
 
-			// Verify the filenames
-			Dictionary<string, string> foundDats = GetValidDats(inputs);
+		/// <summary>
+		/// Wrap showing progress of currently running command
+		/// </summary>
+		private static void InitProgress()
+		{
+			Globals.Logger.Error("This feature is not yet implemented: progress");
+		}
 
-			// Once we have each DAT, look up each associated hash based on the hash of the DATs.
-			// Then, for each rom, check to see if they exist in the folder. If they do, add it
-			// to the have DAT, else wise go to the miss DAT. Then output both when the DAT is done
-			// processing, moving on to the next...
-			// NOTE: This might share code with InitFixdat
+		/// <summary>
+		/// Wrap backing up of no longer needed files from the depots
+		/// </summary>
+		/// <param name="backup">Backup directory where backup files are moved to</param>
+		/// <param name="workers">How many workers to launch for the job, default from config</param>
+		/// <param name="depot">List of depots to scan files in, empty means all</param>
+		/// <param name="dats">List of DATs to use as the basis of scanning, empty means all</param>
+		/// <param name="logOnly">True if only the output of the operation is shown, false to actually run</param>
+		private static void InitPurgeBackup(
+			string backup,
+			int workers,
+			List<string> depot,
+			List<string> dats,
+			bool logOnly)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: purge-backup");
+
+			PurgeBackup(logOnly);
+		}
+
+		/// <summary>
+		/// Wrap deleting of no longer needed files from the depots
+		/// </summary>
+		/// <param name="workers">How many workers to launch for the job, default from config</param>
+		/// <param name="depot">List of depots to scan files in, empty means all</param>
+		/// <param name="dats">List of DATs to use as the basis of scanning, empty means all</param>
+		/// <param name="logOnly">True if only the output of the operation is shown, false to actually run</param>
+		private static void InitPurgeDelete(
+			int workers,
+			List<string> depot,
+			List<string> dats,
+			bool logOnly)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: purge-delete");
+
+			PurgeDelete(logOnly);
+		}
+
+		/// <summary>
+		/// Wrap refreshing the database with potentially new dats
+		/// </summary>
+		/// <param name="workers">How many workers to launch for the job, default from config</param>
+		/// <param name="missingSha1s">Write paths of dats with missing sha1s into this file</param>
+		private static void InitRefreshDats(
+			int workers,
+			string missingSha1s)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: refresh-dats");
+
+			RefreshDatabase();
+		}
+
+		/// <summary>
+		/// Wrap rescanning depots
+		/// </summary>
+		/// <param name="inputs">List of depots to rescan, empty means all</param>
+		private static void InitRescanDepots(List<string> inputs)
+		{
+			Globals.Logger.Error("This feature is not yet implemented: rescan-depots");
+
+			foreach (string depot in inputs)
+			{
+				Rescan(depot);
+			}
+		}
+
+		/// <summary>
+		/// Wrap gracefully shutting down the server
+		/// </summary>
+		private static void InitShutdown()
+		{
+			Globals.Logger.Error("This feature is not yet implemented: shutdown");
+		}
+
+		/// <summary>
+		/// Wrap printing the version
+		/// </summary>
+		private static void InitVersion()
+		{
+			Globals.Logger.Error("This feature is not yet implemented: version");
 		}
 
 		#endregion

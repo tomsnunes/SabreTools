@@ -59,12 +59,24 @@ namespace RombaSharp
 			DatabaseTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 
 			// Create a new Help object for this program
-			_help = RetrieveHelp();
+			_help = RombaSharp.RetrieveHelp();
 
-			// If output is being redirected, don't allow clear screens
-			if (!Console.IsOutputRedirected)
+			// Get the location of the script tag, if it exists
+			int scriptLocation = (new List<string>(args)).IndexOf("--script");
+
+			// If output is being redirected or we are in script mode, don't allow clear screens
+			if (!Console.IsOutputRedirected && scriptLocation == -1)
 			{
 				Console.Clear();
+				Build.PrepareConsole("RombaSharp");
+			}
+
+			// Now we remove the script tag because it messes things up
+			if (scriptLocation > -1)
+			{
+				List<string> newargs = new List<string>(args);
+				newargs.RemoveAt(scriptLocation);
+				args = newargs.ToArray();
 			}
 
 			// Credits take precidence over all
@@ -85,13 +97,31 @@ namespace RombaSharp
 
 			// User flags
 			bool copy = false,
+				fixdatOnly = false,
 				logOnly = false,
-				onlyNeeded = false;
+				noDb = false,
+				onlyNeeded = false,
+				skipInitialScan = false,
+				useGolangZip = false;
 
 			// User inputs
-			string depotPath = "",
+			string backup = "",
+				description = "",
+				missingSha1s = "",
+				name = "",
 				newdat = "",
-				outdat = "";
+				old = "",
+				outdat = "",
+				resume = "",
+				source = "";
+			int include7Zips = 0,
+				includeGZips = 0,
+				includeZips = 0,
+				subworkers = 0,
+				workers = 0;
+			long size = -1;
+			List<string> dats = new List<string>();
+			List<string> depot = new List<string>();
 			List<string> inputs = new List<string>();
 
 			// Get the first argument as a feature flag
@@ -154,27 +184,102 @@ namespace RombaSharp
 				// Check all of the flag names and translate to arguments
 				switch (feat.Key)
 				{
-					// User flags
+					#region User Flags
+
 					case "copy":
 						copy = true;
+						break;
+					case "fixdatOnly":
+						fixdatOnly = true;
 						break;
 					case "log-only":
 						logOnly = true;
 						break;
+					case "no-db":
+						noDb = true;
+						break;
 					case "only-needed":
 						onlyNeeded = true;
 						break;
+					case "skip-initial-scan":
+						skipInitialScan = true;
+						break;
+					case "use-golang-zip":
+						useGolangZip = true;
+						break;
 
-					// User inputs
+					#endregion
+
+					#region User Int32 Inputs
+
+					case "include-7zips":
+						include7Zips = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 0;
+						break;
+					case "include-gzips":
+						includeGZips = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 0;
+						break;
+					case "include-zips":
+						includeZips = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 0;
+						break;
+					case "subworkers":
+						subworkers = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : _cores;
+						break;
+					case "workers":
+						workers = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : _cores;
+						break;
+
+					#endregion
+
+					#region User Int64 Inputs
+
+					case "size":
+						size = (long)feat.Value.GetValue() == Int64.MinValue ? (long)feat.Value.GetValue() : 0;
+						break;
+
+					#endregion
+
+					#region User List<string> Inputs
+
+					case "dats":
+						dats.AddRange((List<string>)feat.Value.GetValue());
+						break;
 					case "depot":
-						depotPath = (string)feat.Value.GetValue();
+						depot.AddRange((List<string>)feat.Value.GetValue());
+						break;
+
+					#endregion
+
+					#region User String Inputs
+
+					case "backup":
+						backup = (string)feat.Value.GetValue();
+						break;
+					case "description":
+						description = (string)feat.Value.GetValue();
+						break;
+					case "missingSha1s":
+						missingSha1s = (string)feat.Value.GetValue();
+						break;
+					case "name":
+						name = (string)feat.Value.GetValue();
 						break;
 					case "new":
 						newdat = (string)feat.Value.GetValue();
 						break;
+					case "old":
+						old = (string)feat.Value.GetValue();
+						break;
 					case "out":
 						outdat = (string)feat.Value.GetValue();
 						break;
+					case "resume":
+						resume = (string)feat.Value.GetValue();
+						break;
+					case "source":
+						source = (string)feat.Value.GetValue();
+						break;
+
+					#endregion
 				}
 			}
 
@@ -187,44 +292,48 @@ namespace RombaSharp
 				// Adds ROM files from the specified directories to the ROM archive
 				case "Archive":
 					VerifyInputs(inputs, feature);
-					InitArchive(inputs, onlyNeeded);
+					InitArchive(inputs, onlyNeeded, resume, includeZips, workers, includeGZips, include7Zips, skipInitialScan, useGolangZip, noDb);
 					break;
 				// For each specified DAT file it creates the torrentzip files
 				case "Build":
 					VerifyInputs(inputs, feature);
-					InitBuild(inputs, copy);
+					InitBuild(inputs, outdat, fixdatOnly, copy, workers, subworkers);
+					break;
+				// Cancels current long-running job
+				case "Cancel":
+					InitCancel();
+					break;
+				// Prints dat stats
+				case "DatStats":
+					VerifyInputs(inputs, feature);
+					InitDatStats(inputs);
 					break;
 				// Prints db stats
-				case "Stats":
-					DisplayDBStats();
+				case "DbStats":
+					InitDbStats();
 					break;
-				// Rescan a specific depot
-				case "Rescan Depots":
-					VerifyInputs(inputs, feature);
-					foreach (string input in inputs)
-					{
-						Rescan(input);
-					}
-					break;
-				// Creates a DAT file with those entries that are in new DAT
+				// Creates a DAT file with those entries that are in -new DAT
 				case "Diffdat":
-					InitDiffDat(newdat);
+					InitDiffDat(outdat, old, newdat, name, description);
 					break;
-				// Creates a DAT file for the specified input directory
+				// Creates a DAT file for the specified input directory and saves it to the -out filename
 				case "Dir2Dat":
-					VerifyInputs(inputs, feature);
-					InitDir2Dat(inputs);
+					InitDir2Dat(outdat, source, name, description);
 					break;
-				// Export the database to file
+				// Creates a DAT file with those entries that are in -new DAT
+				case "EDiffdat":
+					InitEDiffDat(outdat, old, newdat);
+					break;
+				// Exports db to export.csv
 				case "Export":
-					ExportDatabase();
+					InitExport();
 					break;
 				// For each specified DAT file it creates a fix DAT
 				case "Fixdat":
 					VerifyInputs(inputs, feature);
-					InitFixdat(inputs);
+					InitFixdat(inputs, outdat, fixdatOnly, workers, subworkers);
 					break;
-				// Import a CSV into the database
+				// Import a database from a formatted CSV file
 				case "Import":
 					VerifyInputs(inputs, feature);
 					InitImport(inputs);
@@ -232,41 +341,52 @@ namespace RombaSharp
 				// For each specified hash it looks up any available information
 				case "Lookup":
 					VerifyInputs(inputs, feature);
-					InitLookup(inputs);
+					InitLookup(inputs, size, outdat);
 					break;
 				// Prints memory stats
 				case "Memstats":
-					DisplayMemoryStats();
+					InitMemstats();
 					break;
-				// Merges depots
+				// Merges depot
 				case "Merge":
 					VerifyInputs(inputs, feature);
-					InitMerge(inputs, depotPath, onlyNeeded);
+					InitMerge(inputs, onlyNeeded, resume, workers, skipInitialScan);
 					break;
-				// For each specified DAT file it creates a miss file and a have file
+				// Create miss and have file
 				case "Miss":
 					VerifyInputs(inputs, feature);
 					InitMiss(inputs);
 					break;
+				// Shows progress of the currently running command
+				case "Progress":
+					InitProgress();
+					break;
 				// Moves DAT index entries for orphaned DATs
 				case "Purge Backup":
-					PurgeBackup(logOnly);
+					InitPurgeBackup(backup, workers, depot, dats, logOnly);
 					break;
 				// Deletes DAT index entries for orphaned DATs
 				case "Purge Delete":
-					PurgeDelete(logOnly);
+					InitPurgeDelete(workers, depot, dats, logOnly);
 					break;
 				// Refreshes the DAT index from the files in the DAT master directory tree
 				case "Refresh DATs":
-					RefreshDatabase();
+					InitRefreshDats(workers, missingSha1s);
 					break;
-				// Shows progress of the currently running command
-				case "Progress":
-					Globals.Logger.User("This feature is not used in RombaSharp: progress");
+				// Rescan a specific depot
+				case "Rescan Depots":
+					VerifyInputs(inputs, feature);
+					InitRescanDepots(inputs);
 					break;
+				// Gracefully shuts down server
 				case "Shutdown":
-					Globals.Logger.User("This feature is not used in RombaSharp: shutdown");
+					InitShutdown();
 					break;
+				// Prints version
+				case "Version":
+					InitVersion();
+					break;
+				// If nothing is set, show the help
 				default:
 					_help.OutputGenericHelp();
 					break;

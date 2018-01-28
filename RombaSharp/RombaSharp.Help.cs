@@ -9,6 +9,17 @@ namespace RombaSharp
 	{
 		#region Private Flag features
 
+		private static Feature copyFlag
+		{
+			get
+			{
+				return new Feature(
+					"copy",
+					"-copy",
+					"Copy files to output instead of rebuilding",
+					FeatureType.Flag);
+			}
+		} // Unique to RombaSharp
 		private static Feature fixdatOnlyFlag
 		{
 			get
@@ -30,7 +41,7 @@ namespace RombaSharp
 				"Only write out actions to log",
 				FeatureType.Flag);
 			}
-		} // Unique to RombaSharp
+		}
 		private static Feature noDbFlag
 		{
 			get
@@ -308,6 +319,17 @@ namespace RombaSharp
 
 			#endregion
 
+			#region Script
+
+			Feature script = new Feature(
+				"Script",
+				"--script",
+				"Enable script mode (no clear screen)",
+				FeatureType.Flag,
+				longDescription: "For times when RombaSharp is being used in a scripted environment, the user may not want the screen to be cleared every time that it is called. This flag allows the user to skip clearing the screen on run just like if the console was being redirected.");
+
+			#endregion
+
 			#region Archive
 
 			Feature archive = new Feature(
@@ -345,6 +367,7 @@ output dir. The files will be placed in the specified location using a folder
 structure according to the original DAT master directory tree structure.");
 			build.AddFeature(outStringInput);
 			build.AddFeature(fixdatOnlyFlag);
+			build.AddFeature(copyFlag);
 			build.AddFeature(workersInt32Input);
 			build.AddFeature(subworkersInt32Input);
 
@@ -560,6 +583,9 @@ structure. It also deletes the specified DATs from the DAT index.");
 				"purge-delete",
 				"Deletes DAT index entries for orphaned DATs",
 				FeatureType.Flag);
+			purgeDelete.AddFeature(workersInt32Input);
+			purgeDelete.AddFeature(depotListStringInput);
+			purgeDelete.AddFeature(datsListStringInput);
 			purgeDelete.AddFeature(logOnlyFlag);
 
 			#endregion
@@ -615,6 +641,7 @@ contents of any changed dats.");
 
 			// Now, add all of the main features to the Help object
 			help.Add(helpFeature);
+			help.Add(script);
 			help.Add(archive);
 			help.Add(build);
 			help.Add(cancel);
