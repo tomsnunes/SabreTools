@@ -33,6 +33,7 @@ namespace RombaSharp
 		/// <param name="skipInitialScan">True to skip the initial scan of the files to determine amount of work, false otherwise</param>
 		/// <param name="useGolangZip">True to use go zip implementation instead of zlib, false otherwise</param>
 		/// <param name="noDb">True to archive into depot but do not touch DB index and ignore only-needed flag, false otherwise</param>
+		/// TODO: Verify implementation
 		private static void InitArchive(
 			List<string> inputs,
 			bool onlyNeeded,
@@ -210,6 +211,7 @@ namespace RombaSharp
 		/// <param name="copy">True if files should be copied to output, false for rebuild</param>
 		/// <param name="workers">How many workers to launch for the job, default from config</param>
 		/// <param name="subworkers">How many subworkers to launch for each worker, default from config</param>
+		/// TODO: Verify implementation
 		private static void InitBuild(
 			List<string> inputs,
 			string outdat,
@@ -264,6 +266,7 @@ namespace RombaSharp
 		/// Wrap printing dat stats
 		/// </summary>
 		/// <param name="inputs">List of input DATs to get stats from</param>
+		/// TODO: Verify implementation
 		private static void InitDatStats(List<string> inputs)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: datstats");
@@ -285,6 +288,7 @@ namespace RombaSharp
 		/// <param name="newdat">New DAT file</param>
 		/// <param name="name">Name value in DAT header</param>
 		/// <param name="description">Description value in DAT header</param>
+		/// TODO: Implement
 		private static void InitDiffDat(
 			string outdat,
 			string old,
@@ -302,6 +306,7 @@ namespace RombaSharp
 		/// <param name="source">Source directory</param>
 		/// <param name="name">Name value in DAT header</param>
 		/// <param name="description">Description value in DAT header</param>
+		/// TODO: Implement
 		private static void InitDir2Dat(
 			string outdat,
 			string source,
@@ -317,6 +322,7 @@ namespace RombaSharp
 		/// <param name="outdat">Output file</param>
 		/// <param name="old">Old DAT file</param>
 		/// <param name="newdat">New DAT file</param>
+		/// TODO: Implement
 		private static void InitEDiffDat(
 			string outdat,
 			string old,
@@ -328,6 +334,7 @@ namespace RombaSharp
 		/// <summary>
 		/// Wrap exporting the database to CSV
 		/// </summary>
+		/// TODO: Verify implementation
 		private static void InitExport()
 		{
 			ExportDatabase();
@@ -341,6 +348,7 @@ namespace RombaSharp
 		/// <paran name="fixdatOnly">True to only fix dats and don't generate torrentzips, false otherwise</paran>
 		/// <param name = "workers" > How many workers to launch for the job, default from config</param>
 		/// <param name="subworkers">How many subworkers to launch for each worker, default from config</param>
+		/// TODO: Implement
 		private static void InitFixdat(
 			List<string> inputs,
 			string outdat,
@@ -355,6 +363,7 @@ namespace RombaSharp
 		/// Wrap importing CSVs into the database
 		/// </summary>
 		/// <param name="inputs">List of input CSV files to import information from</param>
+		/// TODO: Implement
 		private static void InitImport(List<string> inputs)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: import");
@@ -366,6 +375,7 @@ namespace RombaSharp
 		/// <param name="inputs">List of input strings representing hashes to check for</param>
 		/// <param name="size">Size to limit hash by, -1 otherwise</param>
 		/// <param name="outdat">Output directory</param>
+		/// TODO: Verify implementation
 		private static void InitLookup(
 			List<string> inputs,
 			long size,
@@ -482,6 +492,7 @@ namespace RombaSharp
 		/// <param name="workers">How many workers to launch for the job, default from config</param>
 		/// <param name="skipInitialScan">True to skip the initial scan of the files to determine amount of work, false otherwise</param>
 		/// TODO: Add way of specifying "current depot" since that's what Romba relies on
+		/// TODO: Implement
 		private static void InitMerge(
 			List<string> inputs,
 			bool onlyNeeded,
@@ -495,7 +506,8 @@ namespace RombaSharp
 		/// <summary>
 		/// Wrap creating a havefile and a missfile for each Dat
 		/// </summary>
-		/// <param name="inputs">List of DAT files to get a miss and have for</param>
+		/// <param name="inputs">List of DAT files to get a miss and have for, empty means all</param>
+		/// TODO: Implement
 		private static void InitMiss(List<string> inputs)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: miss");
@@ -517,6 +529,7 @@ namespace RombaSharp
 		/// <param name="depot">List of depots to scan files in, empty means all</param>
 		/// <param name="dats">List of DATs to use as the basis of scanning, empty means all</param>
 		/// <param name="logOnly">True if only the output of the operation is shown, false to actually run</param>
+		/// TODO: Verify implementation
 		private static void InitPurgeBackup(
 			string backup,
 			int workers,
@@ -536,6 +549,7 @@ namespace RombaSharp
 		/// <param name="depot">List of depots to scan files in, empty means all</param>
 		/// <param name="dats">List of DATs to use as the basis of scanning, empty means all</param>
 		/// <param name="logOnly">True if only the output of the operation is shown, false to actually run</param>
+		/// TODO: Verify implementation
 		private static void InitPurgeDelete(
 			int workers,
 			List<string> depot,
@@ -552,6 +566,7 @@ namespace RombaSharp
 		/// </summary>
 		/// <param name="workers">How many workers to launch for the job, default from config</param>
 		/// <param name="missingSha1s">Write paths of dats with missing sha1s into this file</param>
+		/// TODO: Verify implementation
 		private static void InitRefreshDats(
 			int workers,
 			string missingSha1s)
@@ -565,6 +580,7 @@ namespace RombaSharp
 		/// Wrap rescanning depots
 		/// </summary>
 		/// <param name="inputs">List of depots to rescan, empty means all</param>
+		/// TODO: Verify implementation
 		private static void InitRescanDepots(List<string> inputs)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: rescan-depots");
