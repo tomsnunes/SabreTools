@@ -289,7 +289,6 @@ namespace RombaSharp
 		/// <param name="newdat">New DAT file</param>
 		/// <param name="name">Name value in DAT header</param>
 		/// <param name="description">Description value in DAT header</param>
-		/// TODO: Implement
 		private static void InitDiffDat(
 			string outdat,
 			string old,
@@ -297,7 +296,38 @@ namespace RombaSharp
 			string name,
 			string description)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: diffdat");
+			// Ensure the output directory
+			Utilities.EnsureOutputDirectory(outdat, create: true);
+
+			// Check that all required files exist
+			if (!File.Exists(old))
+			{
+				Globals.Logger.Error("File '{0}' does not exist!", old);
+				return;
+			}
+			if (!File.Exists(newdat))
+			{
+				Globals.Logger.Error("File '{0}' does not exist!", newdat);
+				return;
+			}
+
+			// Create the encapsulating datfile
+			DatFile datfile = new DatFile()
+			{
+				Name = name,
+				Description = description,
+			};
+
+			// Create the inputs
+			List<string> dats = new List<string>();
+			dats.Add(newdat);
+			List<string> basedats = new List<string>();
+			basedats.Add(old);
+
+			// Now run the diff on the inputs
+			datfile.DetermineUpdateType(dats, basedats, outdat, UpdateMode.DiffAgainst, false /* inplace */, false /* skip */,
+				true /* bare */, false /* clean */, false /* remUnicode */, false /* descAsName */, new Filter(), SplitType.None,
+				ReplaceMode.None, false /* onlySame */);
 		}
 
 		/// <summary>
@@ -323,13 +353,39 @@ namespace RombaSharp
 		/// <param name="outdat">Output file</param>
 		/// <param name="old">Old DAT file</param>
 		/// <param name="newdat">New DAT file</param>
-		/// TODO: Implement
 		private static void InitEDiffDat(
 			string outdat,
 			string old,
 			string newdat)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: ediffdat");
+			// Ensure the output directory
+			Utilities.EnsureOutputDirectory(outdat, create: true);
+
+			// Check that all required files exist
+			if (!File.Exists(old))
+			{
+				Globals.Logger.Error("File '{0}' does not exist!", old);
+				return;
+			}
+			if (!File.Exists(newdat))
+			{
+				Globals.Logger.Error("File '{0}' does not exist!", newdat);
+				return;
+			}
+
+			// Create the encapsulating datfile
+			DatFile datfile = new DatFile();
+
+			// Create the inputs
+			List<string> dats = new List<string>();
+			dats.Add(newdat);
+			List<string> basedats = new List<string>();
+			basedats.Add(old);
+
+			// Now run the diff on the inputs
+			datfile.DetermineUpdateType(dats, basedats, outdat, UpdateMode.DiffAgainst, false /* inplace */, false /* skip */,
+				true /* bare */, false /* clean */, false /* remUnicode */, false /* descAsName */, new Filter(), SplitType.None,
+				ReplaceMode.None, false /* onlySame */);
 		}
 
 		/// <summary>
