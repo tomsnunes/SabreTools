@@ -95,7 +95,10 @@ namespace SabreTools
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
 		/// <param name="nostore">True if headers should not be stored in the database, false otherwise</param>
-		private static void InitExtractRemoveHeader(List<string> inputs, string outDir, bool nostore)
+		private static void InitExtractRemoveHeader(
+			List<string> inputs,
+			string outDir,
+			bool nostore)
 		{
 			// Get only files from the inputs
 			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
@@ -111,7 +114,9 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
-		private static void InitReplaceHeader(List<string> inputs, string outDir)
+		private static void InitReplaceHeader(
+			List<string> inputs,
+			string outDir)
 		{
 			// Get only files from the inputs
 			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
@@ -143,9 +148,25 @@ namespace SabreTools
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
-		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, bool depot, bool quickScan, bool date, bool delete,
-			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
-			SplitType splitType, bool chdsAsFiles)
+		private static void InitSort(
+			List<string> datfiles,
+			List<string> inputs,
+			string outDir,
+			bool depot,
+			bool quickScan,
+			bool date,
+			bool delete,
+			bool inverse,
+			OutputFormat outputFormat,
+			bool romba,
+			int sevenzip,
+			int gz,
+			int rar,
+			int zip,
+			bool updateDat,
+			string headerToCheckAgainst,
+			SplitType splitType,
+			bool chdsAsFiles)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -190,8 +211,17 @@ namespace SabreTools
 		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
 		/// <param name="radix">Long value representing the split point (Size Split only)</param>
-		private static void InitSplit(List<string> inputs, string outDir, bool inplace, DatFormat datFormat,
-			SplittingMode splittingMode, List<string> exta, List<string> extb, bool shortname, bool basedat, long radix)
+		private static void InitSplit(
+			List<string> inputs,
+			string outDir,
+			bool inplace,
+			DatFormat datFormat,
+			SplittingMode splittingMode,
+			List<string> exta,
+			List<string> extb,
+			bool shortname,
+			bool basedat,
+			long radix)
 		{
 			DatFile datfile = new DatFile();
 			datfile.DatFormat = datFormat;
@@ -208,7 +238,13 @@ namespace SabreTools
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statDatFormat">Set the statistics output format to use</param>
-		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol,
+		private static void InitStats(
+			List<string> inputs,
+			string filename,
+			string outDir,
+			bool single,
+			bool baddumpCol,
+			bool nodumpCol,
 			StatReportFormat statDatFormat)
 		{
 			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat);
@@ -327,8 +363,15 @@ namespace SabreTools
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
-		private static void InitVerify(List<string> datfiles, List<string> inputs, bool depot, bool hashOnly, bool quickScan,
-			string headerToCheckAgainst, SplitType splitType, bool chdsAsFiles)
+		private static void InitVerify(
+			List<string> datfiles,
+			List<string> inputs,
+			bool depot,
+			bool hashOnly,
+			bool quickScan,
+			string headerToCheckAgainst,
+			SplitType splitType,
+			bool chdsAsFiles)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
