@@ -4694,6 +4694,7 @@ namespace SabreTools.Library.DatFiles
 			FileName = "fixDAT_" + FileName;
 			Name = "fixDAT_" + Name;
 			Description = "fixDAT_" + Description;
+			RemoveMarkedItems();
 			Write();
 
 			return success;
@@ -4770,6 +4771,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Now output the fixdat to the main folder
+			RemoveMarkedItems();
 			success &= matched.Write(stats: true);
 
 			return success;
