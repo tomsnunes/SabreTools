@@ -696,8 +696,6 @@ namespace RombaSharp
 			int workers,
 			string missingSha1s)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: refresh-dats");
-
 			// Make sure the db is set
 			if (String.IsNullOrWhiteSpace(_db))
 			{
@@ -716,6 +714,8 @@ namespace RombaSharp
 			{
 				_dats = "dats";
 			}
+
+			_dats = Path.Combine(Globals.ExeDir, _dats);
 
 			// Make sure the folder exists
 			if (!Directory.Exists(_dats))
