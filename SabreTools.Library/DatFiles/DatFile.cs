@@ -3279,11 +3279,6 @@ namespace SabreTools.Library.DatFiles
 		/// <returns>The key for the item</returns>
 		public string ParseAddHelper(DatItem item, bool clean, bool remUnicode)
 		{
-			if (item.Name == "3DMaze/WINDOWS/TEMP/")
-			{
-				Console.WriteLine();
-			}
-
 			string key = "";
 
 			// If there's no name in the rom, we log and skip it
