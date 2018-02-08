@@ -778,7 +778,7 @@ namespace RombaSharp
 
 			foreach (string dathash in unneeded)
 			{
-				query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
+				query = "DELETE FROM dat WHERE hash=\"" + dathash + "\"";
 				slc = new SqliteCommand(query, dbc);
 				slc.ExecuteNonQuery();
 				slc.Dispose();
