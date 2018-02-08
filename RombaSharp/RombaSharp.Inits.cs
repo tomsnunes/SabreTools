@@ -46,8 +46,6 @@ namespace RombaSharp
 			bool useGolangZip,
 			bool noDb)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: archive");
-
 			// First we want to get just all directories from the inputs
 			List<string> onlyDirs = new List<string>();
 			foreach (string input in inputs)
@@ -190,7 +188,7 @@ namespace RombaSharp
 			}
 
 			// Create the sorting object to use and rebuild the needed files
-			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
+			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(2, 2, 2, 2);
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
 				null /*headerToCheckAgainst*/, true /* chdsAsFiles */);
