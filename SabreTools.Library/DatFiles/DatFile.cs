@@ -3279,19 +3279,17 @@ namespace SabreTools.Library.DatFiles
 		/// <returns>The key for the item</returns>
 		public string ParseAddHelper(DatItem item, bool clean, bool remUnicode)
 		{
+			if (item.Name == "3DMaze/WINDOWS/TEMP/")
+			{
+				Console.WriteLine();
+			}
+
 			string key = "";
 
 			// If there's no name in the rom, we log and skip it
 			if (item.Name == null)
 			{
 				Globals.Logger.Warning("{0}: Rom with no name found! Skipping...", FileName);
-				return key;
-			}
-
-			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
-			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
-			{
-				Globals.Logger.Warning("{0}: Rom ending with directory separator found: '{1}'. Skipping...", FileName, item.Name);
 				return key;
 			}
 
