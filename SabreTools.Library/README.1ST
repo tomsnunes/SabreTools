@@ -915,111 +915,118 @@ Options:
 		  -b, --no-automatic-date	 Don't include date in file name
 			  Normally, the DAT will be created with the date in the file name
 			  in brackets. This flag removes that instead of the default.
-	  -di, --diff				 Create diffdats from inputs (all outputs)
-		  By default, all DATs are processed individually with the
-		  user-specified flags. With this flag enabled, input DATs are diffed
-		  against each other in all ways specified by the --diff-X flags.
 
-		  -ag, --against			  Diff all inputs against a set of base DATs
-			  This flag will enable a special type of diffing in which a set of
-			  base DATs are used as a comparison point for each of the input
-			  DATs. This allows users to get a slightly different output to
-			  cascaded diffing, which may be more useful in some cases. This is
-			  heavily influenced by the diffing model used by Romba.
+      -di, --diff-all             Create diffdats from inputs (all standard outputs)
+          By default, all DATs are processed individually with the
+          user-specified flags. With this flag enabled, input DATs are diffed
+          against each other to find duplicates, no duplicates, and only in
+          individuals.
 
-			  -bd, --base-dat			 Add a base DAT for processing
-				  Add a DAT or folder of DATs to the base set to be used for
-				  all operations. Multiple instances of this flag are allowed.
+          -b, --no-automatic-date     Don't include date in file name
+              Normally, the DAT will be created with the date in the file name
+              in brackets. This flag removes that instead of the default.
 
-		  -b, --no-automatic-date	 Don't include date in file name
-			  Normally, the DAT will be created with the date in the file name
-			  in brackets. This flag removes that instead of the default.
+      -did, --diff-duplicates     Create diffdat containing just duplicates
+          All files that have duplicates outside of the original DAT are
+          included.
 
-		  -c, --cascade			   Enable cascaded diffing
-			  This flag allows for a special type of diffing in which the first
-			  DAT is considered a base, and for each additional input DAT, it
-			  only leaves the files that are not in one of the previous DATs.
-			  This can allow for the creation of rollback sets or even just
-			  reduce the amount of duplicates across multiple sets.
+          -b, --no-automatic-date     Don't include date in file name
+              Normally, the DAT will be created with the date in the file name
+              in brackets. This flag removes that instead of the default.
 
-		  -rc, --reverse-cascade	  Enable reverse cascaded diffing
-			  This flag allows for a special type of diffing in which the last
-			  DAT is considered a base, and for each additional input DAT, it
-			  only leaves the files that are not in one of the previous DATs.
-			  This can allow for the creation of rollback sets or even just
-			  reduce the amount of duplicates across multiple sets.
+      -dii, --diff-individuals    Create diffdats for individual DATs
+          All files that have no duplicates outside of the original DATs are
+          put into DATs that are named after the source DAT.
 
-			  -sf, --skip-first-output	Skip output of first DAT
-				  In times where the first DAT does not need to be written out
-				  a second time, this will skip writing it. This can often
-				  speed up the output process.
-				  [Both Cascade and Reverse Cascade]
+          -b, --no-automatic-date     Don't include date in file name
+              Normally, the DAT will be created with the date in the file name
+              in brackets. This flag removes that instead of the default.
 
-	  -did, --diff-du			 Create diffdat containing just duplicates
-		  All files that have duplicates outside of the original DAT are
-		  included.
+      -din, --diff-no-duplicates  Create diffdat containing no duplicates
+          All files that have no duplicates outside of the original DATs are
+          included.
 
-	  -dii, --diff-in			 Create diffdats for individual DATs
-		  All files that have no duplicates outside of the original DATs are
-		  put into DATs that are named after the source DAT.
+          -b, --no-automatic-date     Don't include date in file name
+              Normally, the DAT will be created with the date in the file name
+              in brackets. This flag removes that instead of the default.
 
-	  -din, --diff-nd			 Create diffdat containing no duplicates
-		  All files that have no duplicates outside of the original DATs are
-		  included.
+      -dag, --diff-against        Diff all inputs against a set of base DATs
+          This flag will enable a special type of diffing in which a set of
+          base DATs are used as a comparison point for each of the input DATs.
+          This allows users to get a slightly different output to cascaded
+          diffing, which may be more useful in some cases. This is heavily
+          influenced by the diffing model used by Romba.
 
-		  -b, --no-automatic-date	 Don't include date in file name
-			  Normally, the DAT will be created with the date in the file name
-			  in brackets. This flag removes that instead of the default.
-			  [All 3 diff-X flags]
+          -bd, --base-dat             Add a base DAT for processing
+              Add a DAT or folder of DATs to the base set to be used for all
+              operations. Multiple instances of this flag are allowed.
 
-	  -br, --base-replace		 Replace from base DATs in order
-		  By default, no item names are changed except when there is a merge
-		  occurring. This flag enables users to define a DAT or set of base
-		  DATs to use as "replacements" for all input DATs. Note that the first
-		  found instance of an item in the base DAT(s) will be used and all
-		  others will be discarded. If no additional flag is given, it will
-		  default to updating names.
-		
-	  -rbr, --reverse-base-replace Replace item names from base DATs in reverse
-		  By default, no item names are changed except when there is a merge
-		  occurring. This flag enables users to define a DAT or set of base
-		  DATs to use as "replacements" for all input DATs. Note that the first
-		  found instance of an item in the last base DAT(s) will be used and
-		  all others will be discarded. If no additional flag is given, it will
-		  default to updating names.
+      -br, --base-replace         Replace from base DATs in order
+          By default, no item names are changed except when there is a merge
+          occurring. This flag enables users to define a DAT or set of base
+          DATs to use as "replacements" for all input DATs. Note that the
+          first found instance of an item in the base DAT(s) will be used and
+          all others will be discarded. If no additional flag is given, it
+          will default to updating names.
 
-		  -bd, --base-dat			 Add a base DAT for processing
-			  Add a DAT or folder of DATs to the base set to be used for all
-			  operations. Multiple instances of this flag are allowed.
-			  [Both Base Replace and Reverse Base Replace]
+      -rbr, --reverse-base-replace Replace item names from base DATs in reverse
+          By default, no item names are changed except when there is a merge
+          occurring. This flag enables users to define a DAT or set of base
+          DATs to use as "replacements" for all input DATs. Note that the
+          first found instance of an item in the last base DAT(s) will be used
+          and all others will be discarded. If no additional flag is given, it
+          will default to updating names.
 
-		  -un, --update-names		 Update item names from base DATs
-			  This flag enables updating of item names from base DATs.
-			  [Both Base Replace and Reverse Base Replace]
+          -bd, --base-dat             Add a base DAT for processing
+              Add a DAT or folder of DATs to the base set to be used for all
+              operations. Multiple instances of this flag are allowed.
+			  [Both base-replace and reverse-base-replace]
 
-		  -uh, --update-hashes		Update hashes from base DATs
-			  This flag enables updating of hashes from base DATs.
-			  [Both Base Replace and Reverse Base Replace]
+          -un, --update-names         Update item names from base DATs
+              This flag enables updating of item names from base DATs.
+			  [Both base-replace and reverse-base-replace]
 
-		  -udd, --update-description  Update machine descriptions from base DATs
-			  This flag enables updating of machine descriptions from base
-			  DATs.
-			  [Both Base Replace and Reverse Base Replace]
+          -uh, --update-hashes        Update hashes from base DATs
+              This flag enables updating of hashes from base DATs.
+			  [Both base-replace and reverse-base-replace]
 
-			  -ons, --only-same		   Only update description if machine name matches description
-				  Normally, updating the description will always overwrite if
-				  the machine names are the same. With this flag, descriptions
-				  will only be overwritten if they are the same as the machine
-				  names.
+          -udd, --update-description  Update machine descriptions from base DATs
+              This flag enables updating of machine descriptions from base
+              DATs. [Both base-replace and reverse-base-replace]
 
-		  -uy, --update-year		  Update machine years from base DATs
-			  This flag enables updating of machine years from base DATs.
-			  [Both Base Replace and Reverse Base Replace]
+              -ons, --only-same           Only update description if machine name matches description
+                  Normally, updating the description will always overwrite if
+                  the machine names are the same. With this flag, descriptions
+                  will only be overwritten if they are the same as the machine
+                  names.
 
-		  -um, --update-manufacturer  Update machine manufacturers from base DATs
-			  This flag enables updating of machine manufacturers from base
-			  DATs.
-			  [Both Base Replace and Reverse Base Replace]
+          -uy, --update-year          Update machine years from base DATs
+              This flag enables updating of machine years from base DATs.
+			 [Both base-replace and reverse-base-replace]
+
+          -um, --update-manufacturer  Update machine manufacturers from base DATs
+              This flag enables updating of machine manufacturers from base
+              DATs. [Both base-replace and reverse-base-replace]
+
+      -dc, --diff-cascade         Enable cascaded diffing
+          This flag allows for a special type of diffing in which the first
+          DAT is considered a base, and for each additional input DAT, it only
+          leaves the files that are not in one of the previous DATs. This can
+          allow for the creation of rollback sets or even just reduce the
+          amount of duplicates across multiple sets.
+
+      -drc, --diff-reverse-cascade Enable reverse cascaded diffing
+          This flag allows for a special type of diffing in which the last DAT
+          is considered a base, and for each additional input DAT, it only
+          leaves the files that are not in one of the previous DATs. This can
+          allow for the creation of rollback sets or even just reduce the
+          amount of duplicates across multiple sets. [Both diff-cascade and
+		  diff-reverse-cascade]
+
+          -sf, --skip-first-output    Skip output of first DAT
+              In times where the first DAT does not need to be written out a
+              second time, this will skip writing it. This can often speed up
+              the output process.
 
 	  -gn, --game-name			Filter by game name
 		  Include only items with this game name in the output. Additionally,
@@ -1313,10 +1320,10 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 	files in the same set.
 	
 	Long form:
-		SabreTools.exe --update --diff --against --base-dat="Path\To\Base" InDr
+		SabreTools.exe --update --diff-against --base-dat="Path\To\Base" InDr
 		
 	Short form:
-		SabreTools.exe -ud -di -ag -bd="Path\To\Base" InDr
+		SabreTools.exe -ud -dag -bd="Path\To\Base" InDr
 
 ** Section 4.0 - Contributors
 
@@ -1349,12 +1356,18 @@ This section contains remappings from old flag names to new ones for the purpose
 
 -ab, --add-blank -> -ab, --add-blank-files
 -ae, --add-ext -> -ae, --add-extension
+-ag, --against -> -dag, --diff-against
 -b, --bare -> -b, --no-automatic-date
 -bc, --baddump-col -> -bc, --baddump-column
+-c, --cascade -> -dc, --diff-cascade
 -c, --cat -> -c, --category
 -dan, --desc-name -> -dan, --description-as-name
 -de, --desc -> -de, --description
 -df, --dat-fullnonmerged -> -df, --dat-full-non-merged
+-di, --diff -> -di, --diff-all
+-did, --diff-du -> -did, --diff-duplicates
+-din, --diff-in -> -din, --diff-individuals
+-dnd, --diff-nd -> -dnd, --diff-no-duplicates
 -dnd, --dat-devnonmerged -> -dnd, --dat-device-non-merged
 -dnm, --dat-nonmerged -> -dnm, --dat-non-merged
 -es, --ext -> -es, --extension
@@ -1405,7 +1418,8 @@ This section contains remappings from old flag names to new ones for the purpose
 -otsv, --output-tsv -> -ot=tsv, --output-type=tsv
 -ox, --output-xml -> -ot=xml, --output-type=logiqx
 -out, --out -> -out, --output-dir
--rc, --rev-cascade -> -rc, --reverse-cascade
+-rc, --rev-cascade -> -drc, --diff-reverse-cascade
+-rc, --reverse-cascade -> -drc, --diff-reverse-cascade
 -rep, --rep-ext -> -rep, --replace-extension
 -rmd5, --rem-md5 -> -rmd5, --remove-md5
 -rme, --rem-ext -> -rme, --remove-extensions

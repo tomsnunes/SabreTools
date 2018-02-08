@@ -204,9 +204,6 @@ namespace SabreTools
 					case "add-date":
 						addFileDates = true;
 						break;
-					case "against":
-						updateMode |= UpdateMode.DiffAgainst;
-						break;
 					case "all-stats":
 						statDatFormat = StatReportFormat.All;
 						break;
@@ -221,9 +218,6 @@ namespace SabreTools
 						break;
 					case "base-replace":
 						updateMode |= UpdateMode.BaseReplace;
-						break;
-					case "cascade":
-						updateMode |= UpdateMode.DiffCascade;
 						break;
 					case "chds-as-Files":
 						chdsAsFiles = true;
@@ -272,17 +266,26 @@ namespace SabreTools
 					case "description-as-name":
 						descAsName = true;
 						break;
-					case "diff":
+					case "diff-against":
+						updateMode |= UpdateMode.DiffAgainst;
+						break;
+					case "diff-all":
 						updateMode |= UpdateMode.AllDiffs;
 						break;
-					case "diff-du":
+					case "diff-cascade":
+						updateMode |= UpdateMode.DiffCascade;
+						break;
+					case "diff-duplicates":
 						updateMode |= UpdateMode.DiffDupesOnly;
 						break;
-					case "diff-in":
+					case "diff-individuals":
 						updateMode |= UpdateMode.DiffIndividualsOnly;
 						break;
-					case "diff-nd":
+					case "diff-no-duplicates":
 						updateMode |= UpdateMode.DiffNoDupesOnly;
+						break;
+					case "diff-reverse-cascade":
+						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
 					case "exclude-of":
 						datHeader.ExcludeOf = true;
@@ -456,9 +459,6 @@ namespace SabreTools
 						break;
 					case "reverse-base-name":
 						updateMode |= UpdateMode.ReverseBaseReplace;
-						break;
-					case "reverse-cascade":
-						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
 					case "romba":
 						datHeader.Romba = true;

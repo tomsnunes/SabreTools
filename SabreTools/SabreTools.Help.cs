@@ -33,18 +33,6 @@ namespace SabreTools
 					longDescription: "If this flag is set, then the Date will be appended to each file information in the output DAT. The output format is standardized as \"yyyy/MM/dd HH:mm:ss\".");
 			}
 		}
-		private static Feature againstFlag
-		{
-			get
-			{
-				return new Feature(
-					"against",
-					new List<string>() { "-ag", "--against" },
-					"Diff all inputs against a set of base DATs",
-					FeatureType.Flag,
-					"This flag will enable a special type of diffing in which a set of base DATs are used as a comparison point for each of the input DATs. This allows users to get a slightly different output to cascaded diffing, which may be more useful in some cases. This is heavily influenced by the diffing model used by Romba.");
-			}
-		}
 		private static Feature allStatsFlag
 		{
 			get
@@ -103,18 +91,6 @@ namespace SabreTools
 					"Replace from base DATs in order",
 					FeatureType.Flag,
 					longDescription: "By default, no item names are changed except when there is a merge occurring. This flag enables users to define a DAT or set of base DATs to use as \"replacements\" for all input DATs. Note that the first found instance of an item in the base DAT(s) will be used and all others will be discarded. If no additional flag is given, it will default to updating names.");
-			}
-		}
-		private static Feature cascadeFlag
-		{
-			get
-			{
-				return new Feature(
-					"cascade",
-					new List<string>() { "-c", "--cascade" },
-					"Enable cascaded diffing",
-					FeatureType.Flag,
-					longDescription: "This flag allows for a special type of diffing in which the first DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
 			}
 		}
 		private static Feature chdsAsFilesFlag
@@ -285,52 +261,88 @@ namespace SabreTools
 					longDescription: "By default, all DATs are converted exactly as they are input. Enabling this flag allows for the machine names in the DAT to be replaced by the machine description instead. In most cases, this will result in no change in the output DAT, but a notable example would be a software list DAT where the machine names are generally DOS-friendly while the description is more complete.");
 			}
 		}
-		private static Feature diffFlag
+		private static Feature diffAgainstFlag
 		{
 			get
 			{
 				return new Feature(
-					"diff",
-					new List<string>() { "-di", "--diff" },
-					"Create diffdats from inputs (all outputs)",
+					"diff-against",
+					new List<string>() { "-dag", "--diff-against" },
+					"Diff all inputs against a set of base DATs",
 					FeatureType.Flag,
-					longDescription: "By default, all DATs are processed individually with the user-specified flags. With this flag enabled, input DATs are diffed against each other in all ways specified by the --diff-X flags.");
+					"This flag will enable a special type of diffing in which a set of base DATs are used as a comparison point for each of the input DATs. This allows users to get a slightly different output to cascaded diffing, which may be more useful in some cases. This is heavily influenced by the diffing model used by Romba.");
 			}
 		}
-		private static Feature diffDuFlag
+		private static Feature diffAllFlag
 		{
 			get
 			{
 				return new Feature(
-					"diff-du",
-					new List<string>() { "-did", "--diff-du" },
+					"diff-all",
+					new List<string>() { "-di", "--diff-all" },
+					"Create diffdats from inputs (all standard outputs)",
+					FeatureType.Flag,
+					longDescription: "By default, all DATs are processed individually with the user-specified flags. With this flag enabled, input DATs are diffed against each other to find duplicates, no duplicates, and only in individuals.");
+			}
+		}
+		private static Feature diffCascadeFlag
+		{
+			get
+			{
+				return new Feature(
+					"diff-cascade",
+					new List<string>() { "-dc", "--diff-cascade" },
+					"Enable cascaded diffing",
+					FeatureType.Flag,
+					longDescription: "This flag allows for a special type of diffing in which the first DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
+			}
+		}
+		private static Feature diffDuplicatesFlag
+		{
+			get
+			{
+				return new Feature(
+					"diff-duplicates",
+					new List<string>() { "-did", "--diff-duplicates" },
 					"Create diffdat containing just duplicates",
 					FeatureType.Flag,
 					longDescription: "All files that have duplicates outside of the original DAT are included.");
 			}
 		}
-		private static Feature diffInFlag
+		private static Feature diffIndividualsFlag
 		{
 			get
 			{
 				return new Feature(
-					"diff-in",
-					new List<string>() { "-dii", "--diff-in" },
+					"diff-individuals",
+					new List<string>() { "-dii", "--diff-individuals" },
 					"Create diffdats for individual DATs",
 					FeatureType.Flag,
 					longDescription: "All files that have no duplicates outside of the original DATs are put into DATs that are named after the source DAT.");
 			}
 		}
-		private static Feature diffNdFlag
+		private static Feature diffNoDuplicatesFlag
 		{
 			get
 			{
 				return new Feature(
-					"diff-nd",
-					new List<string>() { "-din", "--diff-nd" },
+					"diff-no-duplicates",
+					new List<string>() { "-din", "--diff-no-duplicates" },
 					"Create diffdat containing no duplicates",
 					FeatureType.Flag,
 					longDescription: "All files that have no duplicates outside of the original DATs are included.");
+			}
+		}
+		private static Feature diffReverseCascadeFlag
+		{
+			get
+			{
+				return new Feature(
+					"diff-reverse-cascade",
+					new List<string>() { "-drc", "--diff-reverse-cascade" },
+					"Enable reverse cascaded diffing",
+					FeatureType.Flag,
+					longDescription: "This flag allows for a special type of diffing in which the last DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
 			}
 		}
 		private static Feature excludeOfFlag
@@ -919,18 +931,6 @@ namespace SabreTools
 					"Replace item names from base DATs in reverse",
 					FeatureType.Flag,
 					longDescription: "By default, no item names are changed except when there is a merge occurring. This flag enables users to define a DAT or set of base DATs to use as \"replacements\" for all input DATs. Note that the first found instance of an item in the last base DAT(s) will be used and all others will be discarded. If no additional flag is given, it will default to updating names.");
-			}
-		}
-		private static Feature reverseCascadeFlag
-		{
-			get
-			{
-				return new Feature(
-					"reverse-cascade",
-					new List<string>() { "-rc", "--reverse-cascade" },
-					"Enable reverse cascaded diffing",
-					FeatureType.Flag,
-					longDescription: "This flag allows for a special type of diffing in which the last DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
 			}
 		}
 		private static Feature rombaFlag
@@ -2589,20 +2589,16 @@ The stats that are outputted are as follows:
 			update.AddFeature(gameDedupFlag);
 			update.AddFeature(mergeFlag);
 				update[mergeFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffFlag);
-				update[diffFlag].AddFeature(againstFlag);
-					update[diffFlag][againstFlag].AddFeature(baseDatListInput);
-				update[diffFlag].AddFeature(noAutomaticDateFlag);
-				update[diffFlag].AddFeature(cascadeFlag);
-					update[diffFlag][cascadeFlag].AddFeature(skipFirstOutputFlag);
-				update[diffFlag].AddFeature(reverseCascadeFlag);
-					update[diffFlag][reverseCascadeFlag].AddFeature(skipFirstOutputFlag);
-			update.AddFeature(diffDuFlag);
-				update[diffDuFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffInFlag);
-				update[diffInFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffNdFlag);
-				update[diffNdFlag].AddFeature(noAutomaticDateFlag);
+			update.AddFeature(diffAllFlag);
+				update[diffAllFlag].AddFeature(noAutomaticDateFlag);
+			update.AddFeature(diffDuplicatesFlag);
+				update[diffDuplicatesFlag].AddFeature(noAutomaticDateFlag);
+			update.AddFeature(diffIndividualsFlag);
+				update[diffIndividualsFlag].AddFeature(noAutomaticDateFlag);
+			update.AddFeature(diffNoDuplicatesFlag);
+				update[diffNoDuplicatesFlag].AddFeature(noAutomaticDateFlag);
+			update.AddFeature(diffAgainstFlag);
+				update[diffAgainstFlag].AddFeature(baseDatListInput);
 			update.AddFeature(baseReplaceFlag);
 				update[baseReplaceFlag].AddFeature(baseDatListInput);
 				update[baseReplaceFlag].AddFeature(updateNamesFlag);
@@ -2619,6 +2615,10 @@ The stats that are outputted are as follows:
 					update[reverseBaseReplaceFlag][updateDescriptionFlag].AddFeature(onlySameFlag);
 				update[reverseBaseReplaceFlag].AddFeature(updateYearFlag);
 				update[reverseBaseReplaceFlag].AddFeature(updateManufacturerFlag);
+			update.AddFeature(diffCascadeFlag);
+				update[diffCascadeFlag].AddFeature(skipFirstOutputFlag);
+			update.AddFeature(diffReverseCascadeFlag);
+				update[diffReverseCascadeFlag].AddFeature(skipFirstOutputFlag);
 			update.AddFeature(gameNameListInput);
 			update.AddFeature(notGameNameListInput);
 			update.AddFeature(gameDescriptionListInput);
