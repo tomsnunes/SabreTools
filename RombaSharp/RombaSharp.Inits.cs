@@ -12,6 +12,8 @@ using SabreTools.Library.Tools;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
+
+using StreamWriter = System.IO.StreamWriter;
 #endif
 
 namespace RombaSharp
