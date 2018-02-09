@@ -688,7 +688,6 @@ namespace RombaSharp
 		/// </summary>
 		/// <param name="workers">How many workers to launch for the job, default from config</param>
 		/// <param name="missingSha1s">Write paths of dats with missing sha1s into this file</param>
-		/// TODO: Verify implementation
 		private static void InitRefreshDats(
 			int workers,
 			string missingSha1s)
