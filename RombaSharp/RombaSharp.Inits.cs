@@ -217,10 +217,10 @@ namespace RombaSharp
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
 
-			// Create a base output folder
-			if (!Directory.Exists("out"))
+			// Ensure the output directory is set
+			if (String.IsNullOrWhiteSpace(outdat))
 			{
-				Directory.CreateDirectory("out");
+				outdat = "out";
 			}
 
 			// Now that we have the dictionary, we can loop through and output to a new folder for each
@@ -231,11 +231,8 @@ namespace RombaSharp
 				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0);
 
 				// Create the new output directory if it doesn't exist
-				string outputFolder = Path.Combine("out", Path.GetFileNameWithoutExtension(foundDats[key]));
-				if (!Directory.Exists(outputFolder))
-				{
-					Directory.CreateDirectory(outputFolder);
-				}
+				string outputFolder = Path.Combine(outdat, Path.GetFileNameWithoutExtension(foundDats[key]));
+				Utilities.EnsureOutputDirectory(outputFolder, create: true);
 
 				// Get all online depots
 				List<string> onlineDepots = _depots.Where(d => d.Value.Item2).Select(d => d.Key).ToList();
@@ -776,17 +773,23 @@ namespace RombaSharp
 			watch.Stop();
 
 			// Now loop through and remove all references to old Dats
-			watch.Start("Removing unmatched DAT information");
-
-			foreach (string dathash in unneeded)
+			if (unneeded.Count > 0)
 			{
-				query = "DELETE FROM dat WHERE hash=\"" + dathash + "\"";
+				watch.Start("Removing unmatched DAT information");
+
+				query = "DELETE FROM dat WHERE";
+				foreach (string dathash in unneeded)
+				{
+					query += " OR hash=\"" + dathash + "\"";
+				}
+
+				query = query.Replace("WHERE OR", "WHERE");
 				slc = new SqliteCommand(query, dbc);
 				slc.ExecuteNonQuery();
 				slc.Dispose();
-			}
 
-			watch.Stop();
+				watch.Stop();
+			}
 
 			dbc.Dispose();
 		}
