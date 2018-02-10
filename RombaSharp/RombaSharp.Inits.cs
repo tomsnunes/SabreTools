@@ -35,6 +35,8 @@ namespace RombaSharp
 		/// <param name="skipInitialScan">True to skip the initial scan of the files to determine amount of work, false otherwise</param>
 		/// <param name="useGolangZip">True to use go zip implementation instead of zlib, false otherwise</param>
 		/// <param name="noDb">True to archive into depot but do not touch DB index and ignore only-needed flag, false otherwise</param>
+		/// TODO: Add ability to update .romba files with proper size AND use the correct depot if it fills up
+		/// TODO: Add ability to mark which depot the files are being rebuilt to in the DB
 		private static void InitArchive(
 			List<string> inputs,
 			bool onlyNeeded,
@@ -434,16 +436,17 @@ namespace RombaSharp
 		/// <summary>
 		/// Wrap exporting the database to CSV
 		/// </summary>
-		/// TODO: Verify implementation
+		/// TODO: Add ability to say which depot the files are found in
 		private static void InitExport()
 		{
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
 			dbc.Open();
 			StreamWriter sw = new StreamWriter(Utilities.TryCreate("export.csv"));
 
-			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
+			// First take care of all file hashes
+			sw.WriteLine("CRC,MD5,SHA-1"); // ,Depot
 
-			string query = "SELECT dats.id, size, crc, md5, sha1, indepot, hash FROM data JOIN dats ON data.id=dats.id";
+			string query = "SELECT crcsha1.crc, md5sha1.md5, md5sha1.sha1 FROM crcsha1 JOIN md5sha1 ON crcsha1.sha1=md5sha1.sha1"; // md5sha1.sha1=sha1depot.sha1
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
 
@@ -451,14 +454,27 @@ namespace RombaSharp
 			{
 				while (sldr.Read())
 				{
-					string line = "\"" + sldr.GetInt32(0) + "\","
-							+ "\"" + sldr.GetInt64(1) + "\","
-							+ "\"" + sldr.GetString(2) + "\","
-							+ "\"" + sldr.GetString(3) + "\","
-							+ "\"" + sldr.GetString(4) + "\","
-							+ "\"" + sldr.GetInt32(5) + "\","
-							+ "\"" + sldr.GetString(6) + "\"";
+					string line = sldr.GetString(0) + ","
+							+ sldr.GetString(1) + ","
+							+ sldr.GetString(2); // + ","
+							// + sldr.GetString(3);
 					sw.WriteLine(line);
+				}
+			}
+
+			// Then take care of all DAT hashes
+			sw.WriteLine();
+			sw.WriteLine("DAT Hash");
+
+			query = "SELECT hash FROM dat";
+			slc = new SqliteCommand(query, dbc);
+			sldr = slc.ExecuteReader();
+
+			if (sldr.HasRows)
+			{
+				while (sldr.Read())
+				{
+					sw.WriteLine(sldr.GetString(0));
 				}
 			}
 
@@ -491,10 +507,101 @@ namespace RombaSharp
 		/// Wrap importing CSVs into the database
 		/// </summary>
 		/// <param name="inputs">List of input CSV files to import information from</param>
-		/// TODO: Implement
 		private static void InitImport(List<string> inputs)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: import");
+
+			// First ensure the inputs and database connection
+			inputs = Utilities.GetOnlyFilesFromInputs(inputs);
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			SqliteCommand slc = new SqliteCommand();
+			dbc.Open();
+
+			// Now, for each of these files, attempt to add the data found inside
+			foreach (string input in inputs)
+			{
+				StreamReader sr = new StreamReader(Utilities.TryOpenRead(input));
+
+				// The first line should be the hash header
+				string line = sr.ReadLine();
+				if (line != "CRC,MD5,SHA-1") // ,Depot
+				{
+					Globals.Logger.Error("{0} is not a valid export file");
+					continue;
+				}
+
+				// Define the insert queries
+				string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
+				string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
+				string sha1query = "INSERT OR IGNORE INTO sha1 (sha1) VALUES";
+				string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
+				string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
+
+				// For each line until we hit a blank line...
+				while (!sr.EndOfStream && line != "")
+				{
+					line = sr.ReadLine();
+					string[] hashes = line.Split(',');
+
+					// Loop through the parsed entries
+					if (!String.IsNullOrWhiteSpace(hashes[0]))
+					{
+						crcquery += " (\"" + hashes[0] + "\"),";
+					}
+					if (!String.IsNullOrWhiteSpace(hashes[1]))
+					{
+						md5query += " (\"" + hashes[1] + "\"),";
+					}
+					if (!String.IsNullOrWhiteSpace(hashes[2]))
+					{
+						sha1query += " (\"" + hashes[2] + "\"),";
+
+						if (!String.IsNullOrWhiteSpace(hashes[0]))
+						{
+							crcsha1query += " (\"" + hashes[0] + "\", \"" + hashes[2] + "\"),";
+						}
+						if (!String.IsNullOrWhiteSpace(hashes[1]))
+						{
+							md5sha1query += " (\"" + hashes[1] + "\", \"" + hashes[2] + "\"),";
+						}
+					}
+				}
+
+				// Now run the queries after fixing them
+				if (crcquery != "INSERT OR IGNORE INTO crc (crc) VALUES")
+				{
+					slc = new SqliteCommand(crcquery.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (md5query != "INSERT OR IGNORE INTO md5 (md5) VALUES")
+				{
+					slc = new SqliteCommand(md5query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1) VALUES")
+				{
+					slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (crcsha1query != "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES")
+				{
+					slc = new SqliteCommand(crcsha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (md5sha1query != "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES")
+				{
+					slc = new SqliteCommand(md5sha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+
+				// Now add all of the DAT hashes
+				// TODO: Do we really need to save the DAT hashes?
+
+				sr.Dispose();
+			}
+
+			slc.Dispose();
+			dbc.Dispose();
 		}
 
 		/// <summary>
