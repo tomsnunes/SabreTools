@@ -66,6 +66,7 @@ namespace SabreTools.Library.DatFiles
 			// Prepare all internal variables
 			Encoding enc = Utilities.GetEncoding(filename);
 			XmlReader xtr = Utilities.GetXmlTextReader(filename);
+			List<string> dirs = new List<string>();
 
 			// If we got a null reader, just return
 			if (xtr == null)
@@ -82,6 +83,12 @@ namespace SabreTools.Library.DatFiles
 					// We only want elements
 					if (xtr.NodeType != XmlNodeType.Element)
 					{
+						// If we're ending a dir, remove the last item from the dirs list, if possible
+						if (xtr.Name == "dir" && dirs.Count > 0)
+						{
+							dirs.RemoveAt(dirs.Count - 1);
+						}
+
 						xtr.Read();
 						continue;
 					}
@@ -101,10 +108,16 @@ namespace SabreTools.Library.DatFiles
 							// Skip the header node now that we've processed it
 							xtr.Skip();
 							break;
+						// Unique to RomVault-created DATs
+						case "dir":
+							Type = "SuperDAT";
+							dirs.Add(xtr.GetAttribute("name") ?? "");
+							xtr.Read();
+							break;
 						// We want to process the entire subtree of the game
 						case "machine": // New-style Logiqx
 						case "game": // Old-style Logiqx
-							ReadMachine(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);
+							ReadMachine(xtr.ReadSubtree(), dirs, filename, sysid, srcid, keep, clean, remUnicode);
 
 							// Skip the machine now that we've processed it
 							xtr.Skip();
@@ -271,6 +284,8 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read game/machine information
 		/// </summary>
+		/// <param name="reader">XmlReader to use to parse the machine</param>
+		/// <param name="dirs">List of dirs to prepend to the game name</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -279,6 +294,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ReadMachine(
 			XmlReader reader,
+			List<string> dirs,
 
 			// Standard Dat parsing
 			string filename,
@@ -302,7 +318,6 @@ namespace SabreTools.Library.DatFiles
 			string key = "";
 			string temptype = reader.Name;
 			bool containsItems = false;
-			List<string> parent = new List<string>();
 
 			// Create a new machine
 			MachineType machineType = MachineType.NULL;
@@ -319,10 +334,11 @@ namespace SabreTools.Library.DatFiles
 				machineType |= MachineType.Mechanical;
 			}
 
+			string dirsString = (dirs != null && dirs.Count() > 0 ? string.Join("/", dirs) + "/" : "");
 			Machine machine = new Machine
 			{
-				Name = reader.GetAttribute("name"),
-				Description = reader.GetAttribute("name"),
+				Name = dirsString + reader.GetAttribute("name"),
+				Description = dirsString + reader.GetAttribute("name"),
 				SourceFile = reader.GetAttribute("sourcefile"),
 				Board = reader.GetAttribute("board"),
 				RebuildTo = reader.GetAttribute("rebuildto"),
@@ -344,11 +360,6 @@ namespace SabreTools.Library.DatFiles
 				{
 					machine.Name = tempout;
 				}
-			}
-			// Get the name of the game from the parent
-			else if (Type == "SuperDAT" && keep && parent.Count > 0)
-			{
-				machine.Name = String.Join("\\", parent) + "\\" + machine.Name;
 			}
 
 			while (!reader.EOF)
