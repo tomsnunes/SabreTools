@@ -731,7 +731,7 @@ namespace RombaSharp
 		/// TODO: Implement
 		private static void InitMemstats()
 		{
-			Globals.Logger.User("This feature is not yet implemented: cancel");
+			Globals.Logger.User("This feature is not yet implemented: memstats");
 		}
 
 		/// <summary>
