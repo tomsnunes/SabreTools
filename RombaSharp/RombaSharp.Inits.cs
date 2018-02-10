@@ -250,9 +250,10 @@ namespace RombaSharp
 		/// <summary>
 		/// Wrap cancelling a long-running job
 		/// </summary>
+		/// TODO: Implement
 		private static void InitCancel()
 		{
-			Globals.Logger.User("This feature is obsolete: cancel");
+			Globals.Logger.User("This feature is not yet implemented: cancel");
 		}
 
 		/// <summary>
@@ -606,9 +607,10 @@ namespace RombaSharp
 		/// <summary>
 		/// Wrap printing memory stats
 		/// </summary>
+		/// TODO: Implement
 		private static void InitMemstats()
 		{
-			Globals.Logger.User("This feature is obsolete: cancel");
+			Globals.Logger.User("This feature is not yet implemented: cancel");
 		}
 
 		/// <summary>
@@ -644,9 +646,10 @@ namespace RombaSharp
 		/// <summary>
 		/// Wrap showing progress of currently running command
 		/// </summary>
+		/// TODO: Implement
 		private static void InitProgress()
 		{
-			Globals.Logger.User("This feature is obsolete: progress");
+			Globals.Logger.User("This feature is not yet implemented: progress");
 		}
 
 		/// <summary>
@@ -940,9 +943,10 @@ WHERE sha1.sha1 IN (""" + String.Join("\",\"", hashes) + "\")";
 		/// <summary>
 		/// Wrap gracefully shutting down the server
 		/// </summary>
+		/// TODO: Implement
 		private static void InitShutdown()
 		{
-			Globals.Logger.User("This feature is obsolete: shutdown");
+			Globals.Logger.User("This feature is not yet implemented: shutdown");
 		}
 
 		/// <summary>
