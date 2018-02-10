@@ -710,7 +710,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Filter on rom type
-			if (_romTypes.Count == 0 && _notRomTypes.Count == 0 && item.Type != ItemType.Rom && item.Type != ItemType.Disk)
+			if (_romTypes.Count == 0 && _notRomTypes.Count == 0 && item.Type != ItemType.Rom && item.Type != ItemType.Disk && item.Type != ItemType.Blank)
 			{
 				return false;
 			}
