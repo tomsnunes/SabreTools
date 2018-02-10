@@ -791,6 +791,23 @@ namespace RombaSharp
 		/// TODO: Implement
 		private static void InitMiss(List<string> inputs)
 		{
+			// Verify the filenames
+			Dictionary<string, string> foundDats = GetValidDats(inputs);
+
+			// Create the new output directory if it doesn't exist
+			Utilities.EnsureOutputDirectory(Path.Combine(Globals.ExeDir, "out"), create: true);
+
+			// Now that we have the dictionary, we can loop through and output to a new folder for each
+			foreach (string key in foundDats.Keys)
+			{
+				// Get the DAT file associated with the key
+				DatFile datFile = new DatFile();
+				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0);
+
+				// Now loop through and see if all of the hash combinations exist in the database
+				/* ended here */
+			}
+
 			Globals.Logger.Error("This feature is not yet implemented: miss");
 		}
 
