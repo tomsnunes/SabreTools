@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Help;
@@ -164,17 +165,21 @@ namespace RombaSharp
 				// Verify that the current flag is proper for the feature
 				if (!_help[feature].ValidateInput(args[i]))
 				{
-					Globals.Logger.Error("Invalid input detected: {0}", args[i]);
-					_help.OutputIndividualFeature(feature);
-					Globals.Logger.Close();
-					return;
+					// Special cases for files
+					List<string> temp = new List<string>();
+					temp.Add(args[i]);
+					if (!File.Exists(args[i])
+						&& !Directory.Exists(args[i])
+						&& GetValidDats(temp).Count == 0)
+					{
+						Globals.Logger.Error("Invalid input detected: {0}", args[i]);
+						_help.OutputIndividualFeature(feature);
+						Globals.Logger.Close();
+						return;
+					}
 				}
 
-				// Special precautions for files and directories
-				if (File.Exists(args[i]) || Directory.Exists(args[i]))
-				{
-					inputs.Add(args[i]);
-				}
+				inputs.Add(args[i]);
 			}
 
 			// Now loop through all inputs

@@ -207,7 +207,6 @@ namespace RombaSharp
 		/// <param name="copy">True if files should be copied to output, false for rebuild</param>
 		/// <param name="workers">How many workers to launch for the job, default from config</param>
 		/// <param name="subworkers">How many subworkers to launch for each worker, default from config</param>
-		/// TODO: Verify implementation
 		private static void InitBuild(
 			List<string> inputs,
 			string outdat,
