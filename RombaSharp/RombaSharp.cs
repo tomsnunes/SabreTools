@@ -114,9 +114,9 @@ namespace RombaSharp
 				outdat = "",
 				resume = "",
 				source = "";
-			int include7Zips = 0,
-				includeGZips = 0,
-				includeZips = 0,
+			int include7Zips = 1,
+				includeGZips = 1,
+				includeZips = 1,
 				subworkers = 0,
 				workers = 0;
 			long size = -1;

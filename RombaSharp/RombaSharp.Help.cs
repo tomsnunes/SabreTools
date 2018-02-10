@@ -98,7 +98,7 @@ namespace RombaSharp
 				return new Feature(
 					"include-7zips",
 					"-include-7zips",
-					"flag value == 1 means: add 7zip files themselves into the depot in addition to their contents, flag value > 1 means add 7zip files themselves but don't add content",
+					"flag value == 0 means: add 7zip files themselves into the depot in addition to their contents, flag value == 2 means add 7zip files themselves but don't add content",
 					FeatureType.Int32);
 			}
 		}
@@ -109,7 +109,7 @@ namespace RombaSharp
 				return new Feature(
 					"include-gzips",
 					"-include-gzips",
-					"flag value == 1 means: add gzip files themselves into the depot in addition to their contents, flag value > 1 means add gzip files themselves but don't add content",
+					"flag value == 0 means: add gzip files themselves into the depot in addition to their contents, flag value == 2 means add gzip files themselves but don't add content",
 					FeatureType.Int32);
 			}
 		}
@@ -120,7 +120,7 @@ namespace RombaSharp
 				return new Feature(
 					"include-zips",
 					"-include-zips",
-					"flag value == 1 means: add zip files themselves into the depot in addition to their contents, flag value > 1 means add zip files themselves but don't add content",
+					"flag value == 0 means: add zip files themselves into the depot in addition to their contents, flag value == 2 means add zip files themselves but don't add content",
 					FeatureType.Int32);
 			}
 		}

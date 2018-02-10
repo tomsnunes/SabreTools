@@ -28,14 +28,13 @@ namespace RombaSharp
 		/// <param name="inputs">List of input folders to use</param>
 		/// <param name="onlyNeeded">True if only files in the database and don't exist are added, false otherwise</param>
 		/// <param name="resume">Resume a previously interrupted operation from the specified path</param>
-		/// <param name="includeZips">flag value == 1 means: add Zip files themselves into the depot in addition to their contents, flag value > 1 means add Zip files themselves but don't add content</param>
+		/// <param name="includeZips">flag value == 0 means: add Zip files themselves into the depot in addition to their contents, flag value == 2 means add Zip files themselves but don't add content</param>
 		/// <param name="workers">How many workers to launch for the job, default from config</param>
-		/// <param name="includeGZips">flag value == 1 means: add GZip files themselves into the depot in addition to their contents, flag value > 1 means add GZip files themselves but don't add content</param>
-		/// <param name="include7Zips">flag value == 1 means: add 7Zip files themselves into the depot in addition to their contents, flag value > 1 means add 7Zip files themselves but don't add content</param>
+		/// <param name="includeGZips">flag value == 0 means: add GZip files themselves into the depot in addition to their contents, flag value == 2 means add GZip files themselves but don't add content</param>
+		/// <param name="include7Zips">flag value == 0 means: add 7Zip files themselves into the depot in addition to their contents, flag value == 2 means add 7Zip files themselves but don't add content</param>
 		/// <param name="skipInitialScan">True to skip the initial scan of the files to determine amount of work, false otherwise</param>
 		/// <param name="useGolangZip">True to use go zip implementation instead of zlib, false otherwise</param>
 		/// <param name="noDb">True to archive into depot but do not touch DB index and ignore only-needed flag, false otherwise</param>
-		/// TODO: Verify implementation
 		private static void InitArchive(
 			List<string> inputs,
 			bool onlyNeeded,
@@ -45,7 +44,7 @@ namespace RombaSharp
 			int includeGZips,
 			int include7Zips,
 			bool skipInitialScan,
-			bool useGolangZip,
+			bool useGolangZip, // Obsolete
 			bool noDb)
 		{
 			// First we want to get just all directories from the inputs
@@ -87,7 +86,7 @@ namespace RombaSharp
 				foreach (Rom rom in datItems)
 				{
 					// If we care about if the file exists, check the databse first
-					if (onlyNeeded)
+					if (onlyNeeded && !noDb)
 					{
 						string query = "SELECT * FROM crcsha1 JOIN md5sha1 ON crcsha1.sha1=md5sha1.sha1"
 									+ " WHERE crcsha1.crc=\"" + rom.CRC + "\""
@@ -129,25 +128,28 @@ namespace RombaSharp
 					else
 					{
 						// Add to the queries
-						if (!String.IsNullOrWhiteSpace(rom.CRC))
+						if (!noDb)
 						{
-							crcquery += " (\"" + rom.CRC + "\"),";
-						}
-						if (!String.IsNullOrWhiteSpace(rom.MD5))
-						{
-							md5query += " (\"" + rom.MD5 + "\"),";
-						}
-						if (!String.IsNullOrWhiteSpace(rom.SHA1))
-						{
-							sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
-
 							if (!String.IsNullOrWhiteSpace(rom.CRC))
 							{
-								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+								crcquery += " (\"" + rom.CRC + "\"),";
 							}
 							if (!String.IsNullOrWhiteSpace(rom.MD5))
 							{
-								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+								md5query += " (\"" + rom.MD5 + "\"),";
+							}
+							if (!String.IsNullOrWhiteSpace(rom.SHA1))
+							{
+								sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
+
+								if (!String.IsNullOrWhiteSpace(rom.CRC))
+								{
+									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+								}
+								if (!String.IsNullOrWhiteSpace(rom.MD5))
+								{
+									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+								}
 							}
 						}
 
@@ -190,7 +192,7 @@ namespace RombaSharp
 			}
 
 			// Create the sorting object to use and rebuild the needed files
-			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(2, 2, 2, 2);
+			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(include7Zips, includeGZips, 2, includeZips);
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
 				null /*headerToCheckAgainst*/, true /* chdsAsFiles */);
