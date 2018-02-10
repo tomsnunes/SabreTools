@@ -610,14 +610,11 @@ namespace RombaSharp
 		/// <param name="inputs">List of input strings representing hashes to check for</param>
 		/// <param name="size">Size to limit hash by, -1 otherwise</param>
 		/// <param name="outdat">Output directory</param>
-		/// TODO: Verify implementation
 		private static void InitLookup(
 			List<string> inputs,
 			long size,
 			string outdat)
 		{
-			Globals.Logger.Error("This feature is not yet implemented: lookup");
-
 			// First, try to figure out what type of hash each is by length and clean it
 			List<string> crc = new List<string>();
 			List<string> md5 = new List<string>();
@@ -662,7 +659,13 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, sldr.RecordsAffected);
+					int count = 0;
+					while (sldr.Read())
+					{
+						count++;
+					}
+
+					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, count);
 				}
 				else
 				{
@@ -679,7 +682,13 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, sldr.RecordsAffected);
+					int count = 0;
+					while (sldr.Read())
+					{
+						count++;
+					}
+
+					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, count);
 				}
 				else
 				{
@@ -696,7 +705,13 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, sldr.RecordsAffected);
+					int count = 0;
+					while (sldr.Read())
+					{
+						count++;
+					}
+
+					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, count);
 				}
 				else
 				{

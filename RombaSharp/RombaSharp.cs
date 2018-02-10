@@ -165,21 +165,9 @@ namespace RombaSharp
 				// Verify that the current flag is proper for the feature
 				if (!_help[feature].ValidateInput(args[i]))
 				{
-					// Special cases for files
-					List<string> temp = new List<string>();
-					temp.Add(args[i]);
-					if (!File.Exists(args[i])
-						&& !Directory.Exists(args[i])
-						&& GetValidDats(temp).Count == 0)
-					{
-						Globals.Logger.Error("Invalid input detected: {0}", args[i]);
-						_help.OutputIndividualFeature(feature);
-						Globals.Logger.Close();
-						return;
-					}
+					// Everything else is treated as a generic input
+					inputs.Add(args[i]);
 				}
-
-				inputs.Add(args[i]);
 			}
 
 			// Now loop through all inputs
