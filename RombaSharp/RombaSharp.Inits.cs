@@ -752,6 +752,36 @@ namespace RombaSharp
 			bool skipInitialscan)
 		{
 			Globals.Logger.Error("This feature is not yet implemented: merge");
+
+			// Verify that the inputs are valid directories
+			inputs = Utilities.GetOnlyDirectoriesFromInputs(inputs);
+
+			// Loop over all input directories
+			foreach (string input in inputs)
+			{
+				List<string> depotFiles = Directory.EnumerateFiles(input, "*.gz", SearchOption.AllDirectories).ToList();
+
+				// If we are copying all that is possible but we want to scan first
+				if (!onlyNeeded && !skipInitialscan)
+				{
+					
+				}
+				// If we are copying all that is possible but we don't care to scan first
+				else if (!onlyNeeded && skipInitialscan)
+				{
+
+				}
+				// If we are copying only what is needed but we want to scan first
+				else if (onlyNeeded && !skipInitialscan)
+				{
+
+				}
+				// If we are copying only what is needed but we don't care to scan first
+				else if (onlyNeeded && skipInitialscan)
+				{
+
+				}
+			}
 		}
 
 		/// <summary>
