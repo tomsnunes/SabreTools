@@ -37,7 +37,7 @@ namespace SabreTools.Library.DatFiles
 		private DedupeType _dedupeRoms;
 		private Hash _stripHash;
 
-		// Data specific to the Miss DAT type
+		// Data (mostly) specific to the Miss DAT type
 		private bool _useRomName;
 		private string _prefix;
 		private string _postfix;
