@@ -465,6 +465,18 @@ namespace SabreTools
 					longDescription: "Instead of the normal behavior of rebuilding using a DAT, this flag allows the user to use the DAT as a filter instead. All files that are found in the DAT will be skipped and everything else will be output in the selected format.");
 			}
 		}
+		private static Feature keepEmptyGamesFlag
+		{
+			get
+			{
+				return new Feature(
+					"keep-empty-games",
+					new List<string>() { "-keg", "--keep-empty-games" },
+					"Keep originally empty sets from the input(s)",
+					FeatureType.Flag,
+					longDescription: "Normally, any sets that are considered empty will not be included in the output, this flag allows these empty sets to be added to the output.");
+			}
+		}
 		private static Feature levelFlag
 		{
 			get
@@ -2550,6 +2562,7 @@ The stats that are outputted are as follows:
 				update[outputTsvFlag].AddFeature(quotesFlag);
 			update.AddFeature(outputXmlFlag);
 				update[outputXmlFlag].AddFeature(depreciatedFlag);
+			// End OLD
 			update.AddFeature(filenameStringInput);
 			update.AddFeature(nameStringInput);
 			update.AddFeature(descriptionStringInput);
@@ -2568,6 +2581,7 @@ The stats that are outputted are as follows:
 			update.AddFeature(forcenodumpStringInput);
 			update.AddFeature(forcepackingStringInput);
 			update.AddFeature(excludeOfFlag);
+			update.AddFeature(keepEmptyGamesFlag);
 			update.AddFeature(sceneDateStripFlag);
 			update.AddFeature(cleanFlag);
 			update.AddFeature(removeUnicodeFlag);

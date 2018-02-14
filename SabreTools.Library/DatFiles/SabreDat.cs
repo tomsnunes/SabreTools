@@ -462,11 +462,18 @@ namespace SabreTools.Library.DatFiles
 								break;
 							default:
 								// By default, create a new Blank, just in case
-								datItem = new Blank();
+								if (this.KeepEmptyGames)
+								{
+									datItem = new Blank();
+								}
+								else
+								{
+									datItem = null;
+								}
 								break;
 						}
 
-						datItem.CopyMachineInformation(dir);
+						datItem?.CopyMachineInformation(dir);
 
 						// Now process and add the rom
 						key = ParseAddHelper(datItem, clean, remUnicode);

@@ -36,7 +36,7 @@ namespace RombaSharp
 		/// <param name="useGolangZip">True to use go zip implementation instead of zlib, false otherwise</param>
 		/// <param name="noDb">True to archive into depot but do not touch DB index and ignore only-needed flag, false otherwise</param>
 		/// TODO: Add ability to update .romba files with proper size AND use the correct depot if it fills up
-		/// TODO: Add ability to mark which depot the files are being rebuilt to in the DB
+		/// TODO: Add ability correctly to mark which depot the files are being rebuilt to in the DB
 		private static void InitArchive(
 			List<string> inputs,
 			bool onlyNeeded,

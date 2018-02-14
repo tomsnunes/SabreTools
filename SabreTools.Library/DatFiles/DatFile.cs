@@ -451,6 +451,27 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.ExcludeOf = value;
 			}
 		}
+		public bool KeepEmptyGames
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.KeepEmptyGames;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.KeepEmptyGames = value;
+			}
+		}
 		public bool SceneDateStrip
 		{
 			get

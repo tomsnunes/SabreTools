@@ -286,6 +286,11 @@ Options:
 	  -xof, --exclude-of		  Exclude romof, cloneof, sampleof tags
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
+		  
+	  -keg, --keep-empty-games	  Keep originally empty sets from the input(s)
+		  Normally, any sets that are considered empty will not be included in
+		  the output, this flag allows these empty sets to be added to the
+		  output.
 
 	  -sds, --scene-date-strip	Remove date from scene-named sets
 		  If this flag is enabled, sets with "scene" names will have the date

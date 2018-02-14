@@ -317,6 +317,9 @@ namespace SabreTools
 					case "inverse":
 						inverse = true;
 						break;
+					case "keep-empty-games":
+						datHeader.KeepEmptyGames = true;
+						break;
 					case "level":
 						splittingMode |= SplittingMode.Level;
 						break;
