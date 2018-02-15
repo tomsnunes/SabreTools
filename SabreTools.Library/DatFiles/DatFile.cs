@@ -2117,6 +2117,9 @@ namespace SabreTools.Library.DatFiles
 			outDats = outDatsArray.ToList();
 			watch.Stop();
 
+			// Then, ensure that the internal dat can be sorted in the best possible way
+			BucketBy(SortedBy.CRC, DedupeType.None);
+
 			// Now, loop through the dictionary and populate the correct DATs
 			watch.Start("Populating all output DATs");
 			List<string> keys = Keys;
