@@ -1,6 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
-using SabreTools.Library.Data;
+#if MONO
+using System.IO;
+#else
+using Stream = System.IO.Stream;
+#endif
 
 namespace SabreTools.Library.FileTypes
 {
@@ -87,19 +92,49 @@ namespace SabreTools.Library.FileTypes
 		#region Construtors
 
 		/// <summary>
-		/// Create a new Archive with no base file
+		/// Create a new BaseFile with no base file
 		/// </summary>
 		public BaseFile()
 		{
 		}
 
 		/// <summary>
-		/// Create a new Archive from the given file
+		/// Create a new BaseFile from the given file
 		/// </summary>
-		/// <param name="filename">Name of the file to use as an archive</param>
+		/// <param name="filename">Name of the file to use</param>
 		public BaseFile(string filename)
 		{
-			_filename = filename;
+			BaseFile temp = Utilities.GetFileInfo(_filename);
+
+			this._filename = temp.Filename;
+			this._parent = temp.Parent;
+			this._date = temp.Date;
+			this._crc = temp.CRC;
+			this._md5 = temp.MD5;
+			this._sha1 = temp.SHA1;
+			this._sha256 = temp.SHA256;
+			this._sha384 = temp.SHA384;
+			this._sha512 = temp.SHA512;
+		}
+
+		/// <summary>
+		/// Create a new BaseFile from the given file
+		/// </summary>
+		/// <param name="filename">Name of the file to use</param>
+		/// <param name="stream">Stream to populate information from</param>
+		public BaseFile(string filename, Stream stream)
+		{
+			BaseFile temp = Utilities.GetStreamInfo(stream, stream.Length);
+
+			this._filename = temp.Filename;
+			this._parent = temp.Parent;
+			this._date = temp.Date;
+			this._crc = temp.CRC;
+			this._md5 = temp.MD5;
+			this._sha1 = temp.SHA1;
+			this._sha256 = temp.SHA256;
+			this._sha384 = temp.SHA384;
+			this._sha512 = temp.SHA512;
 		}
 
 		#endregion
