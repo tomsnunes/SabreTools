@@ -507,6 +507,7 @@ namespace SabreTools.Library.Data
 		public static readonly byte[] CabinetSignature =			{ 0x4d, 0x53, 0x43, 0x46 };
 		public static readonly byte[] CHDSignature =				{ 0x4d, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x48, 0x44 };
 		public static readonly byte[] ELFSignature =				{ 0x7f, 0x45, 0x4c, 0x46 };
+		public static readonly byte[] FreeArcSignature =			{ 0x41, 0x72, 0x43, 0x01 };
 		public static readonly byte[] GzSignature =					{ 0x1f, 0x8b, 0x08 };
 		public static readonly byte[] LRZipSignature =				{ 0x4c, 0x52, 0x5a, 0x49 };
 		public static readonly byte[] LZ4Signature =				{ 0x18, 0x4d, 0x22, 0x04 };
