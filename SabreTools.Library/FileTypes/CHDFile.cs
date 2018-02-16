@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-using SabreTools.Library.Data;
+﻿using SabreTools.Library.Data;
 using SabreTools.Library.Tools;
 
 #if MONO
@@ -88,7 +85,7 @@ namespace SabreTools.Library.FileTypes
 	/// 0x68-0x7b - Parent SHA-1
 	/// ----------------------------------------------
 	/// </remarks>
-	public class CHDFile : BaseFile, IDisposable
+	public class CHDFile : BaseFile
 	{
 		#region Private instance variables
 
@@ -110,11 +107,60 @@ namespace SabreTools.Library.FileTypes
 		private uint m_mapentrybytes;    // length of each entry in a map
 
 		// additional required vars
+		private uint? _headerVersion;
 		private BinaryReader m_br;       // Binary reader representing the CHD stream
 
 		#endregion
 
+		#region Pubically facing variables
+
+		public uint? Version
+		{
+			get
+			{
+				if (_headerVersion == null)
+				{
+					_headerVersion = ValidateHeaderVersion();
+				}
+
+				return _headerVersion;
+			}
+		}
+
+		#endregion
+
 		#region Constructors
+
+		/// <summary>
+		/// Create a new, blank CHDFile
+		/// </summary>
+		public CHDFile()
+		{
+			this._fileType = FileType.CHD;
+		}
+
+		/// <summary>
+		/// Create a new CHDFile from an input file
+		/// </summary>
+		/// <param name="filename"></param>
+		public CHDFile(string filename)
+			: base(filename)
+		{
+			_fileType = FileType.CHD;
+			m_br = new BinaryReader(Utilities.TryOpenRead(filename));
+
+			_headerVersion = ValidateHeaderVersion();
+
+			byte[] hash = GetHashFromHeader();
+			if (hash.Length == Constants.MD5Length)
+			{
+				_md5 = hash;
+			}
+			else if (hash.Length == Constants.SHA1Length)
+			{
+				_sha1 = hash;
+			}
+		}
 
 		/// <summary>
 		/// Create a new CHDFile from an input stream
@@ -124,14 +170,18 @@ namespace SabreTools.Library.FileTypes
 		{
 			_fileType = FileType.CHD;
 			m_br = new BinaryReader(chdstream);
-		}
 
-		/// <summary>
-		/// Dispose of the CHDFile
-		/// </summary>
-		public void Dispose()
-		{
-			m_br.Dispose();
+			_headerVersion = ValidateHeaderVersion();
+
+			byte[] hash = GetHashFromHeader();
+			if (hash.Length == Constants.MD5Length)
+			{
+				_md5 = hash;
+			}
+			else if (hash.Length == Constants.SHA1Length)
+			{
+				_sha1 = hash;
+			}
 		}
 
 		#endregion
@@ -142,50 +192,57 @@ namespace SabreTools.Library.FileTypes
 		/// Validate the initial signature, version, and header size
 		/// </summary>
 		/// <returns>Unsigned int containing the version number, null if invalid</returns>
-		public uint? ValidateHeaderVersion()
+		private uint? ValidateHeaderVersion()
 		{
-			// Seek to the beginning to make sure we're reading the correct bytes
-			m_br.BaseStream.Seek(0, SeekOrigin.Begin);
+			try
+			{
+				// Seek to the beginning to make sure we're reading the correct bytes
+				m_br.BaseStream.Seek(0, SeekOrigin.Begin);
 
-			// Read and verify the CHD signature
-			m_signature = m_br.ReadBytes(8);
+				// Read and verify the CHD signature
+				m_signature = m_br.ReadBytes(8);
 
-			// If no signature could be read, return null
-			if (m_signature == null || m_signature.Length == 0)
+				// If no signature could be read, return null
+				if (m_signature == null || m_signature.Length == 0)
+				{
+					return null;
+				}
+
+				if (!m_signature.StartsWith(Constants.CHDSignature, exact: true))
+				{
+					// throw CHDERR_INVALID_FILE;
+					return null;
+				}
+
+				// Get the header size and version
+				m_headersize = m_br.ReadUInt32Reverse();
+				m_version = m_br.ReadUInt32Reverse();
+
+				// If we have an invalid combination of size and version
+				if ((m_version == 1 && m_headersize != Constants.CHD_V1_HEADER_SIZE)
+					|| (m_version == 2 && m_headersize != Constants.CHD_V2_HEADER_SIZE)
+					|| (m_version == 3 && m_headersize != Constants.CHD_V3_HEADER_SIZE)
+					|| (m_version == 4 && m_headersize != Constants.CHD_V4_HEADER_SIZE)
+					|| (m_version == 5 && m_headersize != Constants.CHD_V5_HEADER_SIZE)
+					|| (m_version < 1 || m_version > 5))
+				{
+					// throw CHDERR_UNSUPPORTED_VERSION;
+					return null;
+				}
+
+				return m_version;
+			}
+			catch
 			{
 				return null;
 			}
-
-			if (!m_signature.StartsWith(Constants.CHDSignature, exact: true))
-			{
-				// throw CHDERR_INVALID_FILE;
-				return null;
-			}
-
-			// Get the header size and version
-			m_headersize = m_br.ReadUInt32Reverse();
-			m_version = m_br.ReadUInt32Reverse();
-
-			// If we have an invalid combination of size and version
-			if ((m_version == 1 && m_headersize != Constants.CHD_V1_HEADER_SIZE)
-				|| (m_version == 2 && m_headersize != Constants.CHD_V2_HEADER_SIZE)
-				|| (m_version == 3 && m_headersize != Constants.CHD_V3_HEADER_SIZE)
-				|| (m_version == 4 && m_headersize != Constants.CHD_V4_HEADER_SIZE)
-				|| (m_version == 5 && m_headersize != Constants.CHD_V5_HEADER_SIZE)
-				|| (m_version < 1 || m_version > 5))
-			{
-				// throw CHDERR_UNSUPPORTED_VERSION;
-				return null;
-			}
-
-			return m_version;
 		}
 
 		/// <summary>
 		/// Get the internal MD5 (v1, v2) or SHA-1 (v3, v4, v5) from the CHD
 		/// </summary>
 		/// <returns>MD5 as a byte array, null on error</returns>
-		public byte[] GetHashFromHeader()
+		private byte[] GetHashFromHeader()
 		{
 			// Validate the header by default just in case
 			uint? version = ValidateHeaderVersion();
@@ -194,27 +251,35 @@ namespace SabreTools.Library.FileTypes
 			byte[] hash;
 
 			// Now parse the rest of the header according to the version
-			switch (version)
+			try
 			{
-				case 1:
-					hash = ParseCHDv1Header();
-					break;
-				case 2:
-					hash = ParseCHDv2Header();
-					break;
-				case 3:
-					hash = ParseCHDv3Header();
-					break;
-				case 4:
-					hash = ParseCHDv4Header();
-					break;
-				case 5:
-					hash = ParseCHDv5Header();
-					break;
-				case null:
-				default:
-					// throw CHDERR_INVALID_FILE;
-					return null;
+				switch (version)
+				{
+					case 1:
+						hash = ParseCHDv1Header();
+						break;
+					case 2:
+						hash = ParseCHDv2Header();
+						break;
+					case 3:
+						hash = ParseCHDv3Header();
+						break;
+					case 4:
+						hash = ParseCHDv4Header();
+						break;
+					case 5:
+						hash = ParseCHDv5Header();
+						break;
+					case null:
+					default:
+						// throw CHDERR_INVALID_FILE;
+						return null;
+				}
+			}
+			catch
+			{
+				// throw CHDERR_INVALID_FILE;
+				return null;
 			}
 
 			return hash;

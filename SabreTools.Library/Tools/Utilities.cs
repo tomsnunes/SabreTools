@@ -1040,9 +1040,9 @@ namespace SabreTools.Library.Tools
 		public static BaseFile GetCHDInfo(string input)
 		{
 			FileStream fs = TryOpenRead(input);
-			BaseFile datItem = GetCHDInfo(fs);
+			BaseFile chd = GetCHDInfo(fs);
 			fs.Dispose();
-			return datItem;
+			return chd;
 		}
 
 		/// <summary>
@@ -1369,32 +1369,6 @@ namespace SabreTools.Library.Tools
 					shouldInternalProcess = false;
 					break;
 			}
-		}
-
-		/// <summary>
-		/// Get if file has a known CHD header
-		/// </summary>
-		/// <param name="input">Filename of possible CHD</param>
-		/// <returns>True if the file has a valid CHD header, false otherwise</returns>
-		public static bool HasCHDHeader(string input)
-		{
-			FileStream fs = TryOpenRead(input);
-			bool output = HasCHDHeader(fs);
-			fs.Dispose();
-			return output;
-		}
-
-		/// <summary>
-		/// Get if file is a valid CHD
-		/// </summary>
-		/// <param name="input">Filename of possible CHD</param>
-		/// <returns>True if the file is a valid CHD, false otherwise</returns>
-		public static bool IsValidCHD(string input)
-		{
-			BaseFile baseFile = GetCHDInfo(input);
-			return baseFile != null
-				&& (((CHDFile)baseFile).MD5 != null
-					|| ((CHDFile)baseFile).SHA1 != null);
 		}
 
 		/// <summary>
@@ -1925,7 +1899,7 @@ namespace SabreTools.Library.Tools
 			long offset = 0, bool keepReadOpen = false, bool chdsAsFiles = true)
 		{
 			// We first check to see if it's a CHD
-			if (chdsAsFiles == false && HasCHDHeader(input))
+			if (chdsAsFiles == false && GetCHDInfo(input) != null)
 			{
 				// Seek to the starting position, if one is set
 				try
@@ -1952,8 +1926,8 @@ namespace SabreTools.Library.Tools
 					Globals.Logger.Warning("Stream does not support seeking. Stream position not changed");
 				}
 
-				// Get the Disk from the information
-				BaseFile disk = GetCHDInfo(input);
+				// Get the BaseFile from the information
+				BaseFile chd = GetCHDInfo(input);
 
 				// Seek to the beginning of the stream if possible
 				try
@@ -1974,7 +1948,7 @@ namespace SabreTools.Library.Tools
 					input.Dispose();
 				}
 
-				return disk;
+				return chd;
 			}
 
 			BaseFile rom = new BaseFile() 
@@ -2130,54 +2104,8 @@ namespace SabreTools.Library.Tools
 		/// </remarks>
 		public static BaseFile GetCHDInfo(Stream input)
 		{
-			// Get a CHD object to store the data
 			CHDFile chd = new CHDFile(input);
-
-			// Ensure that the header is valid
-			byte[] hash = chd.GetHashFromHeader();
-
-			// Set the proper hash of the Disk to return
-			if (hash.Length == Constants.MD5Length)
-			{
-				chd.MD5 = hash;
-				return chd;
-			}
-			else if (hash.Length == Constants.SHA1Length)
-			{
-				chd.SHA1 = hash;
-				return chd;
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Get if stream has a known CHD header
-		/// </summary>
-		/// <param name="input">Stream of possible CHD</param>
-		/// <returns>True if the stream has a valid CHD header, false otherwise</returns>
-		public static bool HasCHDHeader(Stream input)
-		{
-			// Get a CHD object to store the data
-			CHDFile chd = new CHDFile(input);
-
-			// Now try to get the header version
-			uint? version = chd.ValidateHeaderVersion();
-
-			return version != null;
-		}
-
-		/// <summary>
-		/// Get if stream is a valid CHD
-		/// </summary>
-		/// <param name="input">Stream of possible CHD</param>
-		/// <returns>True if the stream is a valid CHD, false otherwise</returns>
-		public static bool IsValidCHD(Stream input)
-		{
-			BaseFile baseFile = GetCHDInfo(input);
-			return baseFile != null
-				&& (((CHDFile)baseFile).MD5 != null
-					|| ((CHDFile)baseFile).SHA1 != null);
+			return (chd.Version != null && (chd.MD5 != null || chd.SHA1 != null) ? chd : null);
 		}
 
 		#endregion
