@@ -46,32 +46,32 @@ namespace SabreTools.Library.DatItems
 		public string CRC
 		{
 			get { return _crc.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_crc); }
-			set { _crc = Utilities.StringToByteArray(value); }
+			set { _crc = (value == "null" ? Constants.CRCZeroBytes : Utilities.StringToByteArray(value)); }
 		}
 		public string MD5
 		{
 			get { return _md5.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_md5); }
-			set { _md5 = Utilities.StringToByteArray(value); }
+			set { _md5 = (value == "null" ? Constants.MD5ZeroBytes : Utilities.StringToByteArray(value)); }
 		}
 		public string SHA1
 		{
 			get { return _sha1.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha1); }
-			set { _sha1 = Utilities.StringToByteArray(value); }
+			set { _sha1 = (value == "null" ? Constants.SHA1ZeroBytes : Utilities.StringToByteArray(value)); }
 		}
 		public string SHA256
 		{
 			get { return _sha256.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha256); }
-			set { _sha256 = Utilities.StringToByteArray(value); }
+			set { _sha256 = (value == "null" ? Constants.SHA256ZeroBytes : Utilities.StringToByteArray(value)); }
 		}
 		public string SHA384
 		{
 			get { return _sha384.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha384); }
-			set { _sha384 = Utilities.StringToByteArray(value); }
+			set { _sha384 = (value == "null" ? Constants.SHA384ZeroBytes : Utilities.StringToByteArray(value)); }
 		}
 		public string SHA512
 		{
 			get { return _sha512.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha512); }
-			set { _sha512 = Utilities.StringToByteArray(value); }
+			set { _sha512 = (value == "null" ? Constants.SHA512ZeroBytes : Utilities.StringToByteArray(value)); }
 		}
 		public string MergeTag
 		{

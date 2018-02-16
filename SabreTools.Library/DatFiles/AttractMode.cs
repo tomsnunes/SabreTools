@@ -173,12 +173,6 @@ namespace SabreTools.Library.DatFiles
 
 							item.Name = (item.Name == "null" ? "-" : item.Name);
 							((Rom)item).Size = Constants.SizeZero;
-							((Rom)item).CRC = ((Rom)item).CRC == "null" ? Constants.CRCZero : null;
-							((Rom)item).MD5 = ((Rom)item).MD5 == "null" ? Constants.MD5Zero : null;
-							((Rom)item).SHA1 = ((Rom)item).SHA1 == "null" ? Constants.SHA1Zero : null;
-							((Rom)item).SHA256 = ((Rom)item).SHA256 == "null" ? Constants.SHA256Zero : null;
-							((Rom)item).SHA384 = ((Rom)item).SHA384 == "null" ? Constants.SHA384Zero : null;
-							((Rom)item).SHA512 = ((Rom)item).SHA512 == "null" ? Constants.SHA512Zero : null;
 						}
 
 						// Set the new data to compare against
