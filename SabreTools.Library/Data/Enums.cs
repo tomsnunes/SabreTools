@@ -95,11 +95,14 @@
 	public enum FileType
 	{
 		None = 0,
+
+		// Archival types
 		SevenZipArchive,
 		CHD,
 		GZipArchive,
-		RARArchive,
-		TARArchive,
+		RarArchive,
+		TarArchive,
+		ZipArchive,
 	}
 
 	/// <summary>

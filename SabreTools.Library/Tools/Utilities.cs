@@ -37,7 +37,6 @@ using Stream = System.IO.Stream;
 using StreamReader = System.IO.StreamReader;
 #endif
 using NaturalSort;
-using SharpCompress.Common;
 
 namespace SabreTools.Library.Tools
 {
@@ -446,7 +445,7 @@ namespace SabreTools.Library.Tools
 			BaseArchive archive = null;
 
 			// First get the archive type
-			ArchiveType? at = GetArchiveType(input);
+			FileType? at = GetFileType(input);
 
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
@@ -458,20 +457,24 @@ namespace SabreTools.Library.Tools
 			Globals.Logger.Verbose("Found archive of type: {0}", at);
 			switch (at)
 			{
-				case ArchiveType.GZip:
+				case FileType.GZipArchive:
 					archive = new GZipArchive(input);
 					break;
-				case ArchiveType.Rar:
+				case FileType.RarArchive:
 					archive = new RarArchive(input);
 					break;
-				case ArchiveType.SevenZip:
+				case FileType.SevenZipArchive:
 					archive = new SevenZipArchive(input);
 					break;
-				case ArchiveType.Tar:
+				case FileType.TarArchive:
 					archive = new TapeArchive(input);
 					break;
-				case ArchiveType.Zip:
+				case FileType.ZipArchive:
 					archive = new TorrentZipArchive(input);
+					break;
+				case FileType.CHD:
+				default:
+					// We ignore these types for now
 					break;
 			}
 
@@ -483,19 +486,19 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="archiveType">SharpCompress.Common.ArchiveType representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive GetArchive(ArchiveType archiveType)
+		public static BaseArchive GetArchive(FileType archiveType)
 		{
 			switch (archiveType)
 			{
-				case ArchiveType.GZip:
+				case FileType.GZipArchive:
 					return new GZipArchive();
-				case ArchiveType.Rar:
+				case FileType.RarArchive:
 					return new RarArchive();
-				case ArchiveType.SevenZip:
+				case FileType.SevenZipArchive:
 					return new SevenZipArchive();
-				case ArchiveType.Tar:
+				case FileType.TarArchive:
 					return new TapeArchive();
-				case ArchiveType.Zip:
+				case FileType.ZipArchive:
 					return new TorrentZipArchive();
 				default:
 					return null;
@@ -1044,65 +1047,6 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Returns the archive type of an input file
-		/// </summary>
-		/// <param name="input">Input file to check</param>
-		/// <returns>ArchiveType of inputted file (null on error)</returns>
-		public static ArchiveType? GetArchiveType(string input)
-		{
-			ArchiveType? outtype = null;
-
-			// If the file is null, then we have no archive type
-			if (input == null)
-			{
-				return outtype;
-			}
-
-			// First line of defense is going to be the extension, for better or worse
-			if (!HasValidArchiveExtension(input))
-			{
-				return outtype;
-			}
-
-			// Read the first bytes of the file and get the magic number
-			try
-			{
-				byte[] magic = new byte[8];
-				BinaryReader br = new BinaryReader(TryOpenRead(input));
-				magic = br.ReadBytes(8);
-				br.Dispose();
-
-				// Now try to match it to a known signature
-				if (magic.StartsWith(Constants.SevenZipSignature))
-				{
-					outtype = ArchiveType.SevenZip;
-				}
-				else if (magic.StartsWith(Constants.GzSignature))
-				{
-					outtype = ArchiveType.GZip;
-				}
-				else if (magic.StartsWith(Constants.RarSignature) || magic.StartsWith(Constants.RarFiveSignature))
-				{
-					outtype = ArchiveType.Rar;
-				}
-				else if (magic.StartsWith(Constants.TarSignature) || magic.StartsWith(Constants.TarZeroSignature))
-				{
-					outtype = ArchiveType.Tar;
-				}
-				else if (magic.StartsWith(Constants.ZipSignature) || magic.StartsWith(Constants.ZipSignatureEmpty) || magic.StartsWith(Constants.ZipSignatureSpanned))
-				{
-					outtype = ArchiveType.Zip;
-				}
-			}
-			catch (Exception)
-			{
-				// Don't log file open errors
-			}
-
-			return outtype;
-		}
-
-		/// <summary>
 		/// Get what type of DAT the input file is
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
@@ -1329,6 +1273,69 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Returns the file type of an input file
+		/// </summary>
+		/// <param name="input">Input file to check</param>
+		/// <returns>FileType of inputted file (null on error)</returns>
+		public static FileType? GetFileType(string input)
+		{
+			FileType? outFileType = null;
+
+			// If the file is null, then we have no archive type
+			if (input == null)
+			{
+				return outFileType;
+			}
+
+			// First line of defense is going to be the extension, for better or worse
+			if (!HasValidArchiveExtension(input))
+			{
+				return outFileType;
+			}
+
+			// Read the first bytes of the file and get the magic number
+			try
+			{
+				byte[] magic = new byte[8];
+				BinaryReader br = new BinaryReader(TryOpenRead(input));
+				magic = br.ReadBytes(8);
+				br.Dispose();
+
+				// Now try to match it to a known signature
+				if (magic.StartsWith(Constants.SevenZipSignature))
+				{
+					outFileType = FileType.SevenZipArchive;
+				}
+				else if (magic.StartsWith(Constants.CHDSignature))
+				{
+					outFileType = FileType.CHD;
+				}
+				else if (magic.StartsWith(Constants.GzSignature))
+				{
+					outFileType = FileType.GZipArchive;
+				}
+				else if (magic.StartsWith(Constants.RarSignature) || magic.StartsWith(Constants.RarFiveSignature))
+				{
+					outFileType = FileType.RarArchive;
+				}
+				else if (magic.StartsWith(Constants.TarSignature) || magic.StartsWith(Constants.TarZeroSignature))
+				{
+					outFileType = FileType.TarArchive;
+				}
+				else if (magic.StartsWith(Constants.ZipSignature) || magic.StartsWith(Constants.ZipSignatureEmpty) || magic.StartsWith(Constants.ZipSignatureSpanned))
+				{
+					outFileType = FileType.ZipArchive;
+				}
+			}
+			catch (Exception)
+			{
+				// Don't log file open errors
+			}
+
+			return outFileType;
+		}
+
+		/// <summary>
 		/// Get if the current file should be scanned internally and externally
 		/// </summary>
 		/// <param name="input">Name of the input file to check</param>
@@ -1341,26 +1348,27 @@ namespace SabreTools.Library.Tools
 			shouldExternalProcess = true;
 			shouldInternalProcess = true;
 
-			ArchiveType? archiveType = GetArchiveType(input);
-			switch (archiveType)
+			FileType? fileType = GetFileType(input);
+			switch (fileType)
 			{
+				case FileType.CHD:
 				case null:
 					shouldExternalProcess = true;
 					shouldInternalProcess = false;
 					break;
-				case ArchiveType.GZip:
+				case FileType.GZipArchive:
 					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.GZipExternal) != 0);
 					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0);
 					break;
-				case ArchiveType.Rar:
+				case FileType.RarArchive:
 					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.RarExternal) != 0);
 					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.RarInternal) != 0);
 					break;
-				case ArchiveType.SevenZip:
+				case FileType.SevenZipArchive:
 					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.SevenZipExternal) != 0);
 					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.SevenZipInternal) != 0);
 					break;
-				case ArchiveType.Zip:
+				case FileType.ZipArchive:
 					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.ZipExternal) != 0);
 					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0);
 					break;
