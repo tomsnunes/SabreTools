@@ -37,6 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public Folder()
 			: base()
 		{
+			_fileType = FileType.Folder;
 		}
 
 		/// <summary>
@@ -47,6 +48,7 @@ namespace SabreTools.Library.FileTypes
 		public Folder(string filename)
 			: base(filename)
 		{
+			_fileType = FileType.Folder;
 		}
 
 		#endregion

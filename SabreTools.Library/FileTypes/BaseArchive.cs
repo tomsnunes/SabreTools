@@ -9,19 +9,15 @@ using System.IO;
 using MemoryStream = System.IO.MemoryStream;
 using Stream = System.IO.Stream;
 #endif
-using SharpCompress.Common;
 
 namespace SabreTools.Library.FileTypes
 {
-	public abstract class BaseArchive
+	public abstract class BaseArchive : BaseFile
 	{
 		#region Protected instance variables
 
 		// Buffer size used by archives
 		protected const int _bufferSize = 4096 * 128;
-
-		protected ArchiveType _archiveType;
-		protected string _filename;
 
 		#endregion
 
@@ -39,8 +35,8 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
 		public BaseArchive(string filename)
+			: base(filename)
 		{
-			_filename = filename;
 		}
 
 		#endregion

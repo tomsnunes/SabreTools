@@ -27,6 +27,7 @@ namespace SabreTools.Library.FileTypes
 		public ZstdArchive()
 			: base()
 		{
+			_fileType = FileType.ZstdArchive;
 		}
 
 		/// <summary>
@@ -36,7 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public ZstdArchive(string filename)
 			: base(filename)
 		{
-			//_archiveType = ArchiveType.LRZip;
+			_fileType = FileType.ZstdArchive;
 		}
 
 		#endregion

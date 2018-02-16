@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.IO;
 using SabreTools.Library.Data;
+using SabreTools.Library.DatItems;
 
 /// <summary>
 /// This code is based on the header format described at http://www.rarlab.com/technote.htm#srvheaders
@@ -116,7 +117,7 @@ using SabreTools.Library.Data;
 /// </remarks>
 namespace SabreTools.Library.FileTypes
 {
-	public class CoreRarArchive
+	public class CoreRarArchive : BaseArchive
 	{
 		// SFX Module Information
 		public byte[] SFX;
@@ -148,6 +149,55 @@ namespace SabreTools.Library.FileTypes
 
 		// Entry Information
 		public List<CoreRarArchiveEntry> Entries = new List<CoreRarArchiveEntry>();
+
+		#region Unimplemented methods
+
+		public override bool ExtractAll(string outDir)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string ExtractEntry(string entryName, string outDir)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override (MemoryStream, string) ExtractEntryStream(string entryName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override List<string> GetEmptyFolders()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool IsTorrent()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
 	}
 
 	public class CoreRarArchiveEntry

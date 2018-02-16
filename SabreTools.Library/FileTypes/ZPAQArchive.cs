@@ -27,6 +27,7 @@ namespace SabreTools.Library.FileTypes
 		public ZPAQArchive()
 			: base()
 		{
+			_fileType = FileType.ZPAQArchive;
 		}
 
 		/// <summary>
@@ -36,7 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public ZPAQArchive(string filename)
 			: base(filename)
 		{
-			//_archiveType = ArchiveType.LRZip;
+			_fileType = FileType.ZPAQArchive;
 		}
 
 		#endregion

@@ -40,6 +40,7 @@ namespace SabreTools.Library.FileTypes
 		public TapeArchive()
 			: base()
 		{
+			_fileType = FileType.TapeArchive;
 		}
 
 		/// <summary>
@@ -50,7 +51,7 @@ namespace SabreTools.Library.FileTypes
 		public TapeArchive(string filename)
 			: base(filename)
 		{
-			_archiveType = ArchiveType.Tar;
+			_fileType = FileType.TapeArchive;
 		}
 
 		#endregion

@@ -20,7 +20,6 @@ using Stream = System.IO.Stream;
 #endif
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
-using SharpCompress.Common;
 using SharpCompress.Readers;
 
 namespace SabreTools.Library.FileTypes
@@ -38,6 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public RarArchive()
 			: base()
 		{
+			_fileType = FileType.RarArchive;
 		}
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace SabreTools.Library.FileTypes
 		public RarArchive(string filename)
 			: base(filename)
 		{
-			_archiveType = ArchiveType.Rar;
+			_fileType = FileType.RarArchive;
 		}
 
 		#endregion
@@ -252,13 +252,13 @@ namespace SabreTools.Library.FileTypes
 			// Check for the signature first (Skipping the SFX Module)
 			byte[] signature = br.ReadBytes(8);
 			int startpos = 0;
-			while (startpos < Constants.MibiByte && BitConverter.ToString(signature, 0, 7) != Constants.RarSignature && BitConverter.ToString(signature) != Constants.RarFiveSig)
+			while (startpos < Constants.MibiByte && !signature.StartsWith(Constants.RarSignature, exact: true) && !signature.StartsWith(Constants.RarFiveSignature, exact: true))
 			{
 				startpos++;
 				br.BaseStream.Position = startpos;
 				signature = br.ReadBytes(8);
 			}
-			if (BitConverter.ToString(signature, 0, 7) != Constants.RarSignature && BitConverter.ToString(signature) != Constants.RarFiveSig)
+			if (!signature.StartsWith(Constants.RarSignature, exact: true) && !signature.StartsWith(Constants.RarFiveSignature, exact: true))
 			{
 				return;
 			}

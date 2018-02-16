@@ -36,6 +36,7 @@ namespace SabreTools.Library.FileTypes
 		public TorrentZipArchive()
 			: base()
 		{
+			_fileType = FileType.ZipArchive;
 		}
 
 		/// <summary>
@@ -46,7 +47,7 @@ namespace SabreTools.Library.FileTypes
 		public TorrentZipArchive(string filename)
 			: base(filename)
 		{
-			_archiveType = ArchiveType.Zip;
+			_fileType = FileType.ZipArchive;
 		}
 
 		#endregion

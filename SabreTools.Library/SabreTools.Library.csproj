@@ -133,6 +133,7 @@
     <Compile Include="DatFiles\SoftwareList.cs" />
     <Compile Include="DatItems\Blank.cs" />
     <Compile Include="FileTypes\CHDFile.cs" />
+    <Compile Include="FileTypes\BaseFile.cs" />
     <Compile Include="FileTypes\CoreRarArchive.cs" />
     <Compile Include="External\NaturalSort\NaturalComparer.cs" />
     <Compile Include="External\NaturalSort\NaturalReversedComparer.cs" />

@@ -40,6 +40,7 @@ namespace SabreTools.Library.FileTypes
 		public XZArchive()
 			: base()
 		{
+			_fileType = FileType.XZArchive;
 		}
 
 		/// <summary>
@@ -50,7 +51,7 @@ namespace SabreTools.Library.FileTypes
 		public XZArchive(string filename)
 			: base(filename)
 		{
-			//_archiveType = ArchiveType.XZip;
+			_fileType = FileType.XZArchive;
 		}
 
 		#endregion

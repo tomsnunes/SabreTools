@@ -21,7 +21,6 @@ using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 using Ionic.Zlib;
-using SharpCompress.Common;
 
 namespace SabreTools.Library.FileTypes
 {
@@ -38,6 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public GZipArchive()
 			: base()
 		{
+			_fileType = FileType.GZipArchive;
 		}
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace SabreTools.Library.FileTypes
 		public GZipArchive(string filename)
 			: base(filename)
 		{
-			_archiveType = ArchiveType.GZip;
+			_fileType = FileType.GZipArchive;
 		}
 
 		#endregion

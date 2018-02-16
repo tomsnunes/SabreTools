@@ -96,13 +96,21 @@
 	{
 		None = 0,
 
+		// Bare types
+		CHD,
+		Folder,
+
 		// Archival types
 		SevenZipArchive,
-		CHD,
 		GZipArchive,
+		LRZipArchive,
+		LZ4Archive,
 		RarArchive,
-		TarArchive,
+		TapeArchive,
+		XZArchive,
 		ZipArchive,
+		ZPAQArchive,
+		ZstdArchive,
 	}
 
 	/// <summary>

@@ -88,7 +88,7 @@ namespace SabreTools.Library.FileTypes
 	/// 0x68-0x7b - Parent SHA-1
 	/// ----------------------------------------------
 	/// </remarks>
-	public class CHDFile : IDisposable
+	public class CHDFile : BaseFile, IDisposable
 	{
 		#region Private instance variables
 
@@ -122,6 +122,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="chdstream">Stream representing the CHD file</param>
 		public CHDFile(Stream chdstream)
 		{
+			_fileType = FileType.CHD;
 			m_br = new BinaryReader(chdstream);
 		}
 

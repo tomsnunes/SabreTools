@@ -466,13 +466,12 @@ namespace SabreTools.Library.Tools
 				case FileType.SevenZipArchive:
 					archive = new SevenZipArchive(input);
 					break;
-				case FileType.TarArchive:
+				case FileType.TapeArchive:
 					archive = new TapeArchive(input);
 					break;
 				case FileType.ZipArchive:
 					archive = new TorrentZipArchive(input);
 					break;
-				case FileType.CHD:
 				default:
 					// We ignore these types for now
 					break;
@@ -496,7 +495,7 @@ namespace SabreTools.Library.Tools
 					return new RarArchive();
 				case FileType.SevenZipArchive:
 					return new SevenZipArchive();
-				case FileType.TarArchive:
+				case FileType.TapeArchive:
 					return new TapeArchive();
 				case FileType.ZipArchive:
 					return new TorrentZipArchive();
@@ -1320,7 +1319,7 @@ namespace SabreTools.Library.Tools
 				}
 				else if (magic.StartsWith(Constants.TarSignature) || magic.StartsWith(Constants.TarZeroSignature))
 				{
-					outFileType = FileType.TarArchive;
+					outFileType = FileType.TapeArchive;
 				}
 				else if (magic.StartsWith(Constants.ZipSignature) || magic.StartsWith(Constants.ZipSignatureEmpty) || magic.StartsWith(Constants.ZipSignatureSpanned))
 				{
@@ -1350,12 +1349,7 @@ namespace SabreTools.Library.Tools
 
 			FileType? fileType = GetFileType(input);
 			switch (fileType)
-			{
-				case FileType.CHD:
-				case null:
-					shouldExternalProcess = true;
-					shouldInternalProcess = false;
-					break;
+			{				
 				case FileType.GZipArchive:
 					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.GZipExternal) != 0);
 					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0);
@@ -1371,6 +1365,11 @@ namespace SabreTools.Library.Tools
 				case FileType.ZipArchive:
 					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.ZipExternal) != 0);
 					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0);
+					break;
+				case null:
+				default:
+					shouldExternalProcess = true;
+					shouldInternalProcess = false;
 					break;
 			}
 		}

@@ -22,7 +22,6 @@ using ROMVault2.SupportedFiles.Zip;
 using SevenZip; // TODO: Remove this when 7zip write is implemented in SharpCompress
 using SharpCompress.Archives;
 using SharpCompress.Archives.SevenZip;
-using SharpCompress.Common;
 using SharpCompress.Readers;
 
 namespace SabreTools.Library.FileTypes
@@ -41,6 +40,7 @@ namespace SabreTools.Library.FileTypes
 		public SevenZipArchive()
 			: base()
 		{
+			_fileType = FileType.SevenZipArchive;
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace SabreTools.Library.FileTypes
 		public SevenZipArchive(string filename)
 			: base(filename)
 		{
-			_archiveType = ArchiveType.SevenZip;
+			_fileType = FileType.SevenZipArchive;
 		}
 
 		#endregion

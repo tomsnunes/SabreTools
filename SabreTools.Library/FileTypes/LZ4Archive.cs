@@ -27,6 +27,7 @@ namespace SabreTools.Library.FileTypes
 		public LZ4Archive()
 			: base()
 		{
+			_fileType = FileType.LZ4Archive;
 		}
 
 		/// <summary>
@@ -36,7 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public LZ4Archive(string filename)
 			: base(filename)
 		{
-			//_archiveType = ArchiveType.LRZip;
+			_fileType = FileType.LZ4Archive;
 		}
 
 		#endregion
