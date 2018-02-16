@@ -20,7 +20,6 @@ using SearchOption = System.IO.SearchOption;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
-using SharpCompress.Common;
 
 namespace SabreTools.Library.FileTypes
 {
@@ -66,7 +65,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public bool ExtractAll(string outDir)
+		public virtual bool CopyAll(string outDir)
 		{
 			// Copy all files from the current folder to the output directory recursively
 			try
@@ -92,7 +91,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public string ExtractEntry(string entryName, string outDir)
+		public virtual string CopyToFile(string entryName, string outDir)
 		{
 			string realentry = null;
 
@@ -131,7 +130,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="realEntry">Output representing the entry name that was found</param>
 		/// <returns>MemoryStream representing the entry, null on error</returns>
-		public (MemoryStream, string) ExtractEntryStream(string entryName)
+		public virtual (MemoryStream, string) CopyToStream(string entryName)
 		{
 			MemoryStream ms = new MemoryStream();
 			string realentry = null;
@@ -175,7 +174,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of BaseFile objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public virtual List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
 			if (_children == null || _children.Count == 0)
 			{
@@ -200,7 +199,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
 		/// <returns>List of empty folders in the folder</returns>
-		public List<string> GetEmptyFolders()
+		public virtual List<string> GetEmptyFolders()
 		{
 			return Utilities.GetEmptyDirectories(_filename).ToList();
 		}
@@ -210,7 +209,7 @@ namespace SabreTools.Library.FileTypes
 		#region Writing
 
 		/// <summary>
-		/// Write an input file to a torrent LRZip file
+		/// Write an input file to an output folder
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -219,13 +218,13 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
+		public virtual bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			throw new NotImplementedException();
 		}
 
 		/// <summary>
-		/// Write an input stream to a torrent LRZip file
+		/// Write an input stream to an output folder
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -234,7 +233,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
+		public virtual bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			bool success = false;
 
@@ -308,7 +307,7 @@ namespace SabreTools.Library.FileTypes
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrent LRZip archive (assuming the same output archive name)
+		/// Write a set of input files to an output folder (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFiles">Input files to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -316,7 +315,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
+		public virtual bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
 		{
 			throw new NotImplementedException();
 		}

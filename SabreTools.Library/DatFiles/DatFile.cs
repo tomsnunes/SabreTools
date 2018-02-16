@@ -4403,7 +4403,7 @@ namespace SabreTools.Library.DatFiles
 					Folder archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
-						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
+						(fileStream, realName) = archive.CopyToStream(datItem.Name);
 					}
 				}
 				// Otherwise, just open the filestream
@@ -4487,7 +4487,7 @@ namespace SabreTools.Library.DatFiles
 					Folder archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
-						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
+						(fileStream, realName) = archive.CopyToStream(datItem.Name);
 					}
 				}
 				// Otherwise, just open the filestream
@@ -4577,7 +4577,7 @@ namespace SabreTools.Library.DatFiles
 					Folder archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
-						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
+						(fileStream, realName) = archive.CopyToStream(datItem.Name);
 					}
 				}
 				// Otherwise, just open the filestream

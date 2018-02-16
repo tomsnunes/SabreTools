@@ -63,7 +63,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public override bool ExtractAll(string outDir)
+		public override bool CopyAll(string outDir)
 		{
 			bool encounteredErrors = true;
 
@@ -104,10 +104,10 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public override string ExtractEntry(string entryName, string outDir)
+		public override string CopyToFile(string entryName, string outDir)
 		{
 			// Try to extract a stream using the given information
-			(MemoryStream ms, string realEntry) = ExtractEntryStream(entryName);
+			(MemoryStream ms, string realEntry) = CopyToStream(entryName);
 
 			// If the memory stream and the entry name are both non-null, we write to file
 			if (ms != null && realEntry != null)
@@ -150,7 +150,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="realEntry">Output representing the entry name that was found</param>
 		/// <returns>MemoryStream representing the entry, null on error</returns>
-		public override (MemoryStream, string) ExtractEntryStream(string entryName)
+		public override (MemoryStream, string) CopyToStream(string entryName)
 		{
 			MemoryStream ms = new MemoryStream();
 			string realEntry = null;

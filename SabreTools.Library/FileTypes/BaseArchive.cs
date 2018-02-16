@@ -48,7 +48,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public new abstract bool ExtractAll(string outDir);
+		public override abstract bool CopyAll(string outDir);
 
 		/// <summary>
 		/// Attempt to extract an entry from an archive
@@ -56,7 +56,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public new abstract string ExtractEntry(string entryName, string outDir);
+		public override abstract string CopyToFile(string entryName, string outDir);
 
 		/// <summary>
 		/// Attempt to extract a stream from an archive
@@ -64,7 +64,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="realEntry">Output representing the entry name that was found</param>
 		/// <returns>MemoryStream representing the entry, null on error</returns>
-		public new abstract (MemoryStream, string) ExtractEntryStream(string entryName);
+		public override abstract (MemoryStream, string) CopyToStream(string entryName);
 
 		#endregion
 
@@ -104,7 +104,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public abstract bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false);
+		public override abstract bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false);
 
 		/// <summary>
 		/// Write an input stream to an archive
@@ -115,7 +115,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public abstract bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false);
+		public override abstract bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false);
 
 		/// <summary>
 		/// Write a set of input files to an archive (assuming the same output archive name)
@@ -126,7 +126,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public abstract bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false);
+		public override abstract bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false);
 
 		#endregion
 	}
