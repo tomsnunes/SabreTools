@@ -252,13 +252,13 @@ namespace SabreTools.Library.FileTypes
 			// Check for the signature first (Skipping the SFX Module)
 			byte[] signature = br.ReadBytes(8);
 			int startpos = 0;
-			while (startpos < Constants.MibiByte && BitConverter.ToString(signature, 0, 7) != Constants.RarSig && BitConverter.ToString(signature) != Constants.RarFiveSig)
+			while (startpos < Constants.MibiByte && BitConverter.ToString(signature, 0, 7) != Constants.RarSignature && BitConverter.ToString(signature) != Constants.RarFiveSig)
 			{
 				startpos++;
 				br.BaseStream.Position = startpos;
 				signature = br.ReadBytes(8);
 			}
-			if (BitConverter.ToString(signature, 0, 7) != Constants.RarSig && BitConverter.ToString(signature) != Constants.RarFiveSig)
+			if (BitConverter.ToString(signature, 0, 7) != Constants.RarSignature && BitConverter.ToString(signature) != Constants.RarFiveSig)
 			{
 				return;
 			}
