@@ -26,11 +26,58 @@ namespace SabreTools.Library.Data
 
 		public const long SizeZero = 0;
 		public const string CRCZero = "00000000";
+		public static readonly byte[] CRCZeroBytes =	{ 0x00, 0x00, 0x00, 0x00 };
 		public const string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
+		public static readonly byte[] MD5ZeroBytes =	{ 0xda, 0x39, 0xa3, 0xee,
+														  0x5e, 0x6b, 0x4b, 0x0d,
+														  0x32, 0x55, 0xbf, 0xef,
+														  0x95, 0x60, 0x18, 0x90,
+														  0xaf, 0xd8, 0x07, 0x09 };
 		public const string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+		public static readonly byte[] SHA1ZeroBytes =	{ 0xda, 0x39, 0xa3, 0xee,
+														  0x5e, 0x6b, 0x4b, 0x0d,
+														  0x32, 0x55, 0xbf, 0xef,
+														  0x95, 0x60, 0x18, 0x90,
+														  0xaf, 0xd8, 0x07, 0x09 };
 		public const string SHA256Zero = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
+		public static readonly byte[] SHA256ZeroBytes = { 0xba, 0x78, 0x16, 0xbf,
+														  0x8f, 0x01, 0xcf, 0xea,
+														  0x41, 0x41, 0x40, 0xde,
+														  0x5d, 0xae, 0x22, 0x23,
+														  0xb0, 0x03, 0x61, 0xa3,
+														  0x96, 0x17, 0x7a, 0x9c,
+														  0xb4, 0x10, 0xff, 0x61,
+														  0xf2, 0x00, 0x15, 0xad };
 		public const string SHA384Zero = "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7";
+		public static readonly byte[] SHA384ZeroBytes = { 0xcb, 0x00, 0x75, 0x3f,
+														  0x45, 0xa3, 0x5e, 0x8b,
+														  0xb5, 0xa0, 0x3d, 0x69,
+														  0x9a, 0xc6, 0x50, 0x07,
+														  0x27, 0x2c, 0x32, 0xab,
+														  0x0e, 0xde, 0xd1, 0x63,
+														  0x1a, 0x8b, 0x60, 0x5a,
+														  0x43, 0xff, 0x5b, 0xed,
+														  0x80, 0x86, 0x07, 0x2b,
+														  0xa1, 0xe7, 0xcc, 0x23,
+														  0x58, 0xba, 0xec, 0xa1,
+														  0x34, 0xc8, 0x25, 0xa7 };
 		public const string SHA512Zero = "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f";
+		public static readonly byte[] SHA512ZeroBytes = { 0xdd, 0xaf, 0x35, 0xa1,
+														  0x93, 0x61, 0x7a, 0xba,
+														  0xcc, 0x41, 0x73, 0x49,
+														  0xae, 0x20, 0x41, 0x31,
+														  0x12, 0xe6, 0xfa, 0x4e,
+														  0x89, 0xa9, 0x7e, 0xa2,
+														  0x0a, 0x9e, 0xee, 0xe6,
+														  0x4b, 0x55, 0xd3, 0x9a,
+														  0x21, 0x92, 0x99, 0x2a,
+														  0x27, 0x4f, 0xc1, 0xa8,
+														  0x36, 0xba, 0x3c, 0x23,
+														  0xa3, 0xfe, 0xeb, 0xbd,
+														  0x45, 0x4d, 0x44, 0x23,
+														  0x64, 0x3c, 0xe8, 0x0e,
+														  0x2a, 0x9a, 0xc9, 0x4f,
+														  0xa5, 0x4c, 0xa4, 0x9f };
 
 		#endregion
 
@@ -62,15 +109,28 @@ namespace SabreTools.Library.Data
 
 		#region CHD header values
 
-		// CHD signature - "MComprHD"
-		public readonly static byte[] CHDSignatureBytes = { 0x4d, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x48, 0x44 };
-		public const ulong CHDSignature = 0x4d436f6d70724844;
-
 		// Header versions and sizes
 		public const int CHD_HEADER_VERSION = 5;
+		public const int CHD_V1_HEADER_SIZE = 76;
+		public const int CHD_V2_HEADER_SIZE = 80;
 		public const int CHD_V3_HEADER_SIZE = 120;
 		public const int CHD_V4_HEADER_SIZE = 108;
 		public const int CHD_V5_HEADER_SIZE = 124;
+		public const int CHD_MAX_HEADER_SIZE = CHD_V5_HEADER_SIZE;
+
+		// Key offsets within the header (V1)
+		public const long CHDv1MapOffsetOffset = 0;
+		public const long CHDv1MetaOffsetOffset = 0;
+		public const long CHDv1MD5Offset = 44;
+		public const long CHDv1RawMD5Offset = 0;
+		public const long CHDv1ParentMD5Offset = 60;
+
+		// Key offsets within the header (V2)
+		public const long CHDv2MapOffsetOffset = 0;
+		public const long CHDv2MetaOffsetOffset = 0;
+		public const long CHDv2MD5Offset = 44;
+		public const long CHDv2RawMD5Offset = 0;
+		public const long CHDv2ParentMD5Offset = 60;
 
 		// Key offsets within the header (V3)
 		public const long CHDv3MapOffsetOffset = 0;    // offset of map offset field
@@ -440,17 +500,18 @@ namespace SabreTools.Library.Data
 
 		#endregion
 
-		#region Magic numbers as strings
+		#region Magic numbers
 
-		public const string SevenZipSig = "377ABCAF271C";
-		public const string GzSig = "1F8B";
-		public const string RarSig = "526172211A0700";
-		public const string RarFiveSig = "526172211A070100";
-		public const string TarSig = "7573746172202000";
-		public const string TarZeroSig = "7573746172003030";
-		public const string ZipSig = "504B0304";
-		public const string ZipSigEmpty = "504B0506";
-		public const string ZipSigSpanned = "504B0708";
+		public static readonly byte[] SevenZipSignature = { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c };
+		public readonly static byte[] CHDSignature = { 0x4d, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x48, 0x44 };
+		public static readonly byte[] GzSignature = { 0x1f, 0x8b };
+		public static readonly byte[] RarSignature = { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00 };
+		public static readonly byte[] RarFiveSignature = { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00 };
+		public static readonly byte[] TarSignature = { 0x75, 0x73, 0x74, 0x61, 0x72, 0x20, 0x20, 0x00 };
+		public static readonly byte[] TarZeroSignature = { 0x75, 0x73, 0x74, 0x61, 0x72, 0x00, 0x30, 0x30 };
+		public static readonly byte[] ZipSignature = { 0x50, 0x4b, 0x03, 0x04 };
+		public static readonly byte[] ZipSignatureEmpty = { 0x50, 0x4b, 0x05, 0x06 };
+		public static readonly byte[] ZipSignatureSpanned = { 0x50, 0x4b, 0x07, 0x08 };
 
 		#endregion
 
@@ -469,7 +530,7 @@ namespace SabreTools.Library.Data
 			https://pkware.cachefly.net/webdocs/APPNOTE/APPNOTE_6.2.0.txt
 			http://www.romvault.com/trrntzip_explained.doc
 
-			00-03		Local file header signature (0x50, 0x4B, 0x03, 0x04)
+			00-03		Local file header signature (0x50, 0x4B, 0x03, 0x04) ZipSignature
 			04-05		Version needed to extract (0x14, 0x00)
 			06-07		General purpose bit flag (0x02, 0x00)
 			08-09		Compression method (0x08, 0x00)
@@ -481,7 +542,7 @@ namespace SabreTools.Library.Data
 		/* Torrent7z Header Format
 			http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt
 
-			00-05		Local file header signature (0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C)
+			00-05		Local file header signature (0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C) SevenZipSignature
 			06-07		ArchiveVersion (0x00, 0x03)
 			The rest is unknown
 		*/
@@ -492,8 +553,7 @@ namespace SabreTools.Library.Data
 		/* (Torrent)GZ Header Format
 			https://tools.ietf.org/html/rfc1952
 
-			00			Identification 1 (0x1F)
-			01			Identification 2 (0x8B)
+			00-01		Identification (0x1F, 0x8B) GzSignature
 			02			Compression Method (0-7 reserved, 8 deflate; 0x08)
 			03			Flags (0 FTEXT, 1 FHCRC, 2 FEXTRA, 3 FNAME, 4 FCOMMENT, 5 reserved, 6 reserved, 7 reserved; 0x04)
 			04-07		Modification time (Unix format; 0x00, 0x00, 0x00, 0x00)
