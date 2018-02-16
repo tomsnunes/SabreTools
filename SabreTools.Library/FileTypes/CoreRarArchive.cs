@@ -152,17 +152,17 @@ namespace SabreTools.Library.FileTypes
 
 		#region Unimplemented methods
 
-		public override bool ExtractAll(string outDir)
+		public override bool CopyAll(string outDir)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override string ExtractEntry(string entryName, string outDir)
+		public override string CopyToFile(string entryName, string outDir)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override (MemoryStream, string) ExtractEntryStream(string entryName)
+		public override (MemoryStream, string) CopyToStream(string entryName)
 		{
 			throw new NotImplementedException();
 		}
