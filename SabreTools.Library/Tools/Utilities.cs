@@ -473,7 +473,7 @@ namespace SabreTools.Library.Tools
 					archive = new TorrentZipArchive(input);
 					break;
 				default:
-					// We ignore these types for now
+					// We ignore all other types for now
 					break;
 			}
 
@@ -1339,17 +1339,43 @@ namespace SabreTools.Library.Tools
 				{
 					outFileType = FileType.GZipArchive;
 				}
-				else if (magic.StartsWith(Constants.RarSignature) || magic.StartsWith(Constants.RarFiveSignature))
+				else if (magic.StartsWith(Constants.LRZipSignature))
+				{
+					outFileType = FileType.LRZipArchive;
+				}
+				else if (magic.StartsWith(Constants.LZ4Signature)
+					|| magic.StartsWith(Constants.LZ4SkippableMinSignature)
+					|| magic.StartsWith(Constants.LZ4SkippableMaxSignature))
+				{
+					outFileType = FileType.LZ4Archive;
+				}
+				else if (magic.StartsWith(Constants.RarSignature)
+					|| magic.StartsWith(Constants.RarFiveSignature))
 				{
 					outFileType = FileType.RarArchive;
 				}
-				else if (magic.StartsWith(Constants.TarSignature) || magic.StartsWith(Constants.TarZeroSignature))
+				else if (magic.StartsWith(Constants.TarSignature)
+					|| magic.StartsWith(Constants.TarZeroSignature))
 				{
 					outFileType = FileType.TapeArchive;
 				}
-				else if (magic.StartsWith(Constants.ZipSignature) || magic.StartsWith(Constants.ZipSignatureEmpty) || magic.StartsWith(Constants.ZipSignatureSpanned))
+				else if (magic.StartsWith(Constants.XZSignature))
+				{
+					outFileType = FileType.XZArchive;
+				}
+				else if (magic.StartsWith(Constants.ZipSignature)
+					|| magic.StartsWith(Constants.ZipSignatureEmpty)
+					|| magic.StartsWith(Constants.ZipSignatureSpanned))
 				{
 					outFileType = FileType.ZipArchive;
+				}
+				else if (magic.StartsWith(Constants.ZPAQSignature))
+				{
+					outFileType = FileType.ZPAQArchive;
+				}
+				else if (magic.StartsWith(Constants.ZstdSignature))
+				{
+					outFileType = FileType.ZstdArchive;
 				}
 			}
 			catch (Exception)
