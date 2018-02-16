@@ -810,27 +810,27 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = "\t<" + (_depreciated ? "game" : "machine") + " name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
-								(ExcludeOf ? "" :
-									((rom.MachineType & MachineType.Bios) != 0 ? " isbios=\"yes\"" : "") +
-									((rom.MachineType & MachineType.Device) != 0 ? " isdevice=\"yes\"" : "") +
-									((rom.MachineType & MachineType.Mechanical) != 0 ? " ismechanical=\"yes\"" : "") +
-									(rom.Runnable == true ? " runnable=\"yes\"" : "") +
-									(String.IsNullOrWhiteSpace(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
+				string state = "\t<" + (_depreciated ? "game" : "machine") + " name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
+								+ (ExcludeOf ? "" :
+									((rom.MachineType & MachineType.Bios) != 0 ? " isbios=\"yes\"" : "")
+									+ ((rom.MachineType & MachineType.Device) != 0 ? " isdevice=\"yes\"" : "")
+									+ ((rom.MachineType & MachineType.Mechanical) != 0 ? " ismechanical=\"yes\"" : "")
+									+ (rom.Runnable == true ? " runnable=\"yes\"" : "")
+									+ (String.IsNullOrWhiteSpace(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
-										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
-									(String.IsNullOrWhiteSpace(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"")
+									+ (String.IsNullOrWhiteSpace(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
 										? ""
-										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
-									(String.IsNullOrWhiteSpace(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"")
+									+ (String.IsNullOrWhiteSpace(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
 										? ""
 										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
-								) +
-								">\n" +
-							(String.IsNullOrWhiteSpace(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n" +
-							(String.IsNullOrWhiteSpace(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n") +
-							(String.IsNullOrWhiteSpace(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
+								) + ">\n"
+							+ (String.IsNullOrWhiteSpace(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n")
+							+ "\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n"
+							+ (String.IsNullOrWhiteSpace(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n")
+							+ (String.IsNullOrWhiteSpace(rom.Publisher) ? "" : "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n")
+							+ (String.IsNullOrWhiteSpace(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
 
 				sw.Write(state);
 				sw.Flush();
