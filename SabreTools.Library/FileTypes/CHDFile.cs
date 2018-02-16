@@ -16,8 +16,9 @@ namespace SabreTools.Library.FileTypes
 {
 	/// <summary>
 	/// This is code adapted from chd.h and chd.cpp in MAME
+	/// Additional archival code from https://github.com/rtissera/libchdr/blob/master/src/chd.h
 	/// </summary>
-	/// <remrks>
+	/// <remarks>
 	/// ----------------------------------------------
 	/// Common CHD Header:
 	/// 0x00-0x07 - CHD signature
@@ -86,7 +87,7 @@ namespace SabreTools.Library.FileTypes
 	/// 0x54-0x67 - SHA-1
 	/// 0x68-0x7b - Parent SHA-1
 	/// ----------------------------------------------
-	/// </remrks>
+	/// </remarks>
 	public class CHDFile : IDisposable
 	{
 		#region Private instance variables
