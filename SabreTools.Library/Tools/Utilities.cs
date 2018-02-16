@@ -440,7 +440,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="input">Name of the file to create the archive from</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive GetArchive(string input)
+		public static Folder GetArchive(string input)
 		{
 			BaseArchive archive = null;
 
@@ -485,7 +485,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="archiveType">SharpCompress.Common.ArchiveType representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive GetArchive(FileType archiveType)
+		public static Folder GetArchive(FileType archiveType)
 		{
 			switch (archiveType)
 			{
@@ -509,7 +509,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="archiveType">SabreTools.Library.Data.SharpCompress.OutputFormat representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive GetArchive(OutputFormat outputFormat)
+		public static Folder GetArchive(OutputFormat outputFormat)
 		{
 			switch (outputFormat)
 			{
@@ -1033,14 +1033,14 @@ namespace SabreTools.Library.Tools
 		/// Get internal metadata from a CHD
 		/// </summary>
 		/// <param name="input">Filename of possible CHD</param>
-		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
+		/// <returns>A CHDFile object with internal SHA-1 on success, null otherwise</returns>
 		/// <remarks>
 		/// Original code had a "writable" param. This is not required for metadata checking
 		/// </remarks>
-		public static DatItem GetCHDInfo(string input)
+		public static BaseFile GetCHDInfo(string input)
 		{
 			FileStream fs = TryOpenRead(input);
-			DatItem datItem = GetCHDInfo(fs);
+			BaseFile datItem = GetCHDInfo(fs);
 			fs.Dispose();
 			return datItem;
 		}
@@ -1217,18 +1217,18 @@ namespace SabreTools.Library.Tools
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
-		/// <returns>Populated DatItem object if success, empty one on error</returns>
-		public static DatItem GetFileInfo(string input, Hash omitFromScan = 0x0,
+		/// <returns>Populated BaseFile object if success, empty one on error</returns>
+		public static BaseFile GetFileInfo(string input, Hash omitFromScan = 0x0,
 			long offset = 0, bool date = false, string header = null, bool chdsAsFiles = true)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
 			{
-				return new Rom();
+				return null;
 			}
 
 			// Get the information from the file stream
-			DatItem datItem = new Rom();
+			BaseFile baseFile = new BaseFile();
 			if (header != null)
 			{
 				SkipperRule rule = Skipper.GetMatchingRule(input, Path.GetFileNameWithoutExtension(header));
@@ -1242,7 +1242,7 @@ namespace SabreTools.Library.Tools
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
-					datItem = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
+					baseFile = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
 
 					// Dispose of the streams
 					outputStream.Dispose();
@@ -1252,23 +1252,20 @@ namespace SabreTools.Library.Tools
 				else
 				{
 					long length = new FileInfo(input).Length;
-					datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
+					baseFile = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
 				}
 			}
 			else
 			{
 				long length = new FileInfo(input).Length;
-				datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
+				baseFile = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
 			}
 
 			// Add unique data from the file
-			datItem.Name = Path.GetFileName(input);
-			if (datItem.Type == ItemType.Rom)
-			{
-				((Rom)datItem).Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
-			}
+			baseFile.Filename = Path.GetFileName(input);
+			baseFile.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
 
-			return datItem;
+			return baseFile;
 		}
 
 		/// <summary>
@@ -1394,10 +1391,10 @@ namespace SabreTools.Library.Tools
 		/// <returns>True if the file is a valid CHD, false otherwise</returns>
 		public static bool IsValidCHD(string input)
 		{
-			DatItem datItem = GetCHDInfo(input);
-			return datItem != null
-				&& datItem.Type == ItemType.Disk
-				&& ((Disk)datItem).SHA1 != null;
+			BaseFile baseFile = GetCHDInfo(input);
+			return baseFile != null
+				&& (((CHDFile)baseFile).MD5 != null
+					|| ((CHDFile)baseFile).SHA1 != null);
 		}
 
 		/// <summary>
@@ -1563,8 +1560,8 @@ namespace SabreTools.Library.Tools
 			// Now add the information to the database if it's not already there
 			if (!nostore)
 			{
-				Rom rom = (Rom)GetFileInfo(newfile, chdsAsFiles: true);
-				DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
+				BaseFile baseFile = GetFileInfo(newfile, chdsAsFiles: true);
+				DatabaseTools.AddHeaderToDatabase(hstr, ByteArrayToString(baseFile.SHA1), rule.SourceFile);
 			}
 
 			return true;
@@ -1698,10 +1695,10 @@ namespace SabreTools.Library.Tools
 			}
 
 			// First, get the SHA-1 hash of the file
-			Rom rom = (Rom)GetFileInfo(file, chdsAsFiles: true);
+			BaseFile baseFile = GetFileInfo(file, chdsAsFiles: true);
 
 			// Retrieve a list of all related headers from the database
-			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1);
+			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(ByteArrayToString(baseFile.SHA1));
 
 			// If we have nothing retrieved, we return false
 			if (headers.Count == 0)
@@ -1923,8 +1920,8 @@ namespace SabreTools.Library.Tools
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
-		/// <returns>Populated DatItem object if success, empty one on error</returns>
-		public static DatItem GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
+		/// <returns>Populated BaseFile object if success, empty one on error</returns>
+		public static BaseFile GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
 			long offset = 0, bool keepReadOpen = false, bool chdsAsFiles = true)
 		{
 			// We first check to see if it's a CHD
@@ -1956,7 +1953,7 @@ namespace SabreTools.Library.Tools
 				}
 
 				// Get the Disk from the information
-				DatItem disk = GetCHDInfo(input);
+				BaseFile disk = GetCHDInfo(input);
 
 				// Seek to the beginning of the stream if possible
 				try
@@ -1980,16 +1977,9 @@ namespace SabreTools.Library.Tools
 				return disk;
 			}
 
-			Rom rom = new Rom
+			BaseFile rom = new BaseFile() 
 			{
-				Type = ItemType.Rom,
 				Size = size,
-				CRC = string.Empty,
-				MD5 = string.Empty,
-				SHA1 = string.Empty,
-				SHA256 = string.Empty,
-				SHA384 = string.Empty,
-				SHA512 = string.Empty,
 			};
 
 			try
@@ -2061,32 +2051,32 @@ namespace SabreTools.Library.Tools
 				}
 
 				crc.Update(buffer, 0, 0);
-				rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
+				rom.CRC = BitConverter.GetBytes(crc.Value);
 
 				if ((omitFromScan & Hash.MD5) == 0)
 				{
 					md5.TransformFinalBlock(buffer, 0, 0);
-					rom.MD5 = ByteArrayToString(md5.Hash);
+					rom.MD5 = md5.Hash;
 				}
 				if ((omitFromScan & Hash.SHA1) == 0)
 				{
 					sha1.TransformFinalBlock(buffer, 0, 0);
-					rom.SHA1 = ByteArrayToString(sha1.Hash);
+					rom.SHA1 = sha1.Hash;
 				}
 				if ((omitFromScan & Hash.SHA256) == 0)
 				{
 					sha256.TransformFinalBlock(buffer, 0, 0);
-					rom.SHA256 = ByteArrayToString(sha256.Hash);
+					rom.SHA256 = sha256.Hash;
 				}
 				if ((omitFromScan & Hash.SHA384) == 0)
 				{
 					sha384.TransformFinalBlock(buffer, 0, 0);
-					rom.SHA384 = ByteArrayToString(sha384.Hash);
+					rom.SHA384 = sha384.Hash;
 				}
 				if ((omitFromScan & Hash.SHA512) == 0)
 				{
 					sha512.TransformFinalBlock(buffer, 0, 0);
-					rom.SHA512 = ByteArrayToString(sha512.Hash);
+					rom.SHA512 = sha512.Hash;
 				}
 				if ((omitFromScan & Hash.xxHash) == 0)
 				{
@@ -2103,7 +2093,7 @@ namespace SabreTools.Library.Tools
 			}
 			catch (IOException)
 			{
-				return new Rom();
+				return new BaseFile();
 			}
 			finally
 			{
@@ -2134,32 +2124,31 @@ namespace SabreTools.Library.Tools
 		/// Get internal metadata from a CHD
 		/// </summary>
 		/// <param name="input">Stream of possible CHD</param>
-		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
+		/// <returns>A CHDFile object with internal MD5 (v1, v2) or SHA-1 (v3, v4, v5) on success, null otherwise</returns>
 		/// <remarks>
 		/// Original code had a "writable" param. This is not required for metadata checking
 		/// </remarks>
-		public static DatItem GetCHDInfo(Stream input)
+		public static BaseFile GetCHDInfo(Stream input)
 		{
-			// Create a blank Disk to populate and return
-			Disk datItem = new Disk();
-
 			// Get a CHD object to store the data
 			CHDFile chd = new CHDFile(input);
 
-			// Get the best possible hash from the chd
+			// Ensure that the header is valid
 			byte[] hash = chd.GetHashFromHeader();
 
 			// Set the proper hash of the Disk to return
 			if (hash.Length == Constants.MD5Length)
 			{
-				datItem.MD5 = (hash == null ? null : ByteArrayToString(hash));
+				chd.MD5 = hash;
+				return chd;
 			}
 			else if (hash.Length == Constants.SHA1Length)
 			{
-				datItem.SHA1 = (hash == null ? null : ByteArrayToString(hash));
+				chd.SHA1 = hash;
+				return chd;
 			}
 
-			return datItem;
+			return null;
 		}
 
 		/// <summary>
@@ -2185,10 +2174,10 @@ namespace SabreTools.Library.Tools
 		/// <returns>True if the stream is a valid CHD, false otherwise</returns>
 		public static bool IsValidCHD(Stream input)
 		{
-			DatItem datItem = GetCHDInfo(input);
-			return datItem != null
-				&& datItem.Type == ItemType.Disk
-				&& ((Disk)datItem).SHA1 != null;
+			BaseFile baseFile = GetCHDInfo(input);
+			return baseFile != null
+				&& (((CHDFile)baseFile).MD5 != null
+					|| ((CHDFile)baseFile).SHA1 != null);
 		}
 
 		#endregion

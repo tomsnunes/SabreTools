@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.FileTypes;
 using SabreTools.Library.Tools;
 
 namespace SabreTools.Library.DatItems
@@ -99,6 +100,20 @@ namespace SabreTools.Library.DatItems
 			_itemType = ItemType.Disk;
 			_dupeType = 0x00;
 			_itemStatus = ItemStatus.None;
+		}
+
+		/// <summary>
+		/// Create a Rom object from a BaseFile
+		/// </summary>
+		/// <param name="baseFile"></param>
+		public Disk(BaseFile baseFile)
+		{
+			_name = baseFile.Filename;
+			_md5 = baseFile.MD5;
+			_sha1 = baseFile.SHA1;
+			_sha256 = baseFile.SHA256;
+			_sha384 = baseFile.SHA384;
+			_sha512 = baseFile.SHA512;
 		}
 
 		#endregion

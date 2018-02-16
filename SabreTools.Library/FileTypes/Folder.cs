@@ -27,8 +27,14 @@ namespace SabreTools.Library.FileTypes
 	/// <summary>
 	/// Represents a folder for reading and writing
 	/// </summary>
-	public class Folder : BaseArchive
+	public class Folder : BaseFile
 	{
+		#region Protected instance variables
+
+		protected List<BaseFile> _children;
+
+		#endregion
+
 		#region Constructors
 
 		/// <summary>
@@ -60,7 +66,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public override bool ExtractAll(string outDir)
+		public bool ExtractAll(string outDir)
 		{
 			// Copy all files from the current folder to the output directory recursively
 			try
@@ -86,7 +92,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public override string ExtractEntry(string entryName, string outDir)
+		public string ExtractEntry(string entryName, string outDir)
 		{
 			string realentry = null;
 
@@ -125,7 +131,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="realEntry">Output representing the entry name that was found</param>
 		/// <returns>MemoryStream representing the entry, null on error</returns>
-		public override (MemoryStream, string) ExtractEntryStream(string entryName)
+		public (MemoryStream, string) ExtractEntryStream(string entryName)
 		{
 			MemoryStream ms = new MemoryStream();
 			string realentry = null;
@@ -163,33 +169,40 @@ namespace SabreTools.Library.FileTypes
 		#region Information
 
 		/// <summary>
-		/// Generate a list of DatItem objects from the header values in an archive
+		/// Generate a list of immediate children from the current folder
 		/// </summary>
 		/// <param name="omitFromScan">Hash representing the hashes that should be skipped</param>
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
-		/// <returns>List of DatItem objects representing the found data</returns>
+		/// <returns>List of BaseFile objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
-			throw new NotImplementedException();
+			if (_children == null || _children.Count == 0)
+			{
+				_children = new List<BaseFile>();
+				foreach (string file in Directory.EnumerateFiles(_filename, "*", SearchOption.TopDirectoryOnly))
+				{
+					BaseFile nf = Utilities.GetFileInfo(file, omitFromScan: omitFromScan, date: date);
+					_children.Add(nf);
+				}
+				foreach (string dir in Directory.EnumerateDirectories(_filename, "*", SearchOption.TopDirectoryOnly))
+				{
+					Folder fl = new Folder(dir);
+					_children.Add(fl);
+				}
+			}
+
+			return _children;
 		}
 
 		/// <summary>
 		/// Generate a list of empty folders in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
-		/// <returns>List of empty folders in the archive</returns>
-		public override List<string> GetEmptyFolders()
+		/// <returns>List of empty folders in the folder</returns>
+		public List<string> GetEmptyFolders()
 		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Check whether the input file is a standardized format
-		/// </summary>
-		public override bool IsTorrent()
-		{
-			throw new NotImplementedException();
+			return Utilities.GetEmptyDirectories(_filename).ToList();
 		}
 
 		#endregion
@@ -206,7 +219,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
+		public bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			throw new NotImplementedException();
 		}
@@ -221,7 +234,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
+		public bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			bool success = false;
 
@@ -303,7 +316,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
+		public bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
 		{
 			throw new NotImplementedException();
 		}

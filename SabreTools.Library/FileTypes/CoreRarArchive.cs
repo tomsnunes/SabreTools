@@ -167,7 +167,7 @@ namespace SabreTools.Library.FileTypes
 			throw new NotImplementedException();
 		}
 
-		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
 			throw new NotImplementedException();
 		}

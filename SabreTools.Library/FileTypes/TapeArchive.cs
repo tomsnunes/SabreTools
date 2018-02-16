@@ -190,9 +190,9 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
-			List<Rom> found = new List<Rom>();
+			List<BaseFile> found = new List<BaseFile>();
 			string gamename = Path.GetFileNameWithoutExtension(_filename);
 
 			try
@@ -203,24 +203,23 @@ namespace SabreTools.Library.FileTypes
 					// If secure hashes are disabled, do a quickscan
 					if (omitFromScan == Hash.SecureHashes)
 					{
-						found.Add(new Rom
+						found.Add(new BaseFile
 						{
-							Type = ItemType.Rom,
-							Name = entry.Key,
+							Filename = entry.Key,
 							Size = entry.Size,
-							CRC = entry.Crc.ToString("X").ToLowerInvariant(),
+							CRC = BitConverter.GetBytes(entry.Crc),
 							Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
 
-							MachineName = gamename,
+							Parent = gamename,
 						});
 					}
 					// Otherwise, use the stream directly
 					else
 					{
 						Stream entryStream = entry.OpenEntryStream();
-						Rom tarEntryRom = (Rom)Utilities.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
-						tarEntryRom.Name = entry.Key;
-						tarEntryRom.MachineName = gamename;
+						BaseFile tarEntryRom = Utilities.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+						tarEntryRom.Filename = entry.Key;
+						tarEntryRom.Parent = gamename;
 						tarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
 						found.Add(tarEntryRom);
 						entryStream.Dispose();

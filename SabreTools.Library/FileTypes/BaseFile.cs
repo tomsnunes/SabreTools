@@ -4,13 +4,14 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.FileTypes
 {
-	public abstract class BaseFile
+	public class BaseFile
 	{
 		#region Protected instance variables
 
 		protected FileType _fileType;
 		protected string _filename;
-		protected List<BaseFile> _children;
+		protected string _parent;
+		protected string _date;
 
 		// External hash values for the file
 		protected long? _size;
@@ -26,10 +27,24 @@ namespace SabreTools.Library.FileTypes
 		#region Publicly facing variables
 
 		// TODO: Get all of these values automatically so there is no public "set"
+		public FileType Type
+		{
+			get { return _fileType; }
+		}
 		public string Filename
 		{
 			get { return _filename; }
 			set { _filename = value; }
+		}
+		public string Parent
+		{
+			get { return _parent; }
+			set { _parent = value; }
+		}
+		public string Date
+		{
+			get { return _date; }
+			set { _date = value; }
 		}
 		public long? Size
 		{

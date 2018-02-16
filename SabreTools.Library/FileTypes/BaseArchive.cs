@@ -12,7 +12,7 @@ using Stream = System.IO.Stream;
 
 namespace SabreTools.Library.FileTypes
 {
-	public abstract class BaseArchive : BaseFile
+	public abstract class BaseArchive : Folder
 	{
 		#region Protected instance variables
 
@@ -48,7 +48,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public abstract bool ExtractAll(string outDir);
+		public new abstract bool ExtractAll(string outDir);
 
 		/// <summary>
 		/// Attempt to extract an entry from an archive
@@ -56,7 +56,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public abstract string ExtractEntry(string entryName, string outDir);
+		public new abstract string ExtractEntry(string entryName, string outDir);
 
 		/// <summary>
 		/// Attempt to extract a stream from an archive
@@ -64,7 +64,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="realEntry">Output representing the entry name that was found</param>
 		/// <returns>MemoryStream representing the entry, null on error</returns>
-		public abstract (MemoryStream, string) ExtractEntryStream(string entryName);
+		public new abstract (MemoryStream, string) ExtractEntryStream(string entryName);
 
 		#endregion
 
@@ -77,14 +77,14 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public abstract List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false);
+		public new abstract List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false);
 
 		/// <summary>
 		/// Generate a list of empty folders in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
 		/// <returns>List of empty folders in the archive</returns>
-		public abstract List<string> GetEmptyFolders();
+		public new abstract List<string> GetEmptyFolders();
 
 		/// <summary>
 		/// Check whether the input file is a standardized format

@@ -41,7 +41,7 @@ namespace RombaSharp
 				if (lowerCaseDats.Contains(input.ToLowerInvariant()))
 				{
 					string fullpath = Path.GetFullPath(datRootDats[lowerCaseDats.IndexOf(input.ToLowerInvariant())]);
-					string sha1 = ((Rom)Utilities.GetFileInfo(fullpath)).SHA1;
+					string sha1 = Utilities.ByteArrayToString(Utilities.GetFileInfo(fullpath).SHA1);
 					foundDats.Add(sha1, fullpath);
 				}
 				else

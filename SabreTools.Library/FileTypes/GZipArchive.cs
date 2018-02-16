@@ -194,54 +194,59 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
-			List<Rom> found = new List<Rom>();
-			string gamename = Path.GetFileNameWithoutExtension(_filename);
-
-			Rom possibleTgz = GetTorrentGZFileInfo();
-
-			// If it was, then add it to the outputs and continue
-			if (possibleTgz != null && possibleTgz.Name != null)
+			if (_children == null || _children.Count == 0)
 			{
-				found.Add(possibleTgz);
-				return found;
-			}
+				_children = new List<BaseFile>();
 
-			try
-			{
-				// If secure hashes are disabled, do a quickscan
-				if (omitFromScan == Hash.SecureHashes)
+				string gamename = Path.GetFileNameWithoutExtension(_filename);
+
+				BaseFile possibleTgz = GetTorrentGZFileInfo();
+
+				// If it was, then add it to the outputs and continue
+				if (possibleTgz != null && possibleTgz.Filename != null)
 				{
-					Rom tempRom = new Rom(gamename, gamename, omitFromScan);
-					BinaryReader br = new BinaryReader(Utilities.TryOpenRead(_filename));
-					br.BaseStream.Seek(-8, SeekOrigin.End);
-					byte[] headercrc = br.ReadBytesReverse(4);
-					tempRom.CRC = Utilities.ByteArrayToString(headercrc);
-					tempRom.Size = br.ReadInt32Reverse();
-					br.Dispose();
-
-					found.Add(tempRom);
+					_children.Add(possibleTgz);
 				}
-				// Otherwise, use the stream directly
 				else
 				{
-					GZipStream gzstream = new GZipStream(Utilities.TryOpenRead(_filename), Ionic.Zlib.CompressionMode.Decompress);
-					Rom gzipEntryRom = (Rom)Utilities.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
-					gzipEntryRom.Name = gzstream.FileName;
-					gzipEntryRom.MachineName = gamename;
-					gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
-					found.Add(gzipEntryRom);
-					gzstream.Dispose();
+					try
+					{
+						// If secure hashes are disabled, do a quickscan
+						if (omitFromScan == Hash.SecureHashes)
+						{
+							BaseFile tempRom = new BaseFile(gamename);
+							BinaryReader br = new BinaryReader(Utilities.TryOpenRead(_filename));
+							br.BaseStream.Seek(-8, SeekOrigin.End);
+							byte[] headercrc = br.ReadBytesReverse(4);
+							tempRom.CRC = headercrc;
+							tempRom.Size = br.ReadInt32Reverse();
+							br.Dispose();
+
+							_children.Add(tempRom);
+						}
+						// Otherwise, use the stream directly
+						else
+						{
+							GZipStream gzstream = new GZipStream(Utilities.TryOpenRead(_filename), Ionic.Zlib.CompressionMode.Decompress);
+							BaseFile gzipEntryRom = Utilities.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
+							gzipEntryRom.Filename = gzstream.FileName;
+							gzipEntryRom.Parent = gamename;
+							gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
+							_children.Add(gzipEntryRom);
+							gzstream.Dispose();
+						}
+					}
+					catch (Exception)
+					{
+						// Don't log file open errors
+						return null;
+					}
 				}
 			}
-			catch (Exception)
-			{
-				// Don't log file open errors
-				return null;
-			}
 
-			return found;
+			return _children;
 		}
 
 		/// <summary>
@@ -325,7 +330,7 @@ namespace SabreTools.Library.FileTypes
 		/// Retrieve file information for a single torrent GZ file
 		/// </summary>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
-		public Rom GetTorrentGZFileInfo()
+		public BaseFile GetTorrentGZFileInfo()
 		{
 			// Check for the file existing first
 			if (!File.Exists(_filename))
@@ -386,23 +391,20 @@ namespace SabreTools.Library.FileTypes
 			}
 
 			// Now convert the data and get the right position
-			string gzmd5 = Utilities.ByteArrayToString(headermd5);
-			string gzcrc = Utilities.ByteArrayToString(headercrc);
 			long extractedsize = (long)headersz;
 
-			Rom rom = new Rom
+			BaseFile baseFile = new BaseFile
 			{
-				Type = ItemType.Rom,
-				Name = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(),
+				Filename = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(),
 				Size = extractedsize,
-				CRC = gzcrc.ToLowerInvariant(),
-				MD5 = gzmd5.ToLowerInvariant(),
-				SHA1 = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(), // TODO: When updating to SHA-256, this needs to update to SHA256
+				CRC = headercrc,
+				MD5 = headermd5,
+				SHA1 = Utilities.StringToByteArray(Path.GetFileNameWithoutExtension(_filename)), // TODO: When updating to SHA-256, this needs to update to SHA256
 
-				MachineName = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(),
+				Parent = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(),
 			};
 
-			return rom;
+			return baseFile;
 		}
 
 		#endregion
@@ -461,7 +463,7 @@ namespace SabreTools.Library.FileTypes
 			outDir = Path.GetFullPath(outDir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			rom = (Rom)Utilities.GetStreamInfo(inputStream, inputStream.Length, keepReadOpen: true);
+			rom = new Rom(Utilities.GetStreamInfo(inputStream, inputStream.Length, keepReadOpen: true));
 
 			// Get the output file name
 			string outfile = null;

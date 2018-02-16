@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.FileTypes;
 using SabreTools.Library.Tools;
 
 namespace SabreTools.Library.DatItems
@@ -163,6 +164,21 @@ namespace SabreTools.Library.DatItems
 				Name = machineName,
 				Description = machineName,
 			};
+		}
+
+		/// <summary>
+		/// Create a Rom object from a BaseFile
+		/// </summary>
+		/// <param name="baseFile"></param>
+		public Rom(BaseFile baseFile)
+		{
+			_name = baseFile.Filename;
+			_crc = baseFile.CRC;
+			_md5 = baseFile.MD5;
+			_sha1 = baseFile.SHA1;
+			_sha256 = baseFile.SHA256;
+			_sha384 = baseFile.SHA384;
+			_sha512 = baseFile.SHA512;
 		}
 
 		#endregion

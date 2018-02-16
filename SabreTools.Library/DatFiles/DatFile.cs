@@ -3625,13 +3625,13 @@ namespace SabreTools.Library.DatFiles
 			if (Romba)
 			{
 				GZipArchive archive = new GZipArchive(item);
-				Rom rom = archive.GetTorrentGZFileInfo();
+				BaseFile rom = archive.GetTorrentGZFileInfo();
 
 				// If the rom is valid, write it out
-				if (rom != null && rom.Name != null)
+				if (rom != null && rom.Filename != null)
 				{
 					// Add the list if it doesn't exist already
-					Add(rom.Size + "-" + rom.CRC, rom);
+					Add(rom.Size + "-" + rom.CRC, new Rom(rom));
 					Globals.Logger.User("File added: {0}", Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
@@ -3655,18 +3655,18 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Create a list for all found items
-			List<Rom> extracted = null;
+			List<BaseFile> extracted = null;
 
 			// If we don't have archives as files, try to scan the file as an archive
 			if (!archivesAsFiles)
 			{
 				// Get the base archive first
-				BaseArchive archive = Utilities.GetArchive(newItem);
+				Folder archive = Utilities.GetArchive(newItem);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
 				{
-					extracted = archive.GetArchiveFileInfo(omitFromScan: omitFromScan, date: addDate);
+					extracted = archive.GetChildren(omitFromScan: omitFromScan, date: addDate);
 				}
 			}
 
@@ -3688,8 +3688,9 @@ namespace SabreTools.Library.DatFiles
 				// First take care of the found items
 				Parallel.ForEach(extracted, Globals.ParallelOptions, rom =>
 				{
+					DatItem datItem = (rom.Type == FileType.CHD ? (DatItem)(new Disk(rom)) : (DatItem)(new Rom(rom)));
 					ProcessFileHelper(newItem,
-						rom,
+						datItem,
 						basePath,
 						(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
 				});
@@ -3700,7 +3701,7 @@ namespace SabreTools.Library.DatFiles
 					List<string> empties = new List<string>();
 
 					// Get the base archive first
-					BaseArchive archive = Utilities.GetArchive(newItem);
+					Folder archive = Utilities.GetArchive(newItem);
 
 					// Now get all blank folders from the archive
 					if (archive != null)
@@ -3741,7 +3742,16 @@ namespace SabreTools.Library.DatFiles
 			bool addDate, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
-			DatItem datItem = Utilities.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
+			BaseFile baseFile = Utilities.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
+			DatItem datItem = null;
+			if (baseFile.Type == FileType.CHD)
+			{
+				datItem = new Disk(baseFile);
+			}
+			else if (baseFile.Type == FileType.None)
+			{
+				datItem = new Rom(baseFile);
+			}
 
 			ProcessFileHelper(item, datItem, basePath, parent);
 		}
@@ -4023,7 +4033,7 @@ namespace SabreTools.Library.DatFiles
 
 				// If we have a path, we want to try to get the rom information
 				GZipArchive archive = new GZipArchive(foundpath);
-				Rom fileinfo = archive.GetTorrentGZFileInfo();
+				BaseFile fileinfo = archive.GetTorrentGZFileInfo();
 
 				// If the file information is null, then we continue
 				if (fileinfo == null)
@@ -4032,7 +4042,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Otherwise, we rebuild that file to all locations that we need to
-				RebuildIndividualFile(fileinfo, foundpath, outDir, date, inverse, outputFormat, romba,
+				RebuildIndividualFile(new Rom(fileinfo), foundpath, outDir, date, inverse, outputFormat, romba,
 					updateDat, false /* isZip */, headerToCheckAgainst);
 			}
 
@@ -4220,17 +4230,27 @@ namespace SabreTools.Library.DatFiles
 			if (shouldExternalProcess)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				DatItem fileinfo = Utilities.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes),
+				BaseFile fileinfo = Utilities.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes),
 					header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
-				usedExternally = RebuildIndividualFile(fileinfo, file, outDir, date, inverse, outputFormat,
+				DatItem datItem = null;
+				if (fileinfo.Type == FileType.CHD)
+				{
+					datItem = new Disk(fileinfo);
+				}
+				else if (fileinfo.Type == FileType.None)
+				{
+					datItem = new Rom(fileinfo);
+				}
+
+				usedExternally = RebuildIndividualFile(datItem, file, outDir, date, inverse, outputFormat,
 					romba, updateDat, null /* isZip */, headerToCheckAgainst);
 			}
 
 			// If we're supposed to scan the file internally
 			if (shouldInternalProcess)
 			{
-				// Create an empty list of Roms for archive entries
-				List<Rom> entries = null;
+				// Create an empty list of BaseFile for archive entries
+				List<BaseFile> entries = null;
 				usedInternally = true;
 
 				// Get the TGZ status for later
@@ -4238,29 +4258,40 @@ namespace SabreTools.Library.DatFiles
 				bool isTorrentGzip = tgz.IsTorrent();
 
 				// Get the base archive first
-				BaseArchive archive = Utilities.GetArchive(file);
+				Folder archive = Utilities.GetArchive(file);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					entries = archive.GetArchiveFileInfo(omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), date: date);
+					entries = archive.GetChildren(omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), date: date);
 				}
 
 				// If the entries list is null, we encountered an error and should scan exteranlly
 				if (entries == null && File.Exists(file))
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					DatItem fileinfo = Utilities.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), chdsAsFiles: chdsAsFiles);
-					usedExternally = RebuildIndividualFile(fileinfo, file, outDir, date, inverse, outputFormat,
+					BaseFile fileinfo = Utilities.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), chdsAsFiles: chdsAsFiles);
+					DatItem datItem = null;
+					if (fileinfo.Type == FileType.CHD)
+					{
+						datItem = new Disk(fileinfo);
+					}
+					else if (fileinfo.Type == FileType.None)
+					{
+						datItem = new Rom(fileinfo);
+					}
+
+					usedExternally = RebuildIndividualFile(datItem, file, outDir, date, inverse, outputFormat,
 						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
 				// Otherwise, loop through the entries and try to match
 				else
 				{
-					foreach (Rom entry in entries)
+					foreach (BaseFile entry in entries)
 					{
-						usedInternally &= RebuildIndividualFile(entry, file, outDir, date, inverse, outputFormat,
+						DatItem datItem = (entry.Type == FileType.CHD ? (DatItem)(new Disk(entry)) : (DatItem)(new Rom(entry)));
+						usedInternally &= RebuildIndividualFile(datItem, file, outDir, date, inverse, outputFormat,
 							romba, updateDat, !isTorrentGzip /* isZip */, headerToCheckAgainst);
 					}
 				}
@@ -4330,7 +4361,7 @@ namespace SabreTools.Library.DatFiles
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
 				GZipArchive tgz = new GZipArchive(file);
-				Rom rom = tgz.GetTorrentGZFileInfo();
+				BaseFile rom = tgz.GetTorrentGZFileInfo();
 				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
 				{
 					Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
@@ -4369,7 +4400,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = Utilities.GetArchive(file);
+					Folder archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4397,7 +4428,7 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in dupes)
 				{
 					// Get the output archive, if possible
-					BaseArchive outputArchive = Utilities.GetArchive(outputFormat);
+					Folder outputArchive = Utilities.GetArchive(outputFormat);
 
 					// Now rebuild to the output file
 					outputArchive.Write(fileStream, outDir, (Rom)item, date: date, romba: romba);
@@ -4414,7 +4445,7 @@ namespace SabreTools.Library.DatFiles
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
 				GZipArchive tgz = new GZipArchive(file);
-				Rom rom = tgz.GetTorrentGZFileInfo();
+				BaseFile rom = tgz.GetTorrentGZFileInfo();
 				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
 				{
 					Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
@@ -4453,7 +4484,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = Utilities.GetArchive(file);
+					Folder archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4472,7 +4503,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Get the item from the current file
-				Rom item = (Rom)Utilities.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
+				Rom item = new Rom(Utilities.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true));
 				item.MachineName = Path.GetFileNameWithoutExtension(item.Name);
 				item.MachineDescription = Path.GetFileNameWithoutExtension(item.Name);
 
@@ -4486,7 +4517,7 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Path.GetFileName(datItem.Name));
 
 				// Get the output archive, if possible
-				BaseArchive outputArchive = Utilities.GetArchive(outputFormat);
+				Folder outputArchive = Utilities.GetArchive(outputFormat);
 
 				// Now rebuild to the output file
 				if (outputArchive == null)
@@ -4543,7 +4574,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = Utilities.GetArchive(file);
+					Folder archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4572,7 +4603,7 @@ namespace SabreTools.Library.DatFiles
 					if (rule.TransformStream(fileStream, transformStream, keepReadOpen: true, keepWriteOpen: true))
 					{
 						// Get the file informations that we will be using
-						Rom headerless = (Rom)Utilities.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true);
+						Rom headerless = new Rom(Utilities.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true));
 
 						// Find if the file has duplicates in the DAT
 						hasDuplicates = headerless.HasDuplicates(this);
@@ -4603,7 +4634,7 @@ namespace SabreTools.Library.DatFiles
 								bool eitherSuccess = false;
 
 								// Get the output archive, if possible
-								BaseArchive outputArchive = Utilities.GetArchive(outputFormat);
+								Folder outputArchive = Utilities.GetArchive(outputFormat);
 
 								// Now rebuild to the output file
 								eitherSuccess |= outputArchive.Write(transformStream, outDir, (Rom)item, date: date, romba: romba);
@@ -4693,7 +4724,7 @@ namespace SabreTools.Library.DatFiles
 
 				// If we have a path, we want to try to get the rom information
 				GZipArchive tgz = new GZipArchive(foundpath);
-				Rom fileinfo = tgz.GetTorrentGZFileInfo();
+				BaseFile fileinfo = tgz.GetTorrentGZFileInfo();
 
 				// If the file information is null, then we continue
 				if (fileinfo == null)
@@ -4702,7 +4733,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Now we want to remove all duplicates from the DAT
-				fileinfo.GetDuplicates(this, remove: true);
+				new Rom(fileinfo).GetDuplicates(this, remove: true);
 			}
 
 			watch.Stop();

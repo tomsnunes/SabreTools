@@ -191,7 +191,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
 			throw new NotImplementedException();
 		}

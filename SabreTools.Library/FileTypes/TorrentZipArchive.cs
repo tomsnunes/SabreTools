@@ -268,9 +268,9 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
-			List<Rom> found = new List<Rom>();
+			List<BaseFile> found = new List<BaseFile>();
 			string gamename = Path.GetFileNameWithoutExtension(_filename);
 
 			try
@@ -300,26 +300,25 @@ namespace SabreTools.Library.FileTypes
 					{
 						string newname = zf.Entries[i].FileName;
 						long newsize = (long)zf.Entries[i].UncompressedSize;
-						string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
+						byte[] newcrc = zf.Entries[i].CRC.Reverse().ToArray();
 						string convertedDate = Utilities.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 
-						found.Add(new Rom
+						found.Add(new BaseFile
 						{
-							Type = ItemType.Rom,
-							Name = newname,
+							Filename = newname,
 							Size = newsize,
 							CRC = newcrc,
 							Date = (date ? convertedDate : null),
 
-							MachineName = gamename,
+							Parent = gamename,
 						});
 					}
 					// Otherwise, use the stream directly
 					else
 					{
-						Rom zipEntryRom = (Rom)Utilities.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
-						zipEntryRom.Name = zf.Entries[i].FileName;
-						zipEntryRom.MachineName = gamename;
+						BaseFile zipEntryRom = Utilities.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
+						zipEntryRom.Filename = zf.Entries[i].FileName;
+						zipEntryRom.Parent = gamename;
 						string convertedDate = Utilities.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 						zipEntryRom.Date = (date ? convertedDate : null);
 						found.Add(zipEntryRom);
