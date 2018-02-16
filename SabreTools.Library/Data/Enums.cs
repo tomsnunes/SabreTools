@@ -90,6 +90,19 @@
 	}
 
 	/// <summary>
+	/// Type of file that is being looked at
+	/// </summary>
+	public enum FileType
+	{
+		None = 0,
+		SevenZipArchive,
+		CHD,
+		GZipArchive,
+		RARArchive,
+		TARArchive,
+	}
+
+	/// <summary>
 	/// Output format for rebuilt files
 	/// </summary>
 	public enum OutputFormat
