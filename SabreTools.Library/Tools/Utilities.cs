@@ -1072,32 +1072,24 @@ namespace SabreTools.Library.Tools
 				magic = br.ReadBytes(8);
 				br.Dispose();
 
-				// Convert it to an uppercase string
-				string mstr = string.Empty;
-				for (int i = 0; i < magic.Length; i++)
-				{
-					mstr += BitConverter.ToString(new byte[] { magic[i] });
-				}
-				mstr = mstr.ToUpperInvariant();
-
 				// Now try to match it to a known signature
-				if (mstr.StartsWith(Constants.SevenZipSig))
+				if (magic.StartsWith(Constants.SevenZipSignature))
 				{
 					outtype = ArchiveType.SevenZip;
 				}
-				else if (mstr.StartsWith(Constants.GzSig))
+				else if (magic.StartsWith(Constants.GzSignature))
 				{
 					outtype = ArchiveType.GZip;
 				}
-				else if (mstr.StartsWith(Constants.RarSig) || mstr.StartsWith(Constants.RarFiveSig))
+				else if (magic.StartsWith(Constants.RarSignature) || magic.StartsWith(Constants.RarFiveSignature))
 				{
 					outtype = ArchiveType.Rar;
 				}
-				else if (mstr.StartsWith(Constants.TarSig) || mstr.StartsWith(Constants.TarZeroSig))
+				else if (magic.StartsWith(Constants.TarSignature) || magic.StartsWith(Constants.TarZeroSignature))
 				{
 					outtype = ArchiveType.Tar;
 				}
-				else if (mstr.StartsWith(Constants.ZipSig) || mstr.StartsWith(Constants.ZipSigEmpty) || mstr.StartsWith(Constants.ZipSigSpanned))
+				else if (magic.StartsWith(Constants.ZipSignature) || magic.StartsWith(Constants.ZipSignatureEmpty) || magic.StartsWith(Constants.ZipSignatureSpanned))
 				{
 					outtype = ArchiveType.Zip;
 				}
@@ -2147,11 +2139,18 @@ namespace SabreTools.Library.Tools
 			// Get a CHD object to store the data
 			CHDFile chd = new CHDFile(input);
 
-			// Get the SHA-1 from the chd
-			byte[] sha1 = chd.GetSHA1FromHeader();
+			// Get the best possible hash from the chd
+			byte[] hash = chd.GetHashFromHeader();
 
-			// Set the SHA-1 of the Disk to return
-			datItem.SHA1 = (sha1 == null ? null : ByteArrayToString(sha1));
+			// Set the proper hash of the Disk to return
+			if (hash.Length == Constants.MD5Length)
+			{
+				datItem.MD5 = (hash == null ? null : ByteArrayToString(hash));
+			}
+			else if (hash.Length == Constants.SHA1Length)
+			{
+				datItem.SHA1 = (hash == null ? null : ByteArrayToString(hash));
+			}
 
 			return datItem;
 		}
@@ -2679,7 +2678,37 @@ namespace SabreTools.Library.Tools
 
 		#endregion
 
-		#region *Externally sourced methods*
+		#region Miscellaneous / Externally Sourced
+
+		/// <summary>
+		/// Returns if the first byte array starts with the second array
+		/// </summary>
+		/// <param name="arr1">First byte array to compare</param>
+		/// <param name="arr2">Second byte array to compare</param>
+		/// <param name="exact">True if the input arrays should match exactly, false otherwise (default)</param>
+		/// <returns>True if the first byte array starts with the second, false otherwise</returns>
+		public static bool StartsWith(this byte[] arr1, byte[] arr2, bool exact = false)
+		{
+			// If we have any invalid inputs, we return false
+			if (arr1 == null || arr2 == null
+				|| arr1.Length == 0 || arr2.Length == 0
+				|| arr2.Length > arr1.Length
+				|| (exact && arr1.Length != arr2.Length))
+			{
+				return false;
+			}
+
+			// Otherwise, loop through and see
+			for (int i = 0; i < arr2.Length; i++)
+			{
+				if (arr1[i] != arr2[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
 
 		/// <summary>
 		/// Returns the human-readable file size for an arbitrary, 64-bit file size 

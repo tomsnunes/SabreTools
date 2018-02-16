@@ -24,6 +24,29 @@ namespace SabreTools.Library.FileTypes
 	/// 0x08-0x0B - Header size
 	/// 0x0C-0x0F - CHD version
 	/// ----------------------------------------------
+	/// CHD v1 header layout:
+	/// 0x10-0x13 - Flags (1: Has parent MD5, 2: Disallow writes)
+	/// 0x14-0x17 - Compression
+	/// 0x18-0x1B - 512-byte sectors per hunk
+	/// 0x1C-0x1F - Hunk count
+	/// 0x20-0x23 - Hard disk cylinder count
+	/// 0x24-0x27 - Hard disk head count
+	/// 0x28-0x2B - Hard disk sector count
+	/// 0x2C-0x3B - MD5
+	/// 0x3C-0x4B - Parent MD5
+	/// ----------------------------------------------
+	/// CHD v2 header layout:
+	/// 0x10-0x13 - Flags (1: Has parent MD5, 2: Disallow writes)
+	/// 0x14-0x17 - Compression
+	/// 0x18-0x1B - seclen-byte sectors per hunk
+	/// 0x1C-0x1F - Hunk count
+	/// 0x20-0x23 - Hard disk cylinder count
+	/// 0x24-0x27 - Hard disk head count
+	/// 0x28-0x2B - Hard disk sector count
+	/// 0x2C-0x3B - MD5
+	/// 0x3C-0x4B - Parent MD5
+	/// 0x4C-0x4F - Number of bytes per sector (seclen)
+	/// ----------------------------------------------
 	/// CHD v3 header layout:
 	/// 0x10-0x13 - Flags (1: Has parent SHA-1, 2: Disallow writes)
 	/// 0x14-0x17 - Compression
@@ -69,12 +92,13 @@ namespace SabreTools.Library.FileTypes
 		#region Private instance variables
 
 		// Core parameters from the header
-		private byte[] m_signature;       // signature
+		private byte[] m_signature;      // signature
 		private uint m_headersize;       // size of the header
 		private uint m_version;          // version of the header
 		private ulong m_logicalbytes;    // logical size of the raw CHD data in bytes
 		private ulong m_mapoffset;       // offset of map
 		private ulong m_metaoffset;      // offset to first metadata bit
+		private uint m_sectorsperhunk;   // number of sectors per hunk
 		private uint m_hunkbytes;        // size of each raw hunk in bytes
 		private ulong m_hunkcount;       // number of hunks represented
 		private uint m_unitbytes;        // size of each unit in bytes
@@ -130,13 +154,10 @@ namespace SabreTools.Library.FileTypes
 				return null;
 			}
 
-			for(int i = 0; i < 8; i++)
+			if (!m_signature.StartsWith(Constants.CHDSignature, exact: true))
 			{
-				if (m_signature[i] != Constants.CHDSignatureBytes[i])
-				{
-					// throw CHDERR_INVALID_FILE;
-					return null;
-				}
+				// throw CHDERR_INVALID_FILE;
+				return null;
 			}
 
 			// Get the header size and version
@@ -144,10 +165,12 @@ namespace SabreTools.Library.FileTypes
 			m_version = m_br.ReadUInt32Reverse();
 
 			// If we have an invalid combination of size and version
-			if ((m_version == 3 && m_headersize != Constants.CHD_V3_HEADER_SIZE)
+			if ((m_version == 1 && m_headersize != Constants.CHD_V1_HEADER_SIZE)
+				|| (m_version == 2 && m_headersize != Constants.CHD_V2_HEADER_SIZE)
+				|| (m_version == 3 && m_headersize != Constants.CHD_V3_HEADER_SIZE)
 				|| (m_version == 4 && m_headersize != Constants.CHD_V4_HEADER_SIZE)
 				|| (m_version == 5 && m_headersize != Constants.CHD_V5_HEADER_SIZE)
-				|| (m_version < 3 || m_version > 5))
+				|| (m_version < 1 || m_version > 5))
 			{
 				// throw CHDERR_UNSUPPORTED_VERSION;
 				return null;
@@ -157,28 +180,34 @@ namespace SabreTools.Library.FileTypes
 		}
 
 		/// <summary>
-		/// Get the internal SHA-1 from the CHD
+		/// Get the internal MD5 (v1, v2) or SHA-1 (v3, v4, v5) from the CHD
 		/// </summary>
-		/// <returns>SHA-1 as a byte array, null on error</returns>
-		public byte[] GetSHA1FromHeader()
+		/// <returns>MD5 as a byte array, null on error</returns>
+		public byte[] GetHashFromHeader()
 		{
 			// Validate the header by default just in case
 			uint? version = ValidateHeaderVersion();
 
-			// Now get the SHA-1 hash, if possible
-			byte[] sha1 = new byte[20];
+			// Now get the hash, if possible
+			byte[] hash;
 
 			// Now parse the rest of the header according to the version
 			switch (version)
 			{
+				case 1:
+					hash = ParseCHDv1Header();
+					break;
+				case 2:
+					hash = ParseCHDv2Header();
+					break;
 				case 3:
-					sha1 = ParseCHDv3Header();
+					hash = ParseCHDv3Header();
 					break;
 				case 4:
-					sha1 = ParseCHDv4Header();
+					hash = ParseCHDv4Header();
 					break;
 				case 5:
-					sha1 = ParseCHDv5Header();
+					hash = ParseCHDv5Header();
 					break;
 				case null:
 				default:
@@ -186,7 +215,94 @@ namespace SabreTools.Library.FileTypes
 					return null;
 			}
 
-			return sha1;
+			return hash;
+		}
+
+		/// <summary>
+		/// Parse a CHD v1 header
+		/// </summary>
+		/// <returns>The extracted MD5 on success, null otherwise</returns>
+		private byte[] ParseCHDv1Header()
+		{
+			// Seek to after the signature to make sure we're reading the correct bytes
+			m_br.BaseStream.Seek(16, SeekOrigin.Begin);
+
+			// Set the blank MD5 hash
+			byte[] md5 = new byte[16];
+
+			// Set offsets and defaults
+			m_mapoffset = 0;
+			m_mapentrybytes = 0;
+
+			// Read the CHD flags
+			uint flags = m_br.ReadUInt32Reverse();
+
+			// Determine compression
+			switch (m_br.ReadUInt32())
+			{
+				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
+				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
+			}
+
+			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+
+			m_sectorsperhunk = m_br.ReadUInt32Reverse();
+			m_hunkcount = m_br.ReadUInt32Reverse();
+			m_br.ReadUInt32Reverse(); // Cylinder count
+			m_br.ReadUInt32Reverse(); // Head count
+			m_br.ReadUInt32Reverse(); // Sector count
+
+			md5 = m_br.ReadBytes(16);
+			m_br.ReadBytes(16); // Parent MD5
+
+			return md5;
+		}
+
+		/// <summary>
+		/// Parse a CHD v2 header
+		/// </summary>
+		/// <returns>The extracted MD5 on success, null otherwise</returns>
+		private byte[] ParseCHDv2Header()
+		{
+			// Seek to after the signature to make sure we're reading the correct bytes
+			m_br.BaseStream.Seek(16, SeekOrigin.Begin);
+
+			// Set the blank MD5 hash
+			byte[] md5 = new byte[16];
+
+			// Set offsets and defaults
+			m_mapoffset = 0;
+			m_mapentrybytes = 0;
+
+			// Read the CHD flags
+			uint flags = m_br.ReadUInt32Reverse();
+
+			// Determine compression
+			switch (m_br.ReadUInt32())
+			{
+				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
+				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
+			}
+
+			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+
+			m_sectorsperhunk = m_br.ReadUInt32Reverse();
+			m_hunkcount = m_br.ReadUInt32Reverse();
+			m_br.ReadUInt32Reverse(); // Cylinder count
+			m_br.ReadUInt32Reverse(); // Head count
+			m_br.ReadUInt32Reverse(); // Sector count
+
+			md5 = m_br.ReadBytes(16);
+			m_br.ReadBytes(16); // Parent MD5
+			m_br.ReadUInt32Reverse(); // Sector size
+
+			return md5;
 		}
 
 		/// <summary>
