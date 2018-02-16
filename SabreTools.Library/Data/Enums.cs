@@ -94,13 +94,12 @@
 	/// </summary>
 	public enum FileType
 	{
+		// Singleton
 		None = 0,
-
-		// Bare types
 		CHD,
-		Folder,
 
-		// Archival types
+		// Can contain children
+		Folder,
 		SevenZipArchive,
 		GZipArchive,
 		LRZipArchive,
