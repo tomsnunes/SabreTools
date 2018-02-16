@@ -13,6 +13,8 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
+using SearchOption = System.IO.SearchOption;
+using StreamReader = System.IO.StreamReader;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 
