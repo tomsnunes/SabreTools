@@ -3625,13 +3625,14 @@ namespace SabreTools.Library.DatFiles
 			if (Romba)
 			{
 				GZipArchive archive = new GZipArchive(item);
-				BaseFile rom = archive.GetTorrentGZFileInfo();
+				BaseFile baseFile = archive.GetTorrentGZFileInfo();
 
 				// If the rom is valid, write it out
-				if (rom != null && rom.Filename != null)
+				if (baseFile != null && baseFile.Filename != null)
 				{
 					// Add the list if it doesn't exist already
-					Add(rom.Size + "-" + rom.CRC, new Rom(rom));
+					Rom rom = new Rom(baseFile);
+					Add(rom.Size + "-" + rom.CRC, rom);
 					Globals.Logger.User("File added: {0}", Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
@@ -3688,7 +3689,7 @@ namespace SabreTools.Library.DatFiles
 				// First take care of the found items
 				Parallel.ForEach(extracted, Globals.ParallelOptions, rom =>
 				{
-					DatItem datItem = (rom.Type == FileType.CHD ? (DatItem)(new Disk(rom)) : (DatItem)(new Rom(rom)));
+					DatItem datItem = Utilities.GetDatItem(rom);
 					ProcessFileHelper(newItem,
 						datItem,
 						basePath,
@@ -4290,7 +4291,7 @@ namespace SabreTools.Library.DatFiles
 				{
 					foreach (BaseFile entry in entries)
 					{
-						DatItem datItem = (entry.Type == FileType.CHD ? (DatItem)(new Disk(entry)) : (DatItem)(new Rom(entry)));
+						DatItem datItem = Utilities.GetDatItem(entry);
 						usedInternally &= RebuildIndividualFile(datItem, file, outDir, date, inverse, outputFormat,
 							romba, updateDat, !isTorrentGzip /* isZip */, headerToCheckAgainst);
 					}

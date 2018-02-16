@@ -684,6 +684,35 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Create a specific type of DatItem to be used based on a BaseFile
+		/// </summary>
+		/// <param name="baseFile">BaseFile containing information to be created</param>
+		/// <returns>DatItem of the specific internal type that corresponds to the inputs</returns>
+		public static DatItem GetDatItem(BaseFile baseFile)
+		{
+			switch (baseFile.Type)
+			{
+				case FileType.CHD:
+					return new Disk(baseFile);
+				case FileType.GZipArchive:
+				case FileType.LRZipArchive:
+				case FileType.LZ4Archive:
+				case FileType.None:
+				case FileType.RarArchive:
+				case FileType.SevenZipArchive:
+				case FileType.TapeArchive:
+				case FileType.XZArchive:
+				case FileType.ZipArchive:
+				case FileType.ZPAQArchive:
+				case FileType.ZstdArchive:
+					return new Rom(baseFile);
+				case FileType.Folder:
+				default:
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// Get DatFormat value from input string
 		/// </summary>
 		/// <param name="input">String to get value from</param>
