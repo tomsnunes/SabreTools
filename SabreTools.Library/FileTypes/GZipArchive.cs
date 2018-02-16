@@ -216,7 +216,10 @@ namespace SabreTools.Library.FileTypes
 						// If secure hashes are disabled, do a quickscan
 						if (omitFromScan == Hash.SecureHashes)
 						{
-							BaseFile tempRom = new BaseFile(gamename);
+							BaseFile tempRom = new BaseFile()
+							{
+								Filename = gamename,
+							};
 							BinaryReader br = new BinaryReader(Utilities.TryOpenRead(_filename));
 							br.BaseStream.Seek(-8, SeekOrigin.End);
 							byte[] headercrc = br.ReadBytesReverse(4);
