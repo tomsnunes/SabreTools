@@ -740,7 +740,7 @@ namespace SabreTools.Library.DatFiles
 				roms.Add(new Rom()
 				{
 					Name = (releaseNumber != "0" ? releaseNumber + " - " : "") + machineName + pair.Item1,
-					CRC = pair.Item2,
+					CRC = Utilities.CleanHashData(pair.Item2, Constants.CRCLength),
 
 					ItemStatus = ItemStatus.None,
 				});

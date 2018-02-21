@@ -405,11 +405,11 @@ namespace SabreTools.Library.DatFiles
 								datItem = new Disk
 								{
 									Name = reader.GetAttribute("name"),
-									MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
-									SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
-									SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
-									SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
-									SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
+									MD5 = Utilities.CleanHashData(reader.GetAttribute("md5"), Constants.MD5Length),
+									SHA1 = Utilities.CleanHashData(reader.GetAttribute("sha1"), Constants.SHA1Length),
+									SHA256 = Utilities.CleanHashData(reader.GetAttribute("sha256"), Constants.SHA256Length),
+									SHA384 = Utilities.CleanHashData(reader.GetAttribute("sha384"), Constants.SHA384Length),
+									SHA512 = Utilities.CleanHashData(reader.GetAttribute("sha512"), Constants.SHA512Length),
 									ItemStatus = its,
 
 									SystemID = sysid,
@@ -436,12 +436,12 @@ namespace SabreTools.Library.DatFiles
 								{
 									Name = reader.GetAttribute("name"),
 									Size = size,
-									CRC = reader.GetAttribute("crc")?.ToLowerInvariant(),
-									MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
-									SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
-									SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
-									SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
-									SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
+									CRC = Utilities.CleanHashData(reader.GetAttribute("crc"), Constants.CRCLength),
+									MD5 = Utilities.CleanHashData(reader.GetAttribute("md5"), Constants.MD5Length),
+									SHA1 = Utilities.CleanHashData(reader.GetAttribute("sha1"), Constants.SHA1Length),
+									SHA256 = Utilities.CleanHashData(reader.GetAttribute("sha256"), Constants.SHA256Length),
+									SHA384 = Utilities.CleanHashData(reader.GetAttribute("sha384"), Constants.SHA384Length),
+									SHA512 = Utilities.CleanHashData(reader.GetAttribute("sha512"), Constants.SHA512Length),
 									ItemStatus = its,
 									Date = date,
 

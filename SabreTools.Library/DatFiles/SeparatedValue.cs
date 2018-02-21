@@ -217,22 +217,22 @@ namespace SabreTools.Library.DatFiles
 							}
 							break;
 						case "DatItem.CRC":
-							crc = value;
+							crc = Utilities.CleanHashData(value, Constants.CRCLength);
 							break;
 						case "DatItem.MD5":
-							md5 = value;
+							md5 = Utilities.CleanHashData(value, Constants.MD5Length);
 							break;
 						case "DatItem.SHA1":
-							sha1 = value;
+							sha1 = Utilities.CleanHashData(value, Constants.SHA1Length);
 							break;
 						case "DatItem.SHA256":
-							sha256 = value;
+							sha256 = Utilities.CleanHashData(value, Constants.SHA256Length);
 							break;
 						case "DatItem.SHA384":
-							sha384 = value;
+							sha384 = Utilities.CleanHashData(value, Constants.SHA384Length);
 							break;
 						case "DatItem.SHA512":
-							sha512 = value;
+							sha512 = Utilities.CleanHashData(value, Constants.SHA512Length);
 							break;
 						case "DatItem.Nodump":
 							status = Utilities.GetItemStatus(value);

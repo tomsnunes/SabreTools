@@ -466,68 +466,68 @@ namespace SabreTools.Library.DatFiles
 								if (item.Type == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Rom)item).CRC = quoteless.ToLowerInvariant();
+									((Rom)item).CRC = Utilities.CleanHashData(quoteless, Constants.CRCLength);
 								}
 								break;
 							case "md5":
 								if (item.Type == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Rom)item).MD5 = quoteless.ToLowerInvariant();
+									((Rom)item).MD5 = Utilities.CleanHashData(quoteless, Constants.MD5Length);
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									i++;
 									quoteless = linegc[i].Replace("\"", "");
-									((Disk)item).MD5 = quoteless.ToLowerInvariant();
+									((Disk)item).MD5 = Utilities.CleanHashData(quoteless, Constants.MD5Length);
 								}
 								break;
 							case "sha1":
 								if (item.Type == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Rom)item).SHA1 = quoteless.ToLowerInvariant();
+									((Rom)item).SHA1 = Utilities.CleanHashData(quoteless, Constants.SHA1Length);
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Disk)item).SHA1 = quoteless.ToLowerInvariant();
+									((Disk)item).SHA1 = Utilities.CleanHashData(quoteless, Constants.SHA1Length);
 								}
 								break;
 							case "sha256":
 								if (item.Type == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Rom)item).SHA256 = quoteless.ToLowerInvariant();
+									((Rom)item).SHA256 = Utilities.CleanHashData(quoteless, Constants.SHA256Length);
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Disk)item).SHA256 = quoteless.ToLowerInvariant();
+									((Disk)item).SHA256 = Utilities.CleanHashData(quoteless, Constants.SHA256Length);
 								}
 								break;
 							case "sha384":
 								if (item.Type == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Rom)item).SHA384 = quoteless.ToLowerInvariant();
+									((Rom)item).SHA384 = Utilities.CleanHashData(quoteless, Constants.SHA384Length);
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Disk)item).SHA384 = quoteless.ToLowerInvariant();
+									((Disk)item).SHA384 = Utilities.CleanHashData(quoteless, Constants.SHA384Length);
 								}
 								break;
 							case "sha512":
 								if (item.Type == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Rom)item).SHA512 = quoteless.ToLowerInvariant();
+									((Rom)item).SHA512 = Utilities.CleanHashData(quoteless, Constants.SHA512Length);
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
-									((Disk)item).SHA512 = quoteless.ToLowerInvariant();
+									((Disk)item).SHA512 = Utilities.CleanHashData(quoteless, Constants.SHA512Length);
 								}
 								break;
 							case "status":

@@ -88,12 +88,12 @@ namespace SabreTools.Library.DatFiles
 				{
 					Name = name,
 					Size = -1,
-					CRC = ((_hash & Hash.CRC) != 0 ? hash : null),
-					MD5 = ((_hash & Hash.MD5) != 0 ? hash : null),
-					SHA1 = ((_hash & Hash.SHA1) != 0 ? hash : null),
-					SHA256 = ((_hash & Hash.SHA256) != 0 ? hash : null),
-					SHA384 = ((_hash & Hash.SHA384) != 0 ? hash : null),
-					SHA512 = ((_hash & Hash.SHA512) != 0 ? hash : null),
+					CRC = ((_hash & Hash.CRC) != 0 ? Utilities.CleanHashData(hash, Constants.CRCLength) : null),
+					MD5 = ((_hash & Hash.MD5) != 0 ? Utilities.CleanHashData(hash, Constants.MD5Length) : null),
+					SHA1 = ((_hash & Hash.SHA1) != 0 ? Utilities.CleanHashData(hash, Constants.SHA1Length) : null),
+					SHA256 = ((_hash & Hash.SHA256) != 0 ? Utilities.CleanHashData(hash, Constants.SHA256Length) : null),
+					SHA384 = ((_hash & Hash.SHA384) != 0 ? Utilities.CleanHashData(hash, Constants.SHA384Length) : null),
+					SHA512 = ((_hash & Hash.SHA512) != 0 ? Utilities.CleanHashData(hash, Constants.SHA512Length) : null),
 					ItemStatus = ItemStatus.None,
 
 					MachineName = Path.GetFileNameWithoutExtension(filename),

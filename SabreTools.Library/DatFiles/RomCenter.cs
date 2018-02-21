@@ -174,7 +174,7 @@ namespace SabreTools.Library.DatFiles
 						{
 							Name = rominfo[5],
 							Size = size,
-							CRC = rominfo[6],
+							CRC = Utilities.CleanHashData(rominfo[6], Constants.CRCLength),
 							ItemStatus = ItemStatus.None,
 
 							MachineName = rominfo[3],
