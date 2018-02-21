@@ -97,6 +97,7 @@ namespace SabreTools.Library.DatFiles
 							xtr.Read();
 							break;
 						// We want to process the entire subtree of the machine
+						case "game": // Some older DATs still use "game"
 						case "machine":
 							ReadMachine(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);
 
@@ -717,9 +718,12 @@ namespace SabreTools.Library.DatFiles
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
 
-				foreach (Tuple<string, string> kvp in rom.Infos)
+				if (rom.Infos != null && rom.Infos.Count > 0)
 				{
-					state += "\t\t<info name=\"" + HttpUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + HttpUtility.HtmlEncode(kvp.Item2) + "\" />\n";
+					foreach (Tuple<string, string> kvp in rom.Infos)
+					{
+						state += "\t\t<info name=\"" + HttpUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + HttpUtility.HtmlEncode(kvp.Item2) + "\" />\n";
+					}
 				}
 
 				sw.Write(state);
