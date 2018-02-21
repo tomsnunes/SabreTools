@@ -173,14 +173,21 @@ namespace SabreTools.Library.FileTypes
 
 			_headerVersion = ValidateHeaderVersion();
 
-			byte[] hash = GetHashFromHeader();
-			if (hash.Length == Constants.MD5Length)
+			if (_headerVersion != null)
 			{
-				_md5 = hash;
-			}
-			else if (hash.Length == Constants.SHA1Length)
-			{
-				_sha1 = hash;
+				byte[] hash = GetHashFromHeader();
+
+				if (hash != null)
+				{
+					if (hash.Length == Constants.MD5Length)
+					{
+						_md5 = hash;
+					}
+					else if (hash.Length == Constants.SHA1Length)
+					{
+						_sha1 = hash;
+					}
+				}
 			}
 		}
 
