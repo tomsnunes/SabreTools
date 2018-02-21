@@ -719,7 +719,7 @@ namespace SabreTools.Library.Tools
 		/// <returns>DatFormat value corresponding to the string</returns>
 		public static DatFormat GetDatFormat(string input)
 		{
-			switch (input?.ToLowerInvariant())
+			switch (input?.Trim().ToLowerInvariant())
 			{
 				case "all":
 					return DatFormat.ALL;
