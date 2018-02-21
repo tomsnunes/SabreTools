@@ -1162,7 +1162,8 @@ namespace SabreTools.Library.Tools
 					{
 						return DatFormat.SabreDat;
 					}
-					else if (second.StartsWith("<dat") && !second.StartsWith("<datafile"))
+					else if ((second.StartsWith("<dat") && !second.StartsWith("<datafile"))
+						|| second.StartsWith("<?xml-stylesheet"))
 					{
 						return DatFormat.OfflineList;
 					}
