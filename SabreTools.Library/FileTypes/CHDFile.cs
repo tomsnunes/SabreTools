@@ -144,22 +144,8 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="filename"></param>
 		public CHDFile(string filename)
-			: base(filename)
+			: this(Utilities.TryOpenRead(filename))
 		{
-			_fileType = FileType.CHD;
-			m_br = new BinaryReader(Utilities.TryOpenRead(filename));
-
-			_headerVersion = ValidateHeaderVersion();
-
-			byte[] hash = GetHashFromHeader();
-			if (hash.Length == Constants.MD5Length)
-			{
-				_md5 = hash;
-			}
-			else if (hash.Length == Constants.SHA1Length)
-			{
-				_sha1 = hash;
-			}
 		}
 
 		/// <summary>
