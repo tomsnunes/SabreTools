@@ -3247,6 +3247,7 @@ namespace SabreTools.Library.DatFiles
 
 			// If the output type isn't set already, get the internal output type
 			DatFormat = (DatFormat == 0 ? Utilities.GetDatFormatFromFile(filename) : DatFormat);
+			_sortedBy = SortedBy.CRC; // Setting this because it can reduce issues later
 
 			// Now parse the correct type of DAT
 			try
@@ -3405,28 +3406,8 @@ namespace SabreTools.Library.DatFiles
 				item = itemDisk;
 			}
 
-			// Get the key and add statistical data
-			switch (item.Type)
-			{
-				case ItemType.Archive:
-				case ItemType.BiosSet:
-				case ItemType.Blank:
-				case ItemType.Release:
-				case ItemType.Sample:
-					key = item.Type.ToString();
-					break;
-				case ItemType.Disk:
-					key = ((Disk)item).MD5 ?? (((Disk)item).SHA1 ?? "nodump");
-					break;
-				case ItemType.Rom:
-					key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
-					break;
-				default:
-					key = "default";
-					break;
-			}
-
-			// Add the item to the DAT
+			// Get the key and add the file
+			key = GetKey(item, SortedBy.CRC);
 			Add(key, item);
 
 			return key;
