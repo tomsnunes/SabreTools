@@ -50,8 +50,9 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
 		/// <param name="read">True for opening file as read, false for opening file as write</param>
-		public Folder(string filename)
-			: base(filename)
+		/// <param name="getHashes">True if hashes for this file should be calculated, false otherwise (default)</param>
+		public Folder(string filename, bool getHashes = false)
+			: base(filename, getHashes)
 		{
 			_fileType = FileType.Folder;
 		}

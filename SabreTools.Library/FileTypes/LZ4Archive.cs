@@ -34,8 +34,9 @@ namespace SabreTools.Library.FileTypes
 		/// Create a new LZ4Archive from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
-		public LZ4Archive(string filename)
-			: base(filename)
+		/// <param name="getHashes">True if hashes for this file should be calculated, false otherwise (default)</param>
+		public LZ4Archive(string filename, bool getHashes = false)
+			: base(filename, getHashes)
 		{
 			_fileType = FileType.LZ4Archive;
 		}

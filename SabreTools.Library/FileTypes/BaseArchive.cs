@@ -34,8 +34,9 @@ namespace SabreTools.Library.FileTypes
 		/// Create a new Archive from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
-		public BaseArchive(string filename)
-			: base(filename)
+		/// <param name="getHashes">True if hashes for this file should be calculated, false otherwise (default)</param>
+		public BaseArchive(string filename, bool getHashes = false)
+			: base(filename, getHashes)
 		{
 		}
 

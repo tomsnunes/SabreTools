@@ -34,8 +34,9 @@ namespace SabreTools.Library.FileTypes
 		/// Create a new ZstdArchive from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
-		public ZstdArchive(string filename)
-			: base(filename)
+		/// <param name="getHashes">True if hashes for this file should be calculated, false otherwise (default)</param>
+		public ZstdArchive(string filename, bool getHashes)
+			: base(filename, getHashes)
 		{
 			_fileType = FileType.ZstdArchive;
 		}

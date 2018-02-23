@@ -102,21 +102,26 @@ namespace SabreTools.Library.FileTypes
 		/// Create a new BaseFile from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use</param>
-		public BaseFile(string filename)
+		/// <param name="getHashes">True if hashes for this file should be calculated (default), false otherwise</param>
+		public BaseFile(string filename, bool getHashes = true)
 		{
 			this._filename = filename;
-			BaseFile temp = Utilities.GetFileInfo(_filename);
 
-			if (temp != null)
+			if (getHashes)
 			{
-				this._parent = temp.Parent;
-				this._date = temp.Date;
-				this._crc = temp.CRC;
-				this._md5 = temp.MD5;
-				this._sha1 = temp.SHA1;
-				this._sha256 = temp.SHA256;
-				this._sha384 = temp.SHA384;
-				this._sha512 = temp.SHA512;
+				BaseFile temp = Utilities.GetFileInfo(_filename);
+
+				if (temp != null)
+				{
+					this._parent = temp.Parent;
+					this._date = temp.Date;
+					this._crc = temp.CRC;
+					this._md5 = temp.MD5;
+					this._sha1 = temp.SHA1;
+					this._sha256 = temp.SHA256;
+					this._sha384 = temp.SHA384;
+					this._sha512 = temp.SHA512;
+				}
 			}
 		}
 
@@ -125,19 +130,28 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="filename">Name of the file to use</param>
 		/// <param name="stream">Stream to populate information from</param>
-		public BaseFile(string filename, Stream stream)
+		/// <param name="getHashes">True if hashes for this file should be calculated (default), false otherwise</param>
+		public BaseFile(string filename, Stream stream, bool getHashes = true)
 		{
-			BaseFile temp = Utilities.GetStreamInfo(stream, stream.Length);
-
 			this._filename = filename;
-			this._parent = temp.Parent;
-			this._date = temp.Date;
-			this._crc = temp.CRC;
-			this._md5 = temp.MD5;
-			this._sha1 = temp.SHA1;
-			this._sha256 = temp.SHA256;
-			this._sha384 = temp.SHA384;
-			this._sha512 = temp.SHA512;
+
+			if (getHashes)
+			{
+				BaseFile temp = Utilities.GetStreamInfo(stream, stream.Length);
+
+				if(temp != null)
+				{
+					this._parent = temp.Parent;
+					this._date = temp.Date;
+					this._crc = temp.CRC;
+					this._md5 = temp.MD5;
+					this._sha1 = temp.SHA1;
+					this._sha256 = temp.SHA256;
+					this._sha384 = temp.SHA384;
+					this._sha512 = temp.SHA512;
+				}
+			}
+				
 		}
 
 		#endregion
