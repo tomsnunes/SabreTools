@@ -386,6 +386,9 @@ namespace SabreTools.Library.DatFiles
 					case "manufacturer":
 						machine.Manufacturer = reader.ReadElementContentAsString();
 						break;
+					case "publisher": // Not technically supported but used by some legacy DATs
+						machine.Publisher = reader.ReadElementContentAsString();
+						break;
 					case "trurip": // This is special metadata unique to TruRip
 						ReadTruRip(reader.ReadSubtree(), machine);
 
