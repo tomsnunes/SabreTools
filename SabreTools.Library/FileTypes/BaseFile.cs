@@ -104,11 +104,11 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="filename">Name of the file to use</param>
 		public BaseFile(string filename)
 		{
+			this._filename = filename;
 			BaseFile temp = Utilities.GetFileInfo(_filename);
 
 			if (temp != null)
 			{
-				this._filename = temp.Filename;
 				this._parent = temp.Parent;
 				this._date = temp.Date;
 				this._crc = temp.CRC;
@@ -129,7 +129,7 @@ namespace SabreTools.Library.FileTypes
 		{
 			BaseFile temp = Utilities.GetStreamInfo(stream, stream.Length);
 
-			this._filename = temp.Filename;
+			this._filename = filename;
 			this._parent = temp.Parent;
 			this._date = temp.Date;
 			this._crc = temp.CRC;
