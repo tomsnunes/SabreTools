@@ -639,8 +639,6 @@ namespace SabreTools.Library.DatItems
 		/// <returns>Key to try to use</returns>
 		private string SortAndGetKey(DatFile datdata, bool sorted = false)
 		{
-			string key = null;
-
 			// If we're not already sorted, take care of it
 			if (!sorted)
 			{
@@ -648,9 +646,7 @@ namespace SabreTools.Library.DatItems
 			}
 
 			// Now that we have the sorted type, we get the proper key
-			key = Utilities.GetKeyFromDatItem(this, datdata.SortedBy);
-
-			return key;
+			return Utilities.GetKeyFromDatItem(this, datdata.SortedBy);
 		}
 
 		#endregion
