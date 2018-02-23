@@ -90,9 +90,9 @@ namespace SabreTools.Library.FileTypes
 			{
 				encounteredErrors = true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				// Don't log file open errors
+				Globals.Logger.Error(ex.ToString());
 				encounteredErrors = true;
 			}
 
@@ -230,9 +230,9 @@ namespace SabreTools.Library.FileTypes
 				// Dispose of the archive
 				ta.Dispose();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				// Don't log file open errors
+				Globals.Logger.Error(ex.ToString());
 				return null;
 			}
 
