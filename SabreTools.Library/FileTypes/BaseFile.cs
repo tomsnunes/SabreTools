@@ -106,15 +106,18 @@ namespace SabreTools.Library.FileTypes
 		{
 			BaseFile temp = Utilities.GetFileInfo(_filename);
 
-			this._filename = temp.Filename;
-			this._parent = temp.Parent;
-			this._date = temp.Date;
-			this._crc = temp.CRC;
-			this._md5 = temp.MD5;
-			this._sha1 = temp.SHA1;
-			this._sha256 = temp.SHA256;
-			this._sha384 = temp.SHA384;
-			this._sha512 = temp.SHA512;
+			if (temp != null)
+			{
+				this._filename = temp.Filename;
+				this._parent = temp.Parent;
+				this._date = temp.Date;
+				this._crc = temp.CRC;
+				this._md5 = temp.MD5;
+				this._sha1 = temp.SHA1;
+				this._sha256 = temp.SHA256;
+				this._sha384 = temp.SHA384;
+				this._sha512 = temp.SHA512;
+			}
 		}
 
 		/// <summary>
