@@ -3649,9 +3649,9 @@ namespace SabreTools.Library.DatFiles
 			string newBasePath = basePath;
 			if (copyFiles)
 			{
-				newBasePath = Path.Combine(tempDir, new Guid().ToString());
+				newBasePath = Path.Combine(tempDir, Guid.NewGuid().ToString());
 				newItem = Path.GetFullPath(Path.Combine(newBasePath, Path.GetFullPath(item).Remove(0, basePath.Length + 1)));
-				Directory.CreateDirectory(Path.GetDirectoryName(newItem));
+				Utilities.TryCreateDirectory(Path.GetDirectoryName(newItem));
 				File.Copy(item, newItem, true);
 			}
 

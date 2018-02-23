@@ -1781,15 +1781,42 @@ namespace SabreTools.Library.Tools
 		/// <param name="file">Name of the directory to delete</param>
 		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
 		/// <returns>True if the file didn't exist or could be deleted, false otherwise</returns>
+		public static bool TryCreateDirectory(string file, bool throwOnError = false)
+		{
+			// Now wrap creating the directory
+			try
+			{
+				Directory.CreateDirectory(file);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Try to safely delete a directory, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the directory to delete</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>True if the file didn't exist or could be deleted, false otherwise</returns>
 		public static bool TryDeleteDirectory(string file, bool throwOnError = false)
 		{
-			// Check if the file exists first
+			// Check if the directory exists first
 			if (!Directory.Exists(file))
 			{
 				return true;
 			}
 
-			// Now wrap deleting the file
+			// Now wrap deleting the directory
 			try
 			{
 				Directory.Delete(file, true);

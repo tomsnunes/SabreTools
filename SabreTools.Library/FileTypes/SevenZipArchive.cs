@@ -395,7 +395,7 @@ namespace SabreTools.Library.FileTypes
 					};
 
 					// Create the temp directory
-					string tempPath = Path.Combine(outDir, new Guid().ToString());
+					string tempPath = Path.Combine(outDir, Guid.NewGuid().ToString());
 					if (!Directory.Exists(tempPath))
 					{
 						Directory.CreateDirectory(tempPath);
@@ -608,7 +608,7 @@ namespace SabreTools.Library.FileTypes
 					keys.Sort(ZipFile.TorrentZipStringCompare);
 
 					// Create the temp directory
-					string tempPath = Path.Combine(outDir, new Guid().ToString());
+					string tempPath = Path.Combine(outDir, Guid.NewGuid().ToString());
 					if (!Directory.Exists(tempPath))
 					{
 						Directory.CreateDirectory(tempPath);
