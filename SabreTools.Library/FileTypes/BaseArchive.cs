@@ -77,14 +77,14 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public new abstract List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false);
+		public override abstract List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false);
 
 		/// <summary>
 		/// Generate a list of empty folders in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
 		/// <returns>List of empty folders in the archive</returns>
-		public new abstract List<string> GetEmptyFolders();
+		public override abstract List<string> GetEmptyFolders();
 
 		/// <summary>
 		/// Check whether the input file is a standardized format
