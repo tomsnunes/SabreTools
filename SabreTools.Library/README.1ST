@@ -200,7 +200,7 @@ Options:
 		  Set the forcepacking tag to the given value.
 		  Possible values are: None, Zip, Unzip
 
-	  -f, --archives-as-files	 Treat archives as files
+	  -aaf, --archives-as-files	 Treat archives as files
 		  Instead of trying to enumerate the files within archives, treat the
 		  archives as files themselves. This is good for uncompressed sets that
 		  include archives that should be read as-is.
