@@ -1440,7 +1440,7 @@ namespace SabreTools.Library.DatFiles
 						DatItem rom = roms[i];
 
 						// We want to get the key most appropriate for the given sorting type
-						string newkey = GetKey(rom, bucketBy, lower, norename);
+						string newkey = Utilities.GetKeyFromDatItem(rom, bucketBy, lower, norename);
 
 						// If the key is different, move the item to the new key
 						if (newkey != key)
@@ -1506,87 +1506,48 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Get the dictionary key that should be used for a given item and sorting type
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by the highest available hash
 		/// </summary>
-		/// <param name="item">DatItem to get the key for</param>
-		/// <param name="sortedBy">SortedBy enum representing what key to get</param>
+		/// <param name="deduperoms">Dedupe type that should be used (default none)</param>
 		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		/// <returns>String representing the key to be used for the DatItem</returns>
-		private string GetKey(DatItem item, SortedBy sortedBy, bool lower = true, bool norename = true)
+		public void BucketByBestAvailable(DedupeType deduperoms = DedupeType.None, bool lower = true, bool norename = true)
 		{
-			// Set the output key as the default blank string
-			string key = "";
-
-			// Now determine what the key should be based on the sortedBy value
-			switch (sortedBy)
+			// If all items are supposed to have a SHA-512, we sort by that
+			if (RomCount + DiskCount - NodumpCount == SHA512Count)
 			{
-				case SortedBy.CRC:
-					key = (item.Type == ItemType.Rom ? ((Rom)item).CRC : Constants.CRCZero);
-					break;
-				case SortedBy.Game:
-					key = (norename ? ""
-						: item.SystemID.ToString().PadLeft(10, '0')
-							+ "-"
-							+ item.SourceID.ToString().PadLeft(10, '0') + "-")
-					+ (String.IsNullOrWhiteSpace(item.MachineName)
-							? "Default"
-							: item.MachineName);
-					if (lower)
-					{
-						key = key.ToLowerInvariant();
-					}
-					if (key == null)
-					{
-						key = "null";
-					}
-
-					key = HttpUtility.HtmlEncode(key);
-					break;
-				case SortedBy.MD5:
-					key = (item.Type == ItemType.Rom
-						? ((Rom)item).MD5
-						: (item.Type == ItemType.Disk
-							? ((Disk)item).MD5
-							: Constants.MD5Zero));
-					break;
-				case SortedBy.SHA1:
-					key = (item.Type == ItemType.Rom
-						? ((Rom)item).SHA1
-						: (item.Type == ItemType.Disk
-							? ((Disk)item).SHA1
-							: Constants.SHA1Zero));
-					break;
-				case SortedBy.SHA256:
-					key = (item.Type == ItemType.Rom
-						? ((Rom)item).SHA256
-						: (item.Type == ItemType.Disk
-							? ((Disk)item).SHA256
-							: Constants.SHA256Zero));
-					break;
-				case SortedBy.SHA384:
-					key = (item.Type == ItemType.Rom
-						? ((Rom)item).SHA384
-						: (item.Type == ItemType.Disk
-							? ((Disk)item).SHA384
-							: Constants.SHA384Zero));
-					break;
-				case SortedBy.SHA512:
-					key = (item.Type == ItemType.Rom
-						? ((Rom)item).SHA512
-						: (item.Type == ItemType.Disk
-							? ((Disk)item).SHA512
-							: Constants.SHA512Zero));
-					break;
+				BucketBy(SortedBy.SHA512, deduperoms, lower, norename);
 			}
 
-			// Double and triple check the key for corner cases
-			if (key == null)
+			// If all items are supposed to have a SHA-384, we sort by that
+			else if (RomCount + DiskCount - NodumpCount == SHA384Count)
 			{
-				key = "";
+				BucketBy(SortedBy.SHA384, deduperoms, lower, norename);
 			}
 
-			return key;
+			// If all items are supposed to have a SHA-256, we sort by that
+			else if (RomCount + DiskCount - NodumpCount == SHA256Count)
+			{
+				BucketBy(SortedBy.SHA256, deduperoms, lower, norename);
+			}
+
+			// If all items are supposed to have a SHA-1, we sort by that
+			else if (RomCount + DiskCount - NodumpCount == SHA1Count)
+			{
+				BucketBy(SortedBy.SHA1, deduperoms, lower, norename);
+			}
+
+			// If all items are supposed to have a MD5, we sort by that
+			else if (RomCount + DiskCount - NodumpCount == MD5Count)
+			{
+				BucketBy(SortedBy.MD5, deduperoms, lower, norename);
+			}
+
+			// Otherwise, we sort by CRC
+			else
+			{
+				BucketBy(SortedBy.CRC, deduperoms, lower, norename);
+			}
 		}
 
 		/// <summary>
@@ -3407,7 +3368,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Get the key and add the file
-			key = GetKey(item, SortedBy.CRC);
+			key = Utilities.GetKeyFromDatItem(item, SortedBy.CRC);
 			Add(key, item);
 
 			return key;

@@ -2718,6 +2718,90 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get the dictionary key that should be used for a given item and sorting type
+		/// </summary>
+		/// <param name="item">DatItem to get the key for</param>
+		/// <param name="sortedBy">SortedBy enum representing what key to get</param>
+		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <returns>String representing the key to be used for the DatItem</returns>
+		public static string GetKeyFromDatItem(DatItem item, SortedBy sortedBy, bool lower = true, bool norename = true)
+		{
+			// Set the output key as the default blank string
+			string key = "";
+
+			// Now determine what the key should be based on the sortedBy value
+			switch (sortedBy)
+			{
+				case SortedBy.CRC:
+					key = (item.Type == ItemType.Rom ? ((Rom)item).CRC : Constants.CRCZero);
+					break;
+				case SortedBy.Game:
+					key = (norename ? ""
+						: item.SystemID.ToString().PadLeft(10, '0')
+							+ "-"
+							+ item.SourceID.ToString().PadLeft(10, '0') + "-")
+					+ (String.IsNullOrWhiteSpace(item.MachineName)
+							? "Default"
+							: item.MachineName);
+					if (lower)
+					{
+						key = key.ToLowerInvariant();
+					}
+					if (key == null)
+					{
+						key = "null";
+					}
+
+					key = HttpUtility.HtmlEncode(key);
+					break;
+				case SortedBy.MD5:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).MD5
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).MD5
+							: Constants.MD5Zero));
+					break;
+				case SortedBy.SHA1:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA1
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA1
+							: Constants.SHA1Zero));
+					break;
+				case SortedBy.SHA256:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA256
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA256
+							: Constants.SHA256Zero));
+					break;
+				case SortedBy.SHA384:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA384
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA384
+							: Constants.SHA384Zero));
+					break;
+				case SortedBy.SHA512:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA512
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA512
+							: Constants.SHA512Zero));
+					break;
+			}
+
+			// Double and triple check the key for corner cases
+			if (key == null)
+			{
+				key = "";
+			}
+
+			return key;
+		}
+
+		/// <summary>
 		/// Returns the human-readable file size for an arbitrary, 64-bit file size 
 		/// The default format is "0.### XB", e.g. "4.2 KB" or "1.434 GB"
 		/// </summary>
