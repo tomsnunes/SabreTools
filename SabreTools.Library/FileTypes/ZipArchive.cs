@@ -18,22 +18,21 @@ using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 using ROMVault2.SupportedFiles.Zip;
-using SharpCompress.Common;
 using SharpCompress.Readers;
 
 namespace SabreTools.Library.FileTypes
 {
 	/// <summary>
-	/// Represents a Torrent7zip archive for reading and writing
+	/// Represents a Zip archive for reading and writing
 	/// </summary>
-	public class TorrentZipArchive : BaseArchive
+	public class ZipArchive : BaseArchive
 	{
 		#region Constructors
 
 		/// <summary>
 		/// Create a new TorrentZipArchive with no base file
 		/// </summary>
-		public TorrentZipArchive()
+		public ZipArchive()
 			: base()
 		{
 			_fileType = FileType.ZipArchive;
@@ -45,7 +44,7 @@ namespace SabreTools.Library.FileTypes
 		/// <param name="filename">Name of the file to use as an archive</param>
 		/// <param name="read">True for opening file as read, false for opening file as write</param>
 		/// <param name="getHashes">True if hashes for this file should be calculated, false otherwise (default)</param>
-		public TorrentZipArchive(string filename, bool getHashes = false)
+		public ZipArchive(string filename, bool getHashes = false)
 			: base(filename, getHashes)
 		{
 			_fileType = FileType.ZipArchive;
@@ -283,10 +282,17 @@ namespace SabreTools.Library.FileTypes
 					throw new Exception(ZipFile.ZipErrorMessageText(zr));
 				}
 
-				for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+				for (int i = 0; i < zf.EntriesCount; i++)
 				{
 					// Open the read stream
 					zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Library.Data.CompressionMethod cm, out uint lastMod);
+
+					// If we get a read error, log it and continue
+					if (zr != ZipReturn.ZipGood)
+					{
+						Globals.Logger.Warning("An error occurred while reading archive {0}: Zip Error - {1}", _filename, zr);
+						continue;
+					}
 
 					// If the entry ends with a directory separator, continue to the next item, if any
 					if (zf.Entries[i].FileName.EndsWith(Path.DirectorySeparatorChar.ToString())
@@ -317,18 +323,17 @@ namespace SabreTools.Library.FileTypes
 					// Otherwise, use the stream directly
 					else
 					{
-						BaseFile zipEntryRom = Utilities.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
+						BaseFile zipEntryRom = Utilities.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan, keepReadOpen: true);
 						zipEntryRom.Filename = zf.Entries[i].FileName;
 						zipEntryRom.Parent = gamename;
 						string convertedDate = Utilities.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 						zipEntryRom.Date = (date ? convertedDate : null);
 						found.Add(zipEntryRom);
-						zr = zf.CloseReadStream();
 					}
 				}
 
-
 				// Dispose of the archive
+				zr = zf.CloseReadStream();
 				zf.Close();
 			}
 			catch (Exception ex)

@@ -470,7 +470,7 @@ namespace SabreTools.Library.Tools
 					archive = new TapeArchive(input);
 					break;
 				case FileType.ZipArchive:
-					archive = new TorrentZipArchive(input);
+					archive = new ZipArchive(input);
 					break;
 				default:
 					// We ignore all other types for now
@@ -498,7 +498,7 @@ namespace SabreTools.Library.Tools
 				case FileType.TapeArchive:
 					return new TapeArchive();
 				case FileType.ZipArchive:
-					return new TorrentZipArchive();
+					return new ZipArchive();
 				default:
 					return null;
 			}
@@ -530,7 +530,7 @@ namespace SabreTools.Library.Tools
 				case OutputFormat.TorrentXZ:
 					return new XZArchive();
 				case OutputFormat.TorrentZip:
-					return new TorrentZipArchive();
+					return new ZipArchive();
 				case OutputFormat.TorrentZPAQ:
 					return new ZPAQArchive();
 				case OutputFormat.TorrentZstd:

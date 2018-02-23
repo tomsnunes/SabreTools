@@ -172,7 +172,7 @@
     <Compile Include="FileTypes\RarArchive.cs" />
     <Compile Include="FileTypes\SevenZipArchive.cs" />
     <Compile Include="FileTypes\TapeArchive.cs" />
-    <Compile Include="FileTypes\TorrentZipArchive.cs" />
+    <Compile Include="FileTypes\ZipArchive.cs" />
     <Compile Include="FileTypes\XZArchive.cs" />
     <Compile Include="FileTypes\ZPAQArchive.cs" />
     <Compile Include="FileTypes\ZstdArchive.cs" />
