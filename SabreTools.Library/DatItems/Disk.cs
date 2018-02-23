@@ -114,6 +114,10 @@ namespace SabreTools.Library.DatItems
 			_sha256 = baseFile.SHA256;
 			_sha384 = baseFile.SHA384;
 			_sha512 = baseFile.SHA512;
+
+			_itemType = ItemType.Disk;
+			_dupeType = 0x00;
+			_itemStatus = ItemStatus.None;
 		}
 
 		#endregion

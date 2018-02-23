@@ -173,12 +173,18 @@ namespace SabreTools.Library.DatItems
 		public Rom(BaseFile baseFile)
 		{
 			_name = baseFile.Filename;
+			_size = baseFile.Size ?? -1;
 			_crc = baseFile.CRC;
 			_md5 = baseFile.MD5;
 			_sha1 = baseFile.SHA1;
 			_sha256 = baseFile.SHA256;
 			_sha384 = baseFile.SHA384;
 			_sha512 = baseFile.SHA512;
+
+			_itemType = ItemType.Rom;
+			_dupeType = 0x00;
+			_itemStatus = ItemStatus.None;
+			_date = "";
 		}
 
 		#endregion
