@@ -813,6 +813,15 @@ namespace ROMVault2.SupportedFiles.Zip
 				dfStream.Close();
 				dfStream.Dispose();
 			}
+			else
+			{
+				FileStream fsStream = _readStream as FileStream;
+				if (fsStream != null)
+				{
+					fsStream.Close();
+					fsStream.Dispose();
+				}
+			}
 			return ZipReturn.ZipGood;
 		}
 
