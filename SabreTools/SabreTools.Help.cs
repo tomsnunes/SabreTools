@@ -51,7 +51,7 @@ namespace SabreTools
 			{
 				return new Feature(
 					"archives-as-files",
-					new List<string>() { "-f", "--archives-as-files" },
+					new List<string>() { "-aaf", "--archives-as-files" },
 					"Treat archives as files",
 					FeatureType.Flag,
 					longDescription: "Instead of trying to enumerate the files within archives, treat the archives as files themselves. This is good for uncompressed sets that include archives that should be read as-is.");
