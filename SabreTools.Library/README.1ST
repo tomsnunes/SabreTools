@@ -707,15 +707,15 @@ Options:
 
 		  -pre, --prefix			  Set prefix for all lines
 			  Set a generic prefix to be prepended to all outputted lines.
-			  [*SV, Missfile only]
 
 		  -post, --postfix			Set postfix for all lines
 			  Set a generic postfix to be appended to all outputted lines.
-			  [*SV, Missfile only]
 
 			  Some special strings that can be used for both prefix and postfix:
-			  - %game% - Replaced with the Game/Machine name
+			  - %game% / %machine% - Replaced with the Game/Machine name
 			  - %name% - Replaced with the Rom name
+			  - %%manufacturer%% - Replaced with game Manufacturer
+			  - %publisher% - Replaced with game Publisher
 			  - %crc% - Replaced with the CRC
 			  - %md5% - Replaced with the MD5
 			  - %sha1% - Replaced with the SHA-1
@@ -726,7 +726,7 @@ Options:
 
 		  -q, --quotes				Double-quote each item
 			  This flag surrounds the item by double-quotes, not including the
-			  prefix or postfix. [*SV, Missfile only]
+			  prefix or postfix.
 
 		  -r, --roms				  Output roms to miss instead of sets
 			  By default, the outputted file will include the name of the game
@@ -735,7 +735,7 @@ Options:
 
 		  -gp, --game-prefix		  Add game name as a prefix
 			  This flag allows for the name of the game to be used as a prefix
-			  to each file. [Missfile, MD5, SFV, SHA* only]
+			  to each file.
 
 		  -ae, --add-extension		Add an extension to each item
 			  Add a postfix extension to each full item name. [Missfile only]

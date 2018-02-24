@@ -5962,6 +5962,8 @@ namespace SabreTools.Library.DatFiles
 				.Replace("%sha512%", sha512)
 				.Replace("%size%", size);
 
+			// TODO: Add GameName logic here too?
+
 			return fix;
 		}
 

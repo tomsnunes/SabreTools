@@ -155,6 +155,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				string state = "", name = "", pre = "", post = "";
+
 				pre = CreatePrefixPostfix(rom, true);
 				post = CreatePrefixPostfix(rom, false);
 

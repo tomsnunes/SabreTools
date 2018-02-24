@@ -390,7 +390,7 @@ namespace SabreTools
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
-					longDescription: "This flag allows for the name of the game to be used as a prefix to each file. [Missfile, MD5, SFV, SHA* only]");
+					longDescription: "This flag allows for the name of the game to be used as a prefix to each file.");
 			}
 		}
 		private static Feature hashFlag
@@ -846,7 +846,7 @@ namespace SabreTools
 					new List<string>() { "-q", "--quotes" },
 					"Double-quote each item",
 					FeatureType.Flag,
-					longDescription: "This flag surrounds the item by double-quotes, not including the prefix or postfix. [*SV, Missfile only]");
+					longDescription: "This flag surrounds the item by double-quotes, not including the prefix or postfix.");
 			}
 		}
 		private static Feature removeExtensionsFlag
@@ -2097,11 +2097,13 @@ Possible values are: None, Zip, Unzip");
 					new List<string>() { "-post", "--postfix" },
 					"Set postfix for all lines",
 					FeatureType.String,
-					longDescription: @"Set a generic postfix to be appended to all outputted lines. [*SV, Missfile only]
+					longDescription: @"Set a generic postfix to be appended to all outputted lines.
 
 Some special strings that can be used:
-- %game% - Replaced with the Game/Machine name
+- %game% / %machine% - Replaced with the Game/Machine name
 - %name% - Replaced with the Rom name
+- %%manufacturer%% - Replaced with game Manufacturer
+- %publisher% - Replaced with game Publisher
 - %crc% - Replaced with the CRC
 - %md5% - Replaced with the MD5
 - %sha1% - Replaced with the SHA-1
@@ -2120,11 +2122,13 @@ Some special strings that can be used:
 					new List<string>() { "-pre", "--prefix" },
 					"Set prefix for all lines",
 					FeatureType.String,
-					longDescription: @"Set a generic prefix to be prepended to all outputted lines. [*SV, Missfile only]
+					longDescription: @"Set a generic prefix to be prepended to all outputted lines.
 
 Some special strings that can be used:
-- %game% - Replaced with the Game/Machine name
+- %game% / %machine% - Replaced with the Game/Machine name
 - %name% - Replaced with the Rom name
+- %%manufacturer%% - Replaced with game Manufacturer
+- %publisher% - Replaced with game Publisher
 - %crc% - Replaced with the CRC
 - %md5% - Replaced with the MD5
 - %sha1% - Replaced with the SHA-1

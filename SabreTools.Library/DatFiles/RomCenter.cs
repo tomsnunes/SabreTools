@@ -339,6 +339,11 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				string state = "";
+
+				// Pre-process the item name
+				rom.Name = CreatePrefixPostfix(rom, true) + rom.Name + CreatePrefixPostfix(rom, false);
+				rom.Name = rom.Name.Replace("\"", ""); // Quotes are not needed here
+
 				if (rom.Type == ItemType.Rom)
 				{
 					state += "¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
