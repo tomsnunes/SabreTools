@@ -544,28 +544,7 @@ namespace SabreTools.Library.DatFiles
 			get { return _mergedBy; }
 		}
 
-		// Data specific to the Miss DAT type
-		public bool UseRomName
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.UseRomName;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.UseRomName = value;
-			}
-		}
+		// Write pre-processing
 		public string Prefix
 		{
 			get
@@ -608,6 +587,27 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.Postfix = value;
 			}
 		}
+		public bool GameName
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.GameName;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.GameName = value;
+			}
+		}
 		public bool Quotes
 		{
 			get
@@ -627,6 +627,29 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				_datHeader.Quotes = value;
+			}
+		}
+
+		// Data specific to the Miss DAT type
+		public bool UseRomName
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.UseRomName;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.UseRomName = value;
 			}
 		}
 		public string ReplaceExtension
@@ -690,27 +713,6 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				_datHeader.RemoveExtension = value;
-			}
-		}
-		public bool GameName
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.GameName;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.GameName = value;
 			}
 		}
 		public bool Romba

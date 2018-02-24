@@ -898,7 +898,7 @@ namespace SabreTools.Library.DatFiles
 				string state = "";
 
 				// Pre-process the item name
-				rom.Name = CreatePrefixPostfix(rom, true) + rom.Name + CreatePrefixPostfix(rom, false);
+				rom.Name = CreatePrefixPostfix(rom, true) + (GameName ? Path.Combine(rom.MachineName, rom.Name) : rom.Name) + CreatePrefixPostfix(rom, false);
 				rom.Name = rom.Name.Replace("\"", ""); // Quotes are not needed here
 
 				switch (rom.Type)
