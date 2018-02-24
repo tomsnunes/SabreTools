@@ -507,7 +507,7 @@ namespace SabreTools.Library.Tools
 		/// <summary>
 		/// Create an archive of the specified type, if possible
 		/// </summary>
-		/// <param name="archiveType">SabreTools.Library.Data.SharpCompress.OutputFormat representing the archive to create</param>
+		/// <param name="archiveType">SabreTools.Library.Data.OutputFormat representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
 		public static Folder GetArchive(OutputFormat outputFormat)
 		{
