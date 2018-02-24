@@ -587,6 +587,90 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.Postfix = value;
 			}
 		}
+		public string AddExtension
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.AddExtension;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.AddExtension = value;
+			}
+		}
+		public string ReplaceExtension
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.ReplaceExtension;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ReplaceExtension = value;
+			}
+		}
+		public bool RemoveExtension
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.RemoveExtension;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.RemoveExtension = value;
+			}
+		}
+		public bool Romba
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Romba;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Romba = value;
+			}
+		}
 		public bool GameName
 		{
 			get
@@ -650,90 +734,6 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				_datHeader.UseRomName = value;
-			}
-		}
-		public string ReplaceExtension
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.ReplaceExtension;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.ReplaceExtension = value;
-			}
-		}
-		public string AddExtension
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.AddExtension;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.AddExtension = value;
-			}
-		}
-		public bool RemoveExtension
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.RemoveExtension;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.RemoveExtension = value;
-			}
-		}
-		public bool Romba
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.Romba;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.Romba = value;
 			}
 		}
 
@@ -5894,6 +5894,100 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			return outfile;
+		}
+
+		/// <summary>
+		/// Process an item and correctly set the item name
+		/// </summary>
+		/// <param name="item">DatItem to update</param>
+		/// <param name="removeQuotes">True if the Quotes flag should be ignored, false otherwise</param>
+		/// <param name="alwaysRomName">True if the UseRomName should be always on (default), false otherwise</param>
+		protected void ProcessItemName(DatItem item, bool removeQuotes, bool alwaysRomName = true)
+		{
+			string name = item.Name;
+
+			// Backup relevant values and set new ones accordingly
+			bool quotesBackup = Quotes;
+			bool useRomNameBackup = UseRomName;
+			if (removeQuotes)
+			{
+				Quotes = false;
+			}
+			if (alwaysRomName)
+			{
+				UseRomName = true;
+			}
+
+			// Create the proper Prefix and Postfix
+			string pre = CreatePrefixPostfix(item, true);
+			string post = CreatePrefixPostfix(item, false);
+
+			// If we're in Romba mode, take care of that instead
+			if (Romba)
+			{
+				if (item.Type == ItemType.Rom)
+				{
+					// We can only write out if there's a SHA-1
+					if (!String.IsNullOrWhiteSpace(((Rom)item).SHA1))
+					{
+						name = ((Rom)item).SHA1.Substring(0, 2)
+							+ "/" + ((Rom)item).SHA1.Substring(2, 2)
+							+ "/" + ((Rom)item).SHA1.Substring(4, 2)
+							+ "/" + ((Rom)item).SHA1.Substring(6, 2)
+							+ "/" + ((Rom)item).SHA1 + ".gz";
+						item.Name = pre + name + post;
+					}
+				}
+				else if (item.Type == ItemType.Disk)
+				{
+					// We can only write out if there's a SHA-1
+					if (!String.IsNullOrWhiteSpace(((Disk)item).SHA1))
+					{
+						name = ((Disk)item).SHA1.Substring(0, 2)
+							+ "/" + ((Disk)item).SHA1.Substring(2, 2)
+							+ "/" + ((Disk)item).SHA1.Substring(4, 2)
+							+ "/" + ((Disk)item).SHA1.Substring(6, 2)
+							+ "/" + ((Disk)item).SHA1 + ".gz";
+						item.Name = pre + name + post;
+					}
+				}
+
+				return;
+			}
+
+			if (!String.IsNullOrWhiteSpace(ReplaceExtension) || RemoveExtension)
+			{
+				if (RemoveExtension)
+				{
+					ReplaceExtension = "";
+				}
+
+				string dir = Path.GetDirectoryName(name);
+				dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
+				name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + ReplaceExtension);
+			}
+			if (!String.IsNullOrWhiteSpace(AddExtension))
+			{
+				name += AddExtension;
+			}
+
+			if (UseRomName && GameName)
+			{
+				name = Path.Combine(item.MachineName, name);
+			}
+
+			// Now assign back the item name
+			item.Name = pre + name + post;
+
+			// Restore all relevant values
+			if (removeQuotes)
+			{
+				Quotes = quotesBackup;
+			}
+			if (alwaysRomName)
+			{
+				UseRomName = useRomNameBackup;
+			}
 		}
 
 		/// <summary>

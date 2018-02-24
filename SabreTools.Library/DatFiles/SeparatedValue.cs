@@ -450,7 +450,21 @@ namespace SabreTools.Library.DatFiles
 
 			try
 			{
-				string state = "", pre = "", post = "";
+				// Initialize all strings
+				string state = "",
+					pre = "",
+					post = "",
+					type = "",
+					romname = "",
+					diskname = "",
+					size = "",
+					crc = "",
+					md5 = "",
+					sha1 = "",
+					sha256 = "",
+					sha384 = "",
+					sha512 = "",
+					status = "";
 
 				// Separated values should only output Rom and Disk
 				if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
@@ -458,49 +472,50 @@ namespace SabreTools.Library.DatFiles
 					return true;
 				}
 
-				pre = CreatePrefixPostfix(rom, true);
-				post = CreatePrefixPostfix(rom, false);
-
 				if (rom.Type == ItemType.Rom)
 				{
-					string inline = string.Format("\"" + FileName + "\""
-						+ "{0}\"" + Name + "\""
-						+ "{0}\"" + Description + "\""
-						+ "{0}\"" + rom.MachineName + "\""
-						+ "{0}\"" + rom.MachineDescription + "\""
-						+ "{0}" + "\"rom\""
-						+ "{0}\"" + rom.Name + "\""
-						+ "{0}" + "\"\""
-						+ "{0}\"" + ((Rom)rom).Size + "\""
-						+ "{0}\"" + ((Rom)rom).CRC + "\""
-						+ "{0}\"" + ((Rom)rom).MD5 + "\""
-						+ "{0}\"" + ((Rom)rom).SHA1 + "\""
-						+ "{0}\"" + ((Rom)rom).SHA256 + "\""
-						// + "{0}\"" + ((Rom)rom).SHA384 + "\""
-						// + "{0}\"" + ((Rom)rom).SHA512 + "\""
-						+ "{0}" + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\""), _delim);
-					state += pre + inline + post + "\n";
+					type = "rom";
+					romname = rom.Name;
+					size = ((Rom)rom).Size.ToString();
+					crc = ((Rom)rom).CRC;
+					md5 = ((Rom)rom).MD5;
+					sha1 = ((Rom)rom).SHA1;
+					sha256 = ((Rom)rom).SHA256;
+					sha384 = ((Rom)rom).SHA384;
+					sha512 = ((Rom)rom).SHA512;
+					status = (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
 				}
 				else if (rom.Type == ItemType.Disk)
 				{
-					string inline = string.Format("\"" + FileName + "\""
-						+ "{0}\"" + Name + "\""
-						+ "{0}\"" + Description + "\""
-						+ "{0}\"" + rom.MachineName + "\""
-						+ "{0}\"" + rom.MachineDescription + "\""
-						+ "{0}" + "\"disk\""
-						+ "{0}" + "\"\""
-						+ "{0}\"" + rom.Name + "\""
-						+ "{0}" + "\"\""
-						+ "{0}" + "\"\""
-						+ "{0}\"" + ((Disk)rom).MD5 + "\""
-						+ "{0}\"" + ((Disk)rom).SHA1 + "\""
-						+ "{0}\"" + ((Disk)rom).SHA256 + "\""
-						// + "{0}\"" + ((Rom)rom).SHA384 + "\""
-						// + "{0}\"" + ((Rom)rom).SHA512 + "\""
-						+ "{0}" + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\""), _delim);
-					state += pre + inline + post + "\n";
+					type = "disk";
+					diskname = rom.Name;
+					md5 = ((Disk)rom).MD5;
+					sha1 = ((Disk)rom).SHA1;
+					sha256 = ((Disk)rom).SHA256;
+					sha384 = ((Disk)rom).SHA384;
+					sha512 = ((Disk)rom).SHA512;
+					status = (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
 				}
+
+				pre = CreatePrefixPostfix(rom, true);
+				post = CreatePrefixPostfix(rom, false);
+				string inline = string.Format("\"" + FileName + "\""
+					+ "{0}\"" + Name + "\""
+					+ "{0}\"" + Description + "\""
+					+ "{0}\"" + rom.MachineName + "\""
+					+ "{0}\"" + rom.MachineDescription + "\""
+					+ "{0}\"" + type + "\""
+					+ "{0}\"" + romname + "\""
+					+ "{0}\"" + diskname + "\""
+					+ "{0}\"" + size + "\""
+					+ "{0}\"" + crc + "\""
+					+ "{0}\"" + md5 + "\""
+					+ "{0}\"" + sha1 + "\""
+					+ "{0}\"" + sha256 + "\""
+					// + "{0}\"" + sha384 + "\""
+					// + "{0}\"" + sha512 + "\""
+					+ "{0}" + status, _delim);
+				state += pre + inline + post + "\n";
 
 				sw.Write(state);
 				sw.Flush();

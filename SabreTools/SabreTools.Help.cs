@@ -858,7 +858,7 @@ namespace SabreTools
 					new List<string>() { "-rme", "--remove-extensions" },
 					"Remove all extensions from all items",
 					FeatureType.Flag,
-					longDescription: "For each item, remove the extension. [Missfile only]");
+					longDescription: "For each item, remove the extension.");
 			}
 		}
 		private static Feature removeMd5Flag
@@ -1877,7 +1877,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					new List<string>() { "-ae", "--add-extension" },
 					"Add an extension to each item",
 					FeatureType.String,
-					longDescription: "Add a postfix extension to each full item name. [Missfile only]");
+					longDescription: "Add a postfix extension to each full item name.");
 			}
 		}
 		private static Feature authorStringInput
@@ -2147,7 +2147,7 @@ Some special strings that can be used:
 					new List<string>() { "-rep", "--replace-extension" },
 					"Replace all extensions with specified",
 					FeatureType.String,
-					longDescription: "When an extension exists, replace it with the provided instead. [Missfile only]");
+					longDescription: "When an extension exists, replace it with the provided instead.");
 			}
 		}
 		private static Feature rootStringInput

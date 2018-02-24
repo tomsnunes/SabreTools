@@ -742,10 +742,9 @@ Options:
 
 		  -rep, --replace-extension   Replace all extensions with specified
 			  When an extension exists, replace it with the provided instead.
-			  [Missfile only]
 
 		  -rme, --remove-extensions   Remove all extensions from all items
-			  For each item, remove the extension. [Missfile only]
+			  For each item, remove the extension.
 
 		  -ro, --romba				Treat like a Romba depot (requires SHA-1)
 			  This flag allows reading and writing of DATs and output files to

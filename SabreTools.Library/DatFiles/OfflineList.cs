@@ -956,8 +956,7 @@ namespace SabreTools.Library.DatFiles
 				string state = "";
 
 				// Pre-process the item name
-				rom.Name = CreatePrefixPostfix(rom, true) + (GameName ? Path.Combine(rom.MachineName, rom.Name) : rom.Name) + CreatePrefixPostfix(rom, false);
-				rom.Name = rom.Name.Replace("\"", ""); // Quotes are not needed here
+				ProcessItemName(rom, true);
 
 				state += "\t\t<game>\n"
 							+ "\t\t\t<imageNumber>1</imageNumber>\n"

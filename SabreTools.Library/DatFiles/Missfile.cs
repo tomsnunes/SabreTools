@@ -154,74 +154,27 @@ namespace SabreTools.Library.DatFiles
 
 			try
 			{
-				string state = "", name = "", pre = "", post = "";
+				string state = "";
 
-				pre = CreatePrefixPostfix(rom, true);
-				post = CreatePrefixPostfix(rom, false);
+				// Process the item name
+				ProcessItemName(rom, false, alwaysRomName: false);
 
 				// If we're in Romba mode, the state is consistent
 				if (Romba)
 				{
-					if (rom.Type == ItemType.Rom)
-					{
-						// We can only write out if there's a SHA-1
-						if (!String.IsNullOrWhiteSpace(((Rom)rom).SHA1))
-						{
-							name = ((Rom)rom).SHA1.Substring(0, 2)
-								+ "/" + ((Rom)rom).SHA1.Substring(2, 2)
-								+ "/" + ((Rom)rom).SHA1.Substring(4, 2)
-								+ "/" + ((Rom)rom).SHA1.Substring(6, 2)
-								+ "/" + ((Rom)rom).SHA1 + ".gz";
-							state += pre + name + post + "\n";
-						}
-					}
-					else if (rom.Type == ItemType.Disk)
-					{
-						// We can only write out if there's a SHA-1
-						if (!String.IsNullOrWhiteSpace(((Disk)rom).SHA1))
-						{
-							name = ((Disk)rom).SHA1.Substring(0, 2)
-								+ "/" + ((Disk)rom).SHA1.Substring(2, 2)
-								+ "/" + ((Disk)rom).SHA1.Substring(4, 2)
-								+ "/" + ((Disk)rom).SHA1.Substring(6, 2)
-								+ "/" + ((Disk)rom).SHA1 + ".gz";
-							state += pre + name + post + "\n";
-						}
-					}
+					state += rom.Name + "\n";
 				}
-
 				// Otherwise, use any flags
 				else
 				{
-					name = (UseRomName ? rom.Name : rom.MachineName);
-					if (!String.IsNullOrWhiteSpace(ReplaceExtension) || RemoveExtension)
-					{
-						if (RemoveExtension)
-						{
-							ReplaceExtension = "";
-						}
-
-						string dir = Path.GetDirectoryName(name);
-						dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-						name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + ReplaceExtension);
-					}
-					if (!String.IsNullOrWhiteSpace(AddExtension))
-					{
-						name += AddExtension;
-					}
-					if (UseRomName && GameName)
-					{
-						name = Path.Combine(rom.MachineName, name);
-					}
-
 					if (!UseRomName && rom.MachineName != lastgame)
 					{
-						state += pre + name + post + "\n";
+						state += rom.Name + "\n";
 						lastgame = rom.MachineName;
 					}
 					else if (UseRomName)
 					{
-						state += pre + name + post + "\n";
+						state += rom.Name + "\n";
 					}
 				}
 
