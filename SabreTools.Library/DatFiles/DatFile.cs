@@ -3566,8 +3566,8 @@ namespace SabreTools.Library.DatFiles
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (Romba)
 			{
-				GZipArchive archive = new GZipArchive(item);
-				BaseFile baseFile = archive.GetTorrentGZFileInfo();
+				GZipArchive gzarc = new GZipArchive(item);
+				BaseFile baseFile = gzarc.GetTorrentGZFileInfo();
 
 				// If the rom is valid, write it out
 				if (baseFile != null && baseFile.Filename != null)
@@ -3597,20 +3597,14 @@ namespace SabreTools.Library.DatFiles
 				File.Copy(item, newItem, true);
 			}
 
-			// Create a list for all found items
+			// Initialize possible archive variables
+			BaseArchive archive = Utilities.GetArchive(newItem);
 			List<BaseFile> extracted = null;
 
-			// If we don't have archives as files, try to scan the file as an archive
-			if (!archivesAsFiles)
+			// If we have an archive and we're supposed to scan it
+			if (archive != null && !archivesAsFiles)
 			{
-				// Get the base archive first
-				Folder archive = Utilities.GetArchive(newItem);
-
-				// Now get all extracted items from the archive
-				if (archive != null)
-				{
-					extracted = archive.GetChildren(omitFromScan: omitFromScan, date: addDate);
-				}
+				extracted = archive.GetChildren(omitFromScan: omitFromScan, date: addDate);
 			}
 
 			// If the file should be skipped based on type, do so now
@@ -3642,9 +3636,6 @@ namespace SabreTools.Library.DatFiles
 				if (addBlanks)
 				{
 					List<string> empties = new List<string>();
-
-					// Get the base archive first
-					Folder archive = Utilities.GetArchive(newItem);
 
 					// Now get all blank folders from the archive
 					if (archive != null)
@@ -3686,17 +3677,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
 			BaseFile baseFile = Utilities.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
-			DatItem datItem = null;
-			if (baseFile.Type == FileType.CHD)
-			{
-				datItem = new Disk(baseFile);
-			}
-			else if (baseFile.Type == FileType.None)
-			{
-				datItem = new Rom(baseFile);
-			}
-
-			ProcessFileHelper(item, datItem, basePath, parent);
+			ProcessFileHelper(item, Utilities.GetDatItem(baseFile), basePath, parent);
 		}
 
 		/// <summary>
@@ -3708,24 +3689,11 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="parent">Parent game to be used</param>
 		private void ProcessFileHelper(string item, DatItem datItem, string basepath, string parent)
 		{
-			// If the datItem isn't a Rom or Disk, return
+			// If we somehow got something other than a Rom or Disk, cancel out
 			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
 			{
 				return;
-			}
-
-			string key = "";
-			if (datItem.Type == ItemType.Rom)
-			{
-				key = ((Rom)datItem).Size + "-" + ((Rom)datItem).CRC;
-			}
-			else if (datItem.Type == ItemType.Disk)
-			{
-				key = ((Disk)datItem).SHA1;
-			}
-
-			// Add the list if it doesn't exist already
-			Add(key);
+			}			
 
 			try
 			{
@@ -3738,93 +3706,107 @@ namespace SabreTools.Library.DatFiles
 				// Make sure we have the full item path
 				item = Path.GetFullPath(item);
 
-				// Get the data to be added as game and item names
-				string gamename = "";
-				string romname = "";
-
-				// If the parent is blank, then we have a non-archive file
-				if (String.IsNullOrWhiteSpace(parent))
-				{
-					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-					if (Type == "SuperDAT")
-					{
-						gamename = Path.GetDirectoryName(item.Remove(0, basepath.Length));
-						romname = Path.GetFileName(item);
-					}
-
-					// Otherwise, we want just the top level folder as the game, and the file as everything else
-					else
-					{
-						gamename = item.Remove(0, basepath.Length).Split(Path.DirectorySeparatorChar)[0];
-						romname = item.Remove(0, (Path.Combine(basepath, gamename).Length));
-					}
-				}
-
-				// Otherwise, we assume that we have an archive
-				else
-				{
-					// If we have a SuperDAT, we want the archive name as the game, and the file as everything else (?)
-					if (Type == "SuperDAT")
-					{
-						gamename = parent;
-						romname = datItem.Name;
-					}
-
-					// Otherwise, we want the archive name as the game, and the file as everything else
-					else
-					{
-						gamename = parent;
-						romname = datItem.Name;
-					}
-				}
-
-				// Sanitize the names
-				if (romname == null)
-				{
-					romname = "";
-				}
-				if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					gamename = gamename.Substring(1);
-				}
-				if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					gamename = gamename.Substring(0, gamename.Length - 1);
-				}
-				if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					romname = romname.Substring(1);
-				}
-				if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					romname = romname.Substring(0, romname.Length - 1);
-				}
-				if (!String.IsNullOrWhiteSpace(gamename) && String.IsNullOrWhiteSpace(romname))
-				{
-					romname = gamename;
-					gamename = "Default";
-				}
-
-				// Update rom information
-				datItem.Name = romname;
-				datItem.MachineName = gamename;
-				datItem.MachineDescription = gamename;
-
-				// If we have a Disk, then the ".chd" extension needs to be removed
-				if (datItem.Type == ItemType.Disk)
-				{
-					datItem.Name = datItem.Name.Replace(".chd", "");
-				}
+				// Process the item to sanitize names based on input
+				SetDatItemInfo(datItem, item, parent, basepath);
 
 				// Add the file information to the DAT
+				string key = Utilities.GetKeyFromDatItem(datItem, SortedBy.CRC);
 				Add(key, datItem);
 
-				Globals.Logger.User("File added: {0}", romname + Environment.NewLine);
+				Globals.Logger.User("File added: {0}", datItem.Name + Environment.NewLine);
 			}
 			catch (IOException ex)
 			{
 				Globals.Logger.Error(ex.ToString());
 				return;
+			}
+		}
+
+		/// <summary>
+		/// Set proper Game and Rom names from user inputs
+		/// </summary>
+		/// <param name="datItem">DatItem representing the input file</param>
+		/// <param name="item">Item name to use</param>
+		/// <param name="parent">Parent name to use</param>
+		/// <param name="basepath">Base path to use</param>
+		private void SetDatItemInfo(DatItem datItem, string item, string parent, string basepath)
+		{
+			// Get the data to be added as game and item names
+			string gamename = "";
+			string romname = "";
+
+			// If the parent is blank, then we have a non-archive file
+			if (String.IsNullOrWhiteSpace(parent))
+			{
+				// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+				if (Type == "SuperDAT")
+				{
+					gamename = Path.GetDirectoryName(item.Remove(0, basepath.Length));
+					romname = Path.GetFileName(item);
+				}
+
+				// Otherwise, we want just the top level folder as the game, and the file as everything else
+				else
+				{
+					gamename = item.Remove(0, basepath.Length).Split(Path.DirectorySeparatorChar)[0];
+					romname = item.Remove(0, (Path.Combine(basepath, gamename).Length));
+				}
+			}
+
+			// Otherwise, we assume that we have an archive
+			else
+			{
+				// If we have a SuperDAT, we want the archive name as the game, and the file as everything else (?)
+				if (Type == "SuperDAT")
+				{
+					gamename = parent;
+					romname = datItem.Name;
+				}
+
+				// Otherwise, we want the archive name as the game, and the file as everything else
+				else
+				{
+					gamename = parent;
+					romname = datItem.Name;
+				}
+			}
+
+			// Sanitize the names
+			if (romname == null)
+			{
+				romname = "";
+			}
+			if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				gamename = gamename.Substring(1);
+			}
+			if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				gamename = gamename.Substring(0, gamename.Length - 1);
+			}
+			if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				romname = romname.Substring(1);
+			}
+			if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				romname = romname.Substring(0, romname.Length - 1);
+			}
+			if (!String.IsNullOrWhiteSpace(gamename) && String.IsNullOrWhiteSpace(romname))
+			{
+				romname = gamename;
+				gamename = "Default";
+			}
+
+			// Update rom information
+			datItem.Name = romname;
+			datItem.MachineName = gamename;
+			datItem.MachineDescription = gamename;
+
+			// If we have a Disk, then the ".chd" extension needs to be removed
+			if (datItem.Type == ItemType.Disk)
+			{
+				datItem.Name = datItem.Name.Replace(".chd", "");
 			}
 		}
 
@@ -4201,7 +4183,7 @@ namespace SabreTools.Library.DatFiles
 				bool isTorrentGzip = tgz.IsTorrent();
 
 				// Get the base archive first
-				Folder archive = Utilities.GetArchive(file);
+				BaseArchive archive = Utilities.GetArchive(file);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -4343,7 +4325,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					Folder archive = Utilities.GetArchive(file);
+					BaseArchive archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.CopyToStream(datItem.Name);
@@ -4427,7 +4409,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					Folder archive = Utilities.GetArchive(file);
+					BaseArchive archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.CopyToStream(datItem.Name);
@@ -4517,7 +4499,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					Folder archive = Utilities.GetArchive(file);
+					BaseArchive archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.CopyToStream(datItem.Name);
