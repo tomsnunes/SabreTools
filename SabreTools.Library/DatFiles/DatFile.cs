@@ -3452,32 +3452,20 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Clean the temp directory path
-			tempDir = (String.IsNullOrWhiteSpace(tempDir) ? Path.GetTempPath() : tempDir);
+			tempDir = Utilities.EnsureTempDirectory(tempDir);
 
 			// Process the input
 			if (Directory.Exists(basePath))
 			{
 				Globals.Logger.Verbose("Folder found: {0}", basePath);
 
-				// Process the files in the main folder
-				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
+				// Process the files in the main folder or any subfolder
+				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
 				Parallel.ForEach(files, Globals.ParallelOptions, item =>
 				{
 					CheckFileForHashes(item, basePath, omitFromScan, bare, archivesAsFiles, skipFileType,
 						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
 				});
-
-				// Find all top-level subfolders
-				files = Directory.EnumerateDirectories(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
-				foreach (string item in files)
-				{
-					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
-					Parallel.ForEach(subfiles, Globals.ParallelOptions, subitem =>
-					{
-						CheckFileForHashes(subitem, basePath, omitFromScan, bare, archivesAsFiles, skipFileType,
-							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
-					});
-				}
 
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
@@ -3574,7 +3562,7 @@ namespace SabreTools.Library.DatFiles
 				{
 					// Add the list if it doesn't exist already
 					Rom rom = new Rom(baseFile);
-					Add(rom.Size + "-" + rom.CRC, rom);
+					Add(Utilities.GetKeyFromDatItem(rom, SortedBy.CRC), rom);
 					Globals.Logger.User("File added: {0}", Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
@@ -3615,7 +3603,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// If the extracted list is null, just scan the item itself
-			if (extracted == null || archivesAsFiles)
+			if (extracted == null)
 			{
 				ProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, chdsAsFiles);
 			}
