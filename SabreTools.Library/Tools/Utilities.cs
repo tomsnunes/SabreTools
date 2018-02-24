@@ -2390,6 +2390,32 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Ensure the temp directory is a proper format and can be created
+		/// </summary>
+		/// <param name="tempDir">Temp directory to check</param>
+		/// <param name="create">True if the temp directory should be created, false otherwise (default)</param>
+		/// <returns>Full path to the proper temp directory</returns>
+		public static string EnsureTempDirectory(string tempDir, bool create = false)
+		{
+			// If the output directory is invalid
+			if (string.IsNullOrWhiteSpace(tempDir))
+			{
+				tempDir = Path.GetTempPath();
+			}
+
+			// Get the full path for the output directory
+			tempDir = Path.GetFullPath(tempDir);
+
+			// If we're creating the output folder, do so
+			if (create)
+			{
+				Directory.CreateDirectory(tempDir);
+			}
+
+			return tempDir;
+		}
+
+		/// <summary>
 		/// Get the extension from the path, if possible
 		/// </summary>
 		/// <param name="path">Path to get extension from</param>
