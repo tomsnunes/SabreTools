@@ -440,7 +440,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="input">Name of the file to create the archive from</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static Folder GetArchive(string input)
+		public static BaseArchive GetArchive(string input)
 		{
 			BaseArchive archive = null;
 
@@ -485,7 +485,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="archiveType">SharpCompress.Common.ArchiveType representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static Folder GetArchive(FileType archiveType)
+		public static BaseArchive GetArchive(FileType archiveType)
 		{
 			switch (archiveType)
 			{
