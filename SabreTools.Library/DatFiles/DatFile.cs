@@ -5900,20 +5900,20 @@ namespace SabreTools.Library.DatFiles
 		/// Process an item and correctly set the item name
 		/// </summary>
 		/// <param name="item">DatItem to update</param>
-		/// <param name="removeQuotes">True if the Quotes flag should be ignored, false otherwise</param>
-		/// <param name="alwaysRomName">True if the UseRomName should be always on (default), false otherwise</param>
-		protected void ProcessItemName(DatItem item, bool removeQuotes, bool alwaysRomName = true)
+		/// <param name="forceRemoveQuotes">True if the Quotes flag should be ignored, false otherwise</param>
+		/// <param name="forceRomName">True if the UseRomName should be always on (default), false otherwise</param>
+		protected void ProcessItemName(DatItem item, bool forceRemoveQuotes, bool forceRomName = true)
 		{
 			string name = item.Name;
 
 			// Backup relevant values and set new ones accordingly
 			bool quotesBackup = Quotes;
 			bool useRomNameBackup = UseRomName;
-			if (removeQuotes)
+			if (forceRemoveQuotes)
 			{
 				Quotes = false;
 			}
-			if (alwaysRomName)
+			if (forceRomName)
 			{
 				UseRomName = true;
 			}
@@ -5980,11 +5980,11 @@ namespace SabreTools.Library.DatFiles
 			item.Name = pre + name + post;
 
 			// Restore all relevant values
-			if (removeQuotes)
+			if (forceRemoveQuotes)
 			{
 				Quotes = quotesBackup;
 			}
-			if (alwaysRomName)
+			if (forceRomName)
 			{
 				UseRomName = useRomNameBackup;
 			}

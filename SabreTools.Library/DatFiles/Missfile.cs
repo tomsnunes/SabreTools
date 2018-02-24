@@ -157,7 +157,7 @@ namespace SabreTools.Library.DatFiles
 				string state = "";
 
 				// Process the item name
-				ProcessItemName(rom, false, alwaysRomName: false);
+				ProcessItemName(rom, false, forceRomName: false);
 
 				// If we're in Romba mode, the state is consistent
 				if (Romba)
