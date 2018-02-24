@@ -5894,6 +5894,77 @@ namespace SabreTools.Library.DatFiles
 			return outfile;
 		}
 
+		/// <summary>
+		/// Create a prefix or postfix from inputs
+		/// </summary>
+		/// <param name="item">DatItem to create a prefix/postfix for</param>
+		/// <param name="prefix">True for prefix, false for postfix</param>
+		/// <returns>Sanitized string representing the postfix or prefix</returns>
+		protected string CreatePrefixPostfix(DatItem item, bool prefix)
+		{
+			// Initialize strings
+			string fix = "",
+				game = item.MachineName,
+				name = item.Name,
+				manufacturer = item.Manufacturer,
+				publisher = item.Publisher,
+				crc = string.Empty,
+				md5 = string.Empty,
+				sha1 = string.Empty,
+				sha256 = string.Empty,
+				sha384 = string.Empty,
+				sha512 = string.Empty,
+				size = string.Empty;
+
+			// If we have a prefix
+			if (prefix)
+			{
+				fix = Prefix + (Quotes ? "\"" : "");
+			}
+			// If we have a postfix
+			else
+			{
+				fix = (Quotes ? "\"" : "") + Postfix;
+			}
+
+			// Ensure we have the proper values for replacement
+			if (item.Type == ItemType.Rom)
+			{
+				crc = ((Rom)item).CRC;
+				md5 = ((Rom)item).MD5;
+				sha1 = ((Rom)item).SHA1;
+				sha256 = ((Rom)item).SHA256;
+				sha384 = ((Rom)item).SHA384;
+				sha512 = ((Rom)item).SHA512;
+				size = ((Rom)item).Size.ToString();
+			}
+			else if (item.Type == ItemType.Disk)
+			{
+				md5 = ((Disk)item).MD5;
+				sha1 = ((Disk)item).SHA1;
+				sha256 = ((Disk)item).SHA256;
+				sha384 = ((Disk)item).SHA384;
+				sha512 = ((Disk)item).SHA512;
+			}
+
+			// Now do bulk replacement where possible
+			fix = fix
+				.Replace("%game%", game)
+				.Replace("%machine%", game)
+				.Replace("%name%", name)
+				.Replace("%manufacturer%", manufacturer)
+				.Replace("%publisher%", publisher)
+				.Replace("%crc%", crc)
+				.Replace("%md5%", md5)
+				.Replace("%sha1%", sha1)
+				.Replace("%sha256%", sha256)
+				.Replace("%sha384%", sha384)
+				.Replace("%sha512%", sha512)
+				.Replace("%size%", size);
+
+			return fix;
+		}
+
 		#endregion
 
 		#endregion // Instance Methods

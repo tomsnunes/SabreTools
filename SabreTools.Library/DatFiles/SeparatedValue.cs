@@ -458,75 +458,8 @@ namespace SabreTools.Library.DatFiles
 					return true;
 				}
 
-				pre = Prefix + (Quotes ? "\"" : "");
-				post = (Quotes ? "\"" : "") + Postfix;
-
-				if (rom.Type == ItemType.Rom)
-				{
-					// Check for special strings in prefix and postfix
-					pre = pre
-						.Replace("%game%", rom.MachineName)
-						.Replace("%name%", rom.Name)
-						.Replace("%crc%", ((Rom)rom).CRC)
-						.Replace("%md5%", ((Rom)rom).MD5)
-						.Replace("%sha1%", ((Rom)rom).SHA1)
-						.Replace("%sha256%", ((Rom)rom).SHA256)
-						.Replace("%sha384%", ((Rom)rom).SHA384)
-						.Replace("%sha512%", ((Rom)rom).SHA512)
-						.Replace("%size%", ((Rom)rom).Size.ToString());
-					post = post
-						.Replace("%game%", rom.MachineName)
-						.Replace("%name%", rom.Name)
-						.Replace("%crc%", ((Rom)rom).CRC)
-						.Replace("%md5%", ((Rom)rom).MD5)
-						.Replace("%sha1%", ((Rom)rom).SHA1)
-						.Replace("%sha256%", ((Rom)rom).SHA256)
-						.Replace("%sha384%", ((Rom)rom).SHA384)
-						.Replace("%sha512%", ((Rom)rom).SHA512)
-						.Replace("%size%", ((Rom)rom).Size.ToString());
-				}
-				else if (rom.Type == ItemType.Disk)
-				{
-					// Check for special strings in prefix and postfix
-					pre = pre
-						.Replace("%game%", rom.MachineName)
-						.Replace("%name%", rom.Name)
-						.Replace("%crc%", string.Empty)
-						.Replace("%md5%", ((Disk)rom).MD5)
-						.Replace("%sha1%", ((Disk)rom).SHA1)
-						.Replace("%sha256%", ((Disk)rom).SHA256)
-						.Replace("%sha384%", ((Disk)rom).SHA384)
-						.Replace("%sha512%", ((Disk)rom).SHA512)
-						.Replace("%size%", string.Empty); ;
-					post = post
-						.Replace("%game%", rom.MachineName)
-						.Replace("%name%", rom.Name)
-						.Replace("%crc%", string.Empty)
-						.Replace("%md5%", ((Disk)rom).MD5)
-						.Replace("%sha1%", ((Disk)rom).SHA1)
-						.Replace("%sha256%", ((Disk)rom).SHA256)
-						.Replace("%sha384%", ((Disk)rom).SHA384)
-						.Replace("%sha512%", ((Disk)rom).SHA512)
-						.Replace("%size%", string.Empty); ;
-				}
-				else
-				{
-					// Check for special strings in prefix and postfix
-					pre = pre
-						.Replace("%game%", rom.MachineName)
-						.Replace("%name%", rom.Name)
-						.Replace("%crc%", string.Empty)
-						.Replace("%md5%", string.Empty)
-						.Replace("%sha1%", string.Empty)
-						.Replace("%size%", string.Empty);
-					post = post
-						.Replace("%game%", rom.MachineName)
-						.Replace("%name%", rom.Name)
-						.Replace("%crc%", string.Empty)
-						.Replace("%md5%", string.Empty)
-						.Replace("%sha1%", string.Empty)
-						.Replace("%size%", string.Empty);
-				}
+				pre = CreatePrefixPostfix(rom, true);
+				post = CreatePrefixPostfix(rom, false);
 
 				if (rom.Type == ItemType.Rom)
 				{
