@@ -738,7 +738,7 @@ Options:
 			  to each file.
 
 		  -ae, --add-extension		Add an extension to each item
-			  Add a postfix extension to each full item name. [Missfile only]
+			  Add a postfix extension to each full item name.
 
 		  -rep, --replace-extension   Replace all extensions with specified
 			  When an extension exists, replace it with the provided instead.
