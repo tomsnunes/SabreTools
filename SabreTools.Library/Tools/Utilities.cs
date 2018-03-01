@@ -2108,7 +2108,7 @@ namespace SabreTools.Library.Tools
 				}
 
 				crc.Update(buffer, 0, 0);
-				rom.CRC = BitConverter.GetBytes(crc.Value);
+				rom.CRC = BitConverter.GetBytes(crc.Value).Reverse().ToArray();
 
 				if ((omitFromScan & Hash.MD5) == 0)
 				{
