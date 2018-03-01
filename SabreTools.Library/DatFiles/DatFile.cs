@@ -2463,7 +2463,7 @@ namespace SabreTools.Library.DatFiles
 						// If the key mapping doesn't exist, add it
 						if (!mapping.ContainsKey(item.MachineName))
 						{
-							mapping.TryAdd(item.MachineName, item.MachineDescription.Replace('/', '_').Replace("\"", "''").Replace(":", " - "));
+							mapping.TryAdd(item.MachineName, item.MachineDescription.Replace('/', '_').Replace("\"", "''").Replace(":", " -"));
 						}
 					}
 				});
