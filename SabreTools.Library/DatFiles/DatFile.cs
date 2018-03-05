@@ -3830,11 +3830,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Check that the output directory exists
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-				outDir = Path.GetFullPath(outDir);
-			}
+			outDir = Utilities.EnsureOutputDirectory(outDir, create: true);
 
 			// Now we want to get forcepack flag if it's not overridden
 			if (outputFormat == OutputFormat.Folder && ForcePacking != ForcePacking.None)
