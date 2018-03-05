@@ -221,7 +221,8 @@ namespace SabreTools.Library.FileTypes
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
 		public virtual bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
-			throw new NotImplementedException();
+			FileStream fs = Utilities.TryOpenRead(inputFile);
+			return Write(fs, outDir, rom, date, romba);
 		}
 
 		/// <summary>
