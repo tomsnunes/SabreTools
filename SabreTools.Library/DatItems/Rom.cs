@@ -184,7 +184,7 @@ namespace SabreTools.Library.DatItems
 			_itemType = ItemType.Rom;
 			_dupeType = 0x00;
 			_itemStatus = ItemStatus.None;
-			_date = "";
+			_date = baseFile.Date;
 		}
 
 		#endregion
