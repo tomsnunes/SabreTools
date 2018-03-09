@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatFiles;
@@ -694,8 +695,11 @@ namespace SabreTools.Library.DatItems
 					continue;
 				}
 
-				// If it's the first rom in the list, don't touch it
-				if (outfiles.Count == 0)
+				// If it's the first non-nodump rom in the list, don't touch it
+				if (outfiles.Count == 0
+					|| outfiles.Count == outfiles.Count(i =>
+						(i.Type == ItemType.Rom && ((Rom)i).ItemStatus == ItemStatus.Nodump)
+						|| (i.Type == ItemType.Disk && ((Disk)i).ItemStatus == ItemStatus.Nodump)))
 				{
 					outfiles.Add(file);
 					continue;
