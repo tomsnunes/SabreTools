@@ -727,8 +727,17 @@ namespace SabreTools.Library.DatItems
 								((Rom)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Rom)file).SHA1)
 									? ((Rom)file).SHA1
 									: ((Rom)saveditem).SHA1);
+								((Rom)saveditem).SHA256 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA256) && !String.IsNullOrWhiteSpace(((Rom)file).SHA256)
+									? ((Rom)file).SHA256
+									: ((Rom)saveditem).SHA256);
+								((Rom)saveditem).SHA384 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA384) && !String.IsNullOrWhiteSpace(((Rom)file).SHA384)
+									? ((Rom)file).SHA384
+									: ((Rom)saveditem).SHA384);
+								((Rom)saveditem).SHA512 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA512) && !String.IsNullOrWhiteSpace(((Rom)file).SHA512)
+									? ((Rom)file).SHA512
+									: ((Rom)saveditem).SHA512);
 							}
-							else
+							else if (file.Type == ItemType.Disk)
 							{
 								((Disk)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Disk)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Disk)file).MD5)
 									? ((Disk)file).MD5
@@ -736,6 +745,15 @@ namespace SabreTools.Library.DatItems
 								((Disk)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Disk)file).SHA1)
 									? ((Disk)file).SHA1
 									: ((Disk)saveditem).SHA1);
+								((Disk)saveditem).SHA256 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA256) && !String.IsNullOrWhiteSpace(((Disk)file).SHA256)
+									? ((Disk)file).SHA256
+									: ((Disk)saveditem).SHA256);
+								((Disk)saveditem).SHA384 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA384) && !String.IsNullOrWhiteSpace(((Disk)file).SHA384)
+									? ((Disk)file).SHA384
+									: ((Disk)saveditem).SHA384);
+								((Disk)saveditem).SHA512 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA512) && !String.IsNullOrWhiteSpace(((Disk)file).SHA512)
+									? ((Disk)file).SHA512
+									: ((Disk)saveditem).SHA512);
 							}
 
 							saveditem.Dupe = dupetype;
