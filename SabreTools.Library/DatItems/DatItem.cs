@@ -676,6 +676,12 @@ namespace SabreTools.Library.DatItems
 			// Then deduplicate them by checking to see if data matches previous saved roms
 			foreach (DatItem file in infiles)
 			{
+				// If we don't have a Rom or a Disk, we skip checking for duplicates
+				if (file.Type != ItemType.Rom && file.Type != ItemType.Disk)
+				{
+					continue;
+				}
+
 				// If it's a nodump, add and skip
 				if (file.Type == ItemType.Rom && ((Rom)file).ItemStatus == ItemStatus.Nodump)
 				{
@@ -709,12 +715,6 @@ namespace SabreTools.Library.DatItems
 					// If it's a duplicate, skip adding it to the output but add any missing information
 					if (dupetype != 0x00)
 					{
-						// If we don't have a rom or disk, then just skip adding
-						if (file.Type != ItemType.Rom && file.Type != ItemType.Disk)
-						{
-							continue;
-						}
-
 						saveditem = lastrom;
 						pos = i;
 
