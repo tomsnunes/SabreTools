@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatFiles;
@@ -675,6 +674,7 @@ namespace SabreTools.Library.DatItems
 			List<DatItem> outfiles = new List<DatItem>();
 
 			// Then deduplicate them by checking to see if data matches previous saved roms
+			int nodumpCount = 0;
 			foreach (DatItem file in infiles)
 			{
 				// If we don't have a Rom or a Disk, we skip checking for duplicates
@@ -687,19 +687,17 @@ namespace SabreTools.Library.DatItems
 				if (file.Type == ItemType.Rom && ((Rom)file).ItemStatus == ItemStatus.Nodump)
 				{
 					outfiles.Add(file);
+					nodumpCount++;
 					continue;
 				}
 				else if (file.Type == ItemType.Disk && ((Disk)file).ItemStatus == ItemStatus.Nodump)
 				{
 					outfiles.Add(file);
+					nodumpCount++;
 					continue;
 				}
-
 				// If it's the first non-nodump rom in the list, don't touch it
-				if (outfiles.Count == 0
-					|| outfiles.Count == outfiles.Count(i =>
-						(i.Type == ItemType.Rom && ((Rom)i).ItemStatus == ItemStatus.Nodump)
-						|| (i.Type == ItemType.Disk && ((Disk)i).ItemStatus == ItemStatus.Nodump)))
+				else if (outfiles.Count == 0 || outfiles.Count == nodumpCount)
 				{
 					outfiles.Add(file);
 					continue;
