@@ -689,112 +689,111 @@ namespace SabreTools.Library.DatItems
 				}
 
 				// If it's the first rom in the list, don't touch it
-				if (outfiles.Count != 0)
-				{
-					// Check if the rom is a duplicate
-					DupeType dupetype = 0x00;
-					DatItem saveditem = new Rom();
-					int pos = -1;
-					for (int i = 0; i < outfiles.Count; i++)
-					{
-						DatItem lastrom = outfiles[i];
-
-						// Get the duplicate status
-						dupetype = file.GetDuplicateStatus(lastrom);
-
-						// If it's a duplicate, skip adding it to the output but add any missing information
-						if (dupetype != 0x00)
-						{
-							// If we don't have a rom or disk, then just skip adding
-							if (file.Type != ItemType.Rom && file.Type != ItemType.Disk)
-							{
-								continue;
-							}
-
-							saveditem = lastrom;
-							pos = i;
-
-							// Roms have more infomration to save
-							if (file.Type == ItemType.Rom)
-							{
-								((Rom)saveditem).Size = ((Rom)saveditem).Size;
-								((Rom)saveditem).CRC = (String.IsNullOrWhiteSpace(((Rom)saveditem).CRC) && !String.IsNullOrWhiteSpace(((Rom)file).CRC)
-									? ((Rom)file).CRC
-									: ((Rom)saveditem).CRC);
-								((Rom)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Rom)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Rom)file).MD5)
-									? ((Rom)file).MD5
-									: ((Rom)saveditem).MD5);
-								((Rom)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Rom)file).SHA1)
-									? ((Rom)file).SHA1
-									: ((Rom)saveditem).SHA1);
-								((Rom)saveditem).SHA256 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA256) && !String.IsNullOrWhiteSpace(((Rom)file).SHA256)
-									? ((Rom)file).SHA256
-									: ((Rom)saveditem).SHA256);
-								((Rom)saveditem).SHA384 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA384) && !String.IsNullOrWhiteSpace(((Rom)file).SHA384)
-									? ((Rom)file).SHA384
-									: ((Rom)saveditem).SHA384);
-								((Rom)saveditem).SHA512 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA512) && !String.IsNullOrWhiteSpace(((Rom)file).SHA512)
-									? ((Rom)file).SHA512
-									: ((Rom)saveditem).SHA512);
-							}
-							else if (file.Type == ItemType.Disk)
-							{
-								((Disk)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Disk)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Disk)file).MD5)
-									? ((Disk)file).MD5
-									: ((Disk)saveditem).MD5);
-								((Disk)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Disk)file).SHA1)
-									? ((Disk)file).SHA1
-									: ((Disk)saveditem).SHA1);
-								((Disk)saveditem).SHA256 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA256) && !String.IsNullOrWhiteSpace(((Disk)file).SHA256)
-									? ((Disk)file).SHA256
-									: ((Disk)saveditem).SHA256);
-								((Disk)saveditem).SHA384 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA384) && !String.IsNullOrWhiteSpace(((Disk)file).SHA384)
-									? ((Disk)file).SHA384
-									: ((Disk)saveditem).SHA384);
-								((Disk)saveditem).SHA512 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA512) && !String.IsNullOrWhiteSpace(((Disk)file).SHA512)
-									? ((Disk)file).SHA512
-									: ((Disk)saveditem).SHA512);
-							}
-
-							saveditem.Dupe = dupetype;
-
-							// If the current system has a lower ID than the previous, set the system accordingly
-							if (file.SystemID < saveditem.SystemID)
-							{
-								saveditem.SystemID = file.SystemID;
-								saveditem.System = file.System;
-								saveditem.CopyMachineInformation(file);
-								saveditem.Name = file.Name;
-							}
-
-							// If the current source has a lower ID than the previous, set the source accordingly
-							if (file.SourceID < saveditem.SourceID)
-							{
-								saveditem.SourceID = file.SourceID;
-								saveditem.Source = file.Source;
-								saveditem.CopyMachineInformation(file);
-								saveditem.Name = file.Name;
-							}
-
-							break;
-						}
-					}
-
-					// If no duplicate is found, add it to the list
-					if (dupetype == 0x00)
-					{
-						outfiles.Add(file);
-					}
-					// Otherwise, if a new rom information is found, add that
-					else
-					{
-						outfiles.RemoveAt(pos);
-						outfiles.Insert(pos, saveditem);
-					}
-				}
-				else
+				if (outfiles.Count == 0)
 				{
 					outfiles.Add(file);
+					continue;
+				}
+
+				// Check if the rom is a duplicate
+				DupeType dupetype = 0x00;
+				DatItem saveditem = new Rom();
+				int pos = -1;
+				for (int i = 0; i < outfiles.Count; i++)
+				{
+					DatItem lastrom = outfiles[i];
+
+					// Get the duplicate status
+					dupetype = file.GetDuplicateStatus(lastrom);
+
+					// If it's a duplicate, skip adding it to the output but add any missing information
+					if (dupetype != 0x00)
+					{
+						// If we don't have a rom or disk, then just skip adding
+						if (file.Type != ItemType.Rom && file.Type != ItemType.Disk)
+						{
+							continue;
+						}
+
+						saveditem = lastrom;
+						pos = i;
+
+						// Roms have more infomration to save
+						if (file.Type == ItemType.Rom)
+						{
+							((Rom)saveditem).Size = ((Rom)saveditem).Size;
+							((Rom)saveditem).CRC = (String.IsNullOrWhiteSpace(((Rom)saveditem).CRC) && !String.IsNullOrWhiteSpace(((Rom)file).CRC)
+								? ((Rom)file).CRC
+								: ((Rom)saveditem).CRC);
+							((Rom)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Rom)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Rom)file).MD5)
+								? ((Rom)file).MD5
+								: ((Rom)saveditem).MD5);
+							((Rom)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Rom)file).SHA1)
+								? ((Rom)file).SHA1
+								: ((Rom)saveditem).SHA1);
+							((Rom)saveditem).SHA256 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA256) && !String.IsNullOrWhiteSpace(((Rom)file).SHA256)
+								? ((Rom)file).SHA256
+								: ((Rom)saveditem).SHA256);
+							((Rom)saveditem).SHA384 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA384) && !String.IsNullOrWhiteSpace(((Rom)file).SHA384)
+								? ((Rom)file).SHA384
+								: ((Rom)saveditem).SHA384);
+							((Rom)saveditem).SHA512 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA512) && !String.IsNullOrWhiteSpace(((Rom)file).SHA512)
+								? ((Rom)file).SHA512
+								: ((Rom)saveditem).SHA512);
+						}
+						else if (file.Type == ItemType.Disk)
+						{
+							((Disk)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Disk)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Disk)file).MD5)
+								? ((Disk)file).MD5
+								: ((Disk)saveditem).MD5);
+							((Disk)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Disk)file).SHA1)
+								? ((Disk)file).SHA1
+								: ((Disk)saveditem).SHA1);
+							((Disk)saveditem).SHA256 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA256) && !String.IsNullOrWhiteSpace(((Disk)file).SHA256)
+								? ((Disk)file).SHA256
+								: ((Disk)saveditem).SHA256);
+							((Disk)saveditem).SHA384 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA384) && !String.IsNullOrWhiteSpace(((Disk)file).SHA384)
+								? ((Disk)file).SHA384
+								: ((Disk)saveditem).SHA384);
+							((Disk)saveditem).SHA512 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA512) && !String.IsNullOrWhiteSpace(((Disk)file).SHA512)
+								? ((Disk)file).SHA512
+								: ((Disk)saveditem).SHA512);
+						}
+
+						saveditem.Dupe = dupetype;
+
+						// If the current system has a lower ID than the previous, set the system accordingly
+						if (file.SystemID < saveditem.SystemID)
+						{
+							saveditem.SystemID = file.SystemID;
+							saveditem.System = file.System;
+							saveditem.CopyMachineInformation(file);
+							saveditem.Name = file.Name;
+						}
+
+						// If the current source has a lower ID than the previous, set the source accordingly
+						if (file.SourceID < saveditem.SourceID)
+						{
+							saveditem.SourceID = file.SourceID;
+							saveditem.Source = file.Source;
+							saveditem.CopyMachineInformation(file);
+							saveditem.Name = file.Name;
+						}
+
+						break;
+					}
+				}
+
+				// If no duplicate is found, add it to the list
+				if (dupetype == 0x00)
+				{
+					outfiles.Add(file);
+				}
+				// Otherwise, if a new rom information is found, add that
+				else
+				{
+					outfiles.RemoveAt(pos);
+					outfiles.Insert(pos, saveditem);
 				}
 			}
 
