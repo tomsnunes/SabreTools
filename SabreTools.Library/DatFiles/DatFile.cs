@@ -2149,7 +2149,7 @@ namespace SabreTools.Library.DatFiles
 				lock (inputs)
 				{
 					path = inputs[i];
-					id = inputs.Count - i;
+					id = inputs.Count - i - 1;
 				}
 
 				Parse(path, id, id, keep: true);
