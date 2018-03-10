@@ -261,7 +261,7 @@ namespace SabreTools
 		/// <param name="updateMode">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
+		/// <param name="bare">True if the date should not be appended to the default name, false otherwise</param>
 		/// /* Filtering info */
 		/// <param name="filter">Pre-populated filter object for DAT filtering</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
@@ -348,7 +348,7 @@ namespace SabreTools
 			// Populate the DatData object
 			DatFile userInputDat = new DatFile(datHeader);
 			
-			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, bare, clean,
+			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, clean,
 				remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
 		}
 

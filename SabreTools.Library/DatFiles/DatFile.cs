@@ -1622,7 +1622,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="updateMode">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
@@ -1631,7 +1630,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
 		/// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise [only for base replacement]</param>
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
-			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
+			bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
 		{
 			// Ensure we only have files in the inputs
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
