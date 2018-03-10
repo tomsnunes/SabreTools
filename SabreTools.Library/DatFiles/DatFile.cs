@@ -2240,14 +2240,14 @@ namespace SabreTools.Library.DatFiles
 							// Individual DATs that are output
 							if ((diff & UpdateMode.DiffIndividualsOnly) != 0)
 							{
-								outDats[item.SystemID].Add(key, item);
+								outDats[inputs.Count - item.SystemID - 1].Add(key, item);
 							}
 
 							// Merged no-duplicates DAT
 							if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 							{
 								DatItem newrom = item.Clone() as DatItem;
-								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
+								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[inputs.Count - item.SystemID - 1].Split('¬')[0]) + ")";
 
 								outerDiffData.Add(key, newrom);
 							}
@@ -2260,7 +2260,7 @@ namespace SabreTools.Library.DatFiles
 						if ((item.Dupe & DupeType.External) != 0)
 						{
 							DatItem newrom = item.Clone() as DatItem;
-							newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
+							newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[inputs.Count - item.SystemID - 1].Split('¬')[0]) + ")";
 
 							dupeData.Add(key, newrom);
 						}
