@@ -1659,14 +1659,14 @@ namespace SabreTools.Library.DatFiles
 			{
 				// Populate the combined data and get the headers
 				List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
-				MergeNoDiff(outDir, inputFileNames, datHeaders);
+				MergeNoDiff(inputFileNames, datHeaders, outDir);
 			}
 			// If we have one of the standard diffing modes
 			else if ((updateMode & UpdateMode.DiffDupesOnly) != 0
 				|| (updateMode & UpdateMode.DiffNoDupesOnly) != 0
 				|| (updateMode & UpdateMode.DiffIndividualsOnly) != 0)
 			{
-				DiffNoCascade(updateMode, outDir, inputFileNames);
+				DiffNoCascade(inputFileNames, outDir, filter, updateMode);
 			}
 			// If we have one of the cascaded diffing modes
 			else if ((updateMode & UpdateMode.DiffCascade) != 0
@@ -1674,7 +1674,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				// Populate the combined data and get the headers
 				List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
-				DiffCascade(outDir, inplace, inputFileNames, datHeaders, skip);
+				DiffCascade(inputFileNames, datHeaders, outDir, inplace, skip);
 			}
 			// If we have diff against mode
 			else if ((updateMode & UpdateMode.DiffAgainst) != 0)
@@ -2038,12 +2038,12 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Output cascading diffs
 		/// </summary>
-		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip)
+		public void DiffCascade(List<string> inputs, List<DatFile> datHeaders, string outDir, bool inplace, bool skip)
 		{
 			string post = "";
 
@@ -2129,10 +2129,11 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Output non-cascading diffs
 		/// </summary>
-		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inputs">List of inputs to write out from</param>
-		public void DiffNoCascade(UpdateMode diff, string outDir, List<string> inputs)
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="filter">Filter object to be passed to the DatItem level</param>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
+		public void DiffNoCascade(List<string> inputs, string outDir, Filter filter, UpdateMode diff)
 		{
 			InternalStopwatch watch = new InternalStopwatch("Initializing all output DATs");
 
@@ -2154,6 +2155,9 @@ namespace SabreTools.Library.DatFiles
 
 				Parse(path, id, id, keep: true);
 			});
+
+			// Now that we have a combined DAT, filter it
+			filter.FilterDatFile(this);
 
 			// Fill in any information not in the base DAT
 			if (String.IsNullOrWhiteSpace(FileName))
@@ -2303,10 +2307,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Output user defined merge
 		/// </summary>
-		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		public void MergeNoDiff(string outDir, List<string> inputs, List<DatFile> datHeaders)
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		public void MergeNoDiff(List<string> inputs, List<DatFile> datHeaders, string outDir)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (Type == "SuperDAT")
