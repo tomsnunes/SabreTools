@@ -1625,7 +1625,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
@@ -1698,8 +1698,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
-		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
@@ -1764,9 +1763,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="replaceMode">ReplaceMode representing what should be updated</param>
 		/// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise</param>
 		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
@@ -1971,12 +1967,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void DiffAgainst(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
 			bool descAsName, Filter filter, SplitType splitType)
 		{
@@ -2345,23 +2338,16 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Convert, update, and filter a DAT file or set of files using a base
+		/// Convert, update, and filter a DAT file or set of files
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files and/or folders</param>
 		/// <param name="outDir">Optional param for output directory</param>
-		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
-		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
-		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void Update(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode, bool descAsName,
 			Filter filter, SplitType splitType)
 		{
