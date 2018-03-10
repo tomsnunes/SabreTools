@@ -2235,7 +2235,7 @@ namespace SabreTools.Library.DatFiles
 					// No duplicates
 					if ((diff & UpdateMode.DiffNoDupesOnly) != 0 || (diff & UpdateMode.DiffIndividualsOnly) != 0)
 					{
-						if ((item.Dupe & DupeType.Internal) != 0)
+						if ((item.Dupe & DupeType.Internal) != 0 || item.Dupe == 0x00)
 						{
 							// Individual DATs that are output
 							if ((diff & UpdateMode.DiffIndividualsOnly) != 0)
