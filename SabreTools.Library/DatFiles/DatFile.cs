@@ -1665,6 +1665,8 @@ namespace SabreTools.Library.DatFiles
 				|| (updateMode & UpdateMode.DiffNoDupesOnly) != 0
 				|| (updateMode & UpdateMode.DiffIndividualsOnly) != 0)
 			{
+				// Populate the combined data
+				PopulateUserData(inputFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
 				DiffNoCascade(inputFileNames, outDir, filter, updateMode);
 			}
 			// If we have one of the cascaded diffing modes
@@ -1719,7 +1721,7 @@ namespace SabreTools.Library.DatFiles
 					DedupeRoms = DedupeRoms,
 				};
 
-				datHeaders[i].Parse(input, i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+				datHeaders[i].Parse(input, i, i, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
 			watch.Stop();
@@ -2134,23 +2136,6 @@ namespace SabreTools.Library.DatFiles
 			DatFile outerDiffData = new DatFile();
 			DatFile dupeData = new DatFile();
 
-			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
-			{
-				string path = "";
-				int id = 0;
-
-				lock (inputs)
-				{
-					path = inputs[i];
-					id = inputs.Count - i - 1;
-				}
-
-				Parse(path, id, id, keep: true);
-			});
-
-			// Now that we have a combined DAT, filter it
-			filter.FilterDatFile(this);
-
 			// Fill in any information not in the base DAT
 			if (String.IsNullOrWhiteSpace(FileName))
 			{
@@ -2158,6 +2143,7 @@ namespace SabreTools.Library.DatFiles
 			}
 			if (String.IsNullOrWhiteSpace(Name))
 			{
+
 				Name = "All DATs";
 			}
 			if (String.IsNullOrWhiteSpace(Description))
@@ -2236,14 +2222,14 @@ namespace SabreTools.Library.DatFiles
 							// Individual DATs that are output
 							if ((diff & UpdateMode.DiffIndividualsOnly) != 0)
 							{
-								outDats[inputs.Count - item.SystemID - 1].Add(key, item);
+								outDats[item.SystemID].Add(key, item);
 							}
 
 							// Merged no-duplicates DAT
 							if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 							{
 								DatItem newrom = item.Clone() as DatItem;
-								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[inputs.Count - item.SystemID - 1].Split('¬')[0]) + ")";
+								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[item.SystemID].Split('¬')[0]) + ")";
 
 								outerDiffData.Add(key, newrom);
 							}
@@ -2256,7 +2242,7 @@ namespace SabreTools.Library.DatFiles
 						if ((item.Dupe & DupeType.External) != 0)
 						{
 							DatItem newrom = item.Clone() as DatItem;
-							newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[inputs.Count - item.SystemID - 1].Split('¬')[0]) + ")";
+							newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[item.SystemID].Split('¬')[0]) + ")";
 
 							dupeData.Add(key, newrom);
 						}
