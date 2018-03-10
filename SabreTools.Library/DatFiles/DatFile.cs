@@ -1738,7 +1738,7 @@ namespace SabreTools.Library.DatFiles
 					datHeaders[i].Remove(key);
 				}
 
-				// Now remove the file dictionary from the souce DAT to save memory
+				// Now remove the file dictionary from the source DAT to save memory
 				datHeaders[i].DeleteDictionary();
 			});
 
