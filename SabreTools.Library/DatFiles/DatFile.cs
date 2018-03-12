@@ -1715,10 +1715,25 @@ namespace SabreTools.Library.DatFiles
 			{
 				string input = inputs[i];
 				Globals.Logger.User("Adding DAT: {0}", input.Split('¬')[0]);
-				datHeaders[i] = new DatFile
+				datHeaders[i] = new DatFile()
 				{
 					DatFormat = (DatFormat != 0 ? DatFormat : 0),
+
+					// Filtering that needs to be copied over
+					ExcludeOf = ExcludeOf,
+					KeepEmptyGames = KeepEmptyGames,
+					SceneDateStrip = SceneDateStrip,
 					DedupeRoms = DedupeRoms,
+					StripHash = StripHash,
+					Prefix = Prefix,
+					Postfix = Postfix,
+					AddExtension = AddExtension,
+					ReplaceExtension = ReplaceExtension,
+					RemoveExtension = RemoveExtension,
+					Romba = Romba,
+					GameName = GameName,
+					Quotes = Quotes,
+					UseRomName = UseRomName,
 				};
 
 				datHeaders[i].Parse(input, i, i, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
