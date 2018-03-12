@@ -818,7 +818,7 @@ namespace SabreTools.Library.DatFiles
 									((rom.MachineType & MachineType.Bios) != 0 ? " isbios=\"yes\"" : "")
 									+ ((rom.MachineType & MachineType.Device) != 0 ? " isdevice=\"yes\"" : "")
 									+ ((rom.MachineType & MachineType.Mechanical) != 0 ? " ismechanical=\"yes\"" : "")
-									+ (rom.Runnable == true ? " runnable=\"yes\"" : "")
+									+ (rom.Runnable == true ? " runnable=\"yes\"" : (rom.Runnable == false ? " runnable=\"no\"" : ""))
 									+ (String.IsNullOrWhiteSpace(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
 										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"")
