@@ -1378,10 +1378,12 @@ This section contains remappings from old flag names to new ones for the purpose
 -ab, --add-blank -> -ab, --add-blank-files
 -ae, --add-ext -> -ae, --add-extension
 -ag, --against -> -dag, --diff-against
+-as, --all-stats -> -srt=all, --report-type=all
 -b, --bare -> -b, --no-automatic-date
 -bc, --baddump-col -> -bc, --baddump-column
 -c, --cascade -> -dc, --diff-cascade
 -c, --cat -> -c, --category
+-csv, --csv -> -srt=csv, --report-type=csv
 -dan, --desc-name -> -dan, --description-as-name
 -de, --desc -> -de, --description
 -df, --dat-fullnonmerged -> -df, --dat-full-non-merged
@@ -1396,6 +1398,7 @@ This section contains remappings from old flag names to new ones for the purpose
 -fm, --forcemerge -> -fm, --forcemerging
 -fn, --forcend -> -fn, --forcenodump
 -fp, --forcepack -> -fp, --forcepacking
+-html, --html -> -srt=html, --report-type=html
 -ic, --ignore-chd -> -ic, --chds-as-files
 -mt, --mt -> -mt, --threads
 -nc, --nodump-col -> -nc, --nodump-column
@@ -1457,6 +1460,7 @@ This section contains remappings from old flag names to new ones for the purpose
 -ska, --skiparc -> -ska, --skip-archives
 -skf, --skipfile -> -skf, --skip-files
 -t7z, --t7z -> -t7z, --torrent-7zip
+-text, --text -> -srt=text, --report-type=text
 -tgz, --tgz -> -tgz, --torrent-gzip
 -tlrz, --tlrz -> -tlrz, --torrent-lrzip
 -tlz4, --tlz4 -> -tlz4, --torrent-lz4
