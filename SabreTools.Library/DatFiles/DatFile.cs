@@ -1680,13 +1680,17 @@ namespace SabreTools.Library.DatFiles
 			// If we have diff against mode
 			else if ((updateMode & UpdateMode.DiffAgainst) != 0)
 			{
-				DiffAgainst(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType);
+				// Populate the combined data
+				PopulateUserData(baseFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
+				DiffAgainst(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType);
 			}
 			// If we have one of the base replacement modes
 			else if ((updateMode & UpdateMode.BaseReplace) != 0
 				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
 			{
-				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
+				// Populate the combined data
+				PopulateUserData(baseFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
+				BaseReplace(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
 			}
 
 			return;
@@ -1768,10 +1772,9 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Replace item values from the base set
+		/// Replace item values from the base set represented by the current DAT
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files</param>
-		/// <param name="baseFileNames">Names of base files</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -1781,29 +1784,10 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="replaceMode">ReplaceMode representing what should be updated</param>
 		/// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise</param>
-		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
+		public void BaseReplace(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
 			bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
 		{
-			// First we want to parse all of the base DATs into the input
-			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
-
-			Parallel.For(0, baseFileNames.Count, Globals.ParallelOptions, i =>
-			{
-				string path = "";
-				int id = 0;
-
-				lock (baseFileNames)
-				{
-					path = baseFileNames[i];
-					id = baseFileNames.Count - i;
-				}
-
-				Parse(path, id, id, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
-			});
-
-			watch.Stop();
-
-			// Now we want to try to replace each item in each input DAT from the base
+			// We want to try to replace each item in each input DAT from the base
 			foreach (string path in inputFileNames)
 			{
 				Globals.Logger.User("Replacing items in '{0}' from the base DAT", path.Split('¬')[0]);
@@ -1975,10 +1959,9 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Output diffs against a base set
+		/// Output diffs against a base set represented by the current DAT
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files</param>
-		/// <param name="baseFileNames">Names of base files</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -1986,19 +1969,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		public void DiffAgainst(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
+		public void DiffAgainst(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
 			bool descAsName, Filter filter, SplitType splitType)
 		{
-			// First we want to parse all of the base DATs into the input
-			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for comparison...");
-
-			Parallel.ForEach(baseFileNames, Globals.ParallelOptions, path =>
-			{
-				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
-			});
-
-			watch.Stop();
-
 			// For comparison's sake, we want to use CRC as the base ordering
 			BucketBy(SortedBy.CRC, DedupeType.Full);
 
