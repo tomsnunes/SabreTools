@@ -2944,7 +2944,7 @@ namespace SabreTools.Library.DatFiles
 					}
 
 					// Otherwise, if the parent doesn't already contain the non-disk (or a merge-equivalent), add it
-					else if (item.Type != ItemType.Disk && !this[parent].Contains(item) && !this[parent].Select(i => i.Name).Contains(((Disk)item).MergeTag))
+					else if (item.Type != ItemType.Disk && !this[parent].Contains(item))
 					{
 						// Rename the child so it's in a subfolder
 						item.Name = item.MachineName + "\\" + item.Name;
