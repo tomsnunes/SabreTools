@@ -9,7 +9,7 @@ namespace SabreTools
 	{
 		#region Private Flag features
 
-		private static Feature addBlankFilesFlag
+		private static Feature _addBlankFilesFlag
 		{
 			get
 			{
@@ -21,7 +21,7 @@ namespace SabreTools
 					longDescription: "If this flag is set, then blank entries will be created for each of the empty directories in the source. This is useful for tools that require all folders be accounted for in the output DAT.");
 			}
 		}
-		private static Feature addDateFlag
+		private static Feature _addDateFlag
 		{
 			get
 			{
@@ -33,7 +33,7 @@ namespace SabreTools
 					longDescription: "If this flag is set, then the Date will be appended to each file information in the output DAT. The output format is standardized as \"yyyy/MM/dd HH:mm:ss\".");
 			}
 		}
-		private static Feature allStatsFlag
+		private static Feature _allStatsFlag
 		{
 			get
 			{
@@ -45,7 +45,7 @@ namespace SabreTools
 					longDescription: "Output all statistical information to all available formats.");
 			}
 		}
-		private static Feature archivesAsFilesFlag
+		private static Feature _archivesAsFilesFlag
 		{
 			get
 			{
@@ -57,7 +57,7 @@ namespace SabreTools
 					longDescription: "Instead of trying to enumerate the files within archives, treat the archives as files themselves. This is good for uncompressed sets that include archives that should be read as-is.");
 			}
 		}
-		private static Feature baddumpColumnFlag
+		private static Feature _baddumpColumnFlag
 		{
 			get
 			{
@@ -69,7 +69,7 @@ namespace SabreTools
 					longDescription: "Add a new column or field for counting the number of baddumps in the DAT.");
 			}
 		}
-		private static Feature baseFlag
+		private static Feature _baseFlag
 		{
 			get
 			{
@@ -81,7 +81,7 @@ namespace SabreTools
 					longDescription: "If splitting an entire folder of DATs, some output files may be normally overwritten since the names would be the same. With this flag, the original DAT name is used in the output name, in the format of \"Original Name(Dir - Name)\". This can be used in conjunction with --short to output in the format of \"Original Name (Name)\" instead.");
 			}
 		}
-		private static Feature baseReplaceFlag
+		private static Feature _baseReplaceFlag
 		{
 			get
 			{
@@ -93,7 +93,7 @@ namespace SabreTools
 					longDescription: "By default, no item names are changed except when there is a merge occurring. This flag enables users to define a DAT or set of base DATs to use as \"replacements\" for all input DATs. Note that the first found instance of an item in the base DAT(s) will be used and all others will be discarded. If no additional flag is given, it will default to updating names.");
 			}
 		}
-		private static Feature chdsAsFilesFlag
+		private static Feature _chdsAsFilesFlag
 		{
 			get
 			{
@@ -105,7 +105,7 @@ namespace SabreTools
 					longDescription: "Normally, CHDs would be processed using their internal hash to compare against the input DATs. This flag forces all CHDs to be treated like regular files.");
 			}
 		}
-		private static Feature cleanFlag
+		private static Feature _cleanFlag
 		{
 			get
 			{
@@ -117,7 +117,7 @@ namespace SabreTools
 					longDescription: "Game names will be sanitized to remove what the original WoD standards deemed as unneeded information, such as parenthesized or bracketed strings.");
 			}
 		}
-		private static Feature copyFilesFlag
+		private static Feature _copyFilesFlag
 		{
 			get
 			{
@@ -129,7 +129,7 @@ namespace SabreTools
 					longDescription: "If this flag is set, then all files that are going to be parsed are moved to the temporary directory before being hashed. This can be helpful in cases where the temp folder is located on an SSD and the user wants to take advantage of this.");
 			}
 		}
-		private static Feature csvFlag
+		private static Feature _csvFlag
 		{
 			get
 			{
@@ -141,7 +141,7 @@ namespace SabreTools
 					longDescription: "Output all statistical information in standardized CSV format.");
 			}
 		}
-		private static Feature datDeviceNonMergedFlag
+		private static Feature _datDeviceNonMergedFlag
 		{
 			get
 			{
@@ -153,7 +153,7 @@ namespace SabreTools
 					longDescription: "Preprocess the DAT to have child sets contain all items from the device references. This is incompatible with the other --dat-X flags.");
 			}
 		}
-		private static Feature datFullNonMergedFlag
+		private static Feature _datFullNonMergedFlag
 		{
 			get
 			{
@@ -165,7 +165,7 @@ namespace SabreTools
 					longDescription: "Preprocess the DAT to have child sets contain all items from the parent sets based on the cloneof and romof tags as well as device references. This is incompatible with the other --dat-X flags.");
 			}
 		}
-		private static Feature datMergedFlag
+		private static Feature _datMergedFlag
 		{
 			get
 			{
@@ -177,7 +177,7 @@ namespace SabreTools
 					longDescription: "Preprocess the DAT to have parent sets contain all items from the children based on the cloneof tag. This is incompatible with the other --dat-X flags.");
 			}
 		}
-		private static Feature datNonMergedFlag
+		private static Feature _datNonMergedFlag
 		{
 			get
 			{
@@ -189,7 +189,7 @@ namespace SabreTools
 					longDescription: "Preprocess the DAT to have child sets contain all items from the parent set based on the romof and cloneof tags. This is incompatible with the other --dat-X flags.");
 			}
 		}
-		private static Feature datSplitFlag
+		private static Feature _datSplitFlag
 		{
 			get
 			{
@@ -201,7 +201,7 @@ namespace SabreTools
 					longDescription: "Preprocess the DAT to remove redundant files between parents and children based on the romof and cloneof tags. This is incompatible with the other --dat-X flags.");
 			}
 		}
-		private static Feature dedupFlag
+		private static Feature _dedupFlag
 		{
 			get
 			{
@@ -213,7 +213,7 @@ namespace SabreTools
 					longDescription: "For all outputted DATs, allow for hash deduping. This makes sure that there are effectively no duplicates in the output files. Cannot be used with game dedup.");
 			}
 		}
-		private static Feature deleteFlag
+		private static Feature _deleteFlag
 		{
 			get
 			{
@@ -225,7 +225,7 @@ namespace SabreTools
 					longDescription: "Optionally, the input files, once processed and fully matched, can be deleted. This can be useful when the original file structure is no longer needed or if there is limited space on the source drive.");
 			}
 		}
-		private static Feature depotFlag
+		private static Feature _depotFlag
 		{
 			get
 			{
@@ -237,7 +237,7 @@ namespace SabreTools
 					longDescription: "Normally, input directories will be treated with no special format. If this flag is used, all input directories will be assumed to be romba-style depots.");
 			}
 		}
-		private static Feature depreciatedFlag
+		private static Feature _depreciatedFlag
 		{
 			get
 			{
@@ -249,7 +249,7 @@ namespace SabreTools
 					longDescription: "By default, Logiqx XML DATs output with the more modern \"machine\" tag for each set. This flag allows users to output the older \"game\" tag instead, for compatibility reasons. [Logiqx only]");
 			}
 		}
-		private static Feature descriptionAsNameFlag
+		private static Feature _descriptionAsNameFlag
 		{
 			get
 			{
@@ -261,7 +261,7 @@ namespace SabreTools
 					longDescription: "By default, all DATs are converted exactly as they are input. Enabling this flag allows for the machine names in the DAT to be replaced by the machine description instead. In most cases, this will result in no change in the output DAT, but a notable example would be a software list DAT where the machine names are generally DOS-friendly while the description is more complete.");
 			}
 		}
-		private static Feature diffAgainstFlag
+		private static Feature _diffAgainstFlag
 		{
 			get
 			{
@@ -273,7 +273,7 @@ namespace SabreTools
 					"This flag will enable a special type of diffing in which a set of base DATs are used as a comparison point for each of the input DATs. This allows users to get a slightly different output to cascaded diffing, which may be more useful in some cases. This is heavily influenced by the diffing model used by Romba.");
 			}
 		}
-		private static Feature diffAllFlag
+		private static Feature _diffAllFlag
 		{
 			get
 			{
@@ -285,7 +285,7 @@ namespace SabreTools
 					longDescription: "By default, all DATs are processed individually with the user-specified flags. With this flag enabled, input DATs are diffed against each other to find duplicates, no duplicates, and only in individuals.");
 			}
 		}
-		private static Feature diffCascadeFlag
+		private static Feature _diffCascadeFlag
 		{
 			get
 			{
@@ -297,7 +297,7 @@ namespace SabreTools
 					longDescription: "This flag allows for a special type of diffing in which the first DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
 			}
 		}
-		private static Feature diffDuplicatesFlag
+		private static Feature _diffDuplicatesFlag
 		{
 			get
 			{
@@ -309,7 +309,7 @@ namespace SabreTools
 					longDescription: "All files that have duplicates outside of the original DAT are included.");
 			}
 		}
-		private static Feature diffIndividualsFlag
+		private static Feature _diffIndividualsFlag
 		{
 			get
 			{
@@ -321,7 +321,7 @@ namespace SabreTools
 					longDescription: "All files that have no duplicates outside of the original DATs are put into DATs that are named after the source DAT.");
 			}
 		}
-		private static Feature diffNoDuplicatesFlag
+		private static Feature _diffNoDuplicatesFlag
 		{
 			get
 			{
@@ -333,7 +333,7 @@ namespace SabreTools
 					longDescription: "All files that have no duplicates outside of the original DATs are included.");
 			}
 		}
-		private static Feature diffReverseCascadeFlag
+		private static Feature _diffReverseCascadeFlag
 		{
 			get
 			{
@@ -345,7 +345,7 @@ namespace SabreTools
 					longDescription: "This flag allows for a special type of diffing in which the last DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
 			}
 		}
-		private static Feature excludeOfFlag
+		private static Feature _excludeOfFlag
 		{
 			get
 			{
@@ -357,7 +357,7 @@ namespace SabreTools
 					longDescription: "If this flag is enabled, then the romof, cloneof, and sampleof tags will be omitted from the outputted DAT.");
 			}
 		}
-		private static Feature extensionFlag
+		private static Feature _extensionFlag
 		{
 			get
 			{
@@ -369,7 +369,7 @@ namespace SabreTools
 					longDescription: "For a DAT, or set of DATs, allow for splitting based on a list of input extensions. This can allow for combined DAT files, such as those combining two separate systems, to be split. Files with any extensions not listed in the input lists will be included in both outputted DAT files.");
 			}
 		}
-		private static Feature gameDedupFlag
+		private static Feature _gameDedupFlag
 		{
 			get
 			{
@@ -381,7 +381,7 @@ namespace SabreTools
 					longDescription: "For all outputted DATs, allow for hash deduping but only within the games, and not across the entire DAT. This makes sure that there are effectively no duplicates within each of the output sets. Cannot be used with standard dedup.");
 			}
 		}
-		private static Feature gamePrefixFlag
+		private static Feature _gamePrefixFlag
 		{
 			get
 			{
@@ -393,7 +393,7 @@ namespace SabreTools
 					longDescription: "This flag allows for the name of the game to be used as a prefix to each file.");
 			}
 		}
-		private static Feature hashFlag
+		private static Feature _hashFlag
 		{
 			get
 			{
@@ -405,7 +405,7 @@ namespace SabreTools
 					longDescription: "For a DAT, or set of DATs, allow for splitting based on the best available hash for each file within. The order of preference for the outputted DATs is as follows: Nodump, SHA-512, SHA-384, SHA-256, SHA-1, MD5, CRC (or worse).");
 			}
 		}
-		private static Feature hashOnlyFlag
+		private static Feature _hashOnlyFlag
 		{
 			get
 			{
@@ -417,7 +417,7 @@ namespace SabreTools
 					longDescription: "This sets a mode where files are not checked based on name but rather hash alone. This allows verification of (possibly) incorrectly named folders and sets to be verified without worrying about the proper set structure to be there.");
 			}
 		}
-		private static Feature htmlFlag
+		private static Feature _htmlFlag
 		{
 			get
 			{
@@ -429,7 +429,7 @@ namespace SabreTools
 					longDescription: "Output all statistical information in standardized HTML format.");
 			}
 		}
-		private static Feature individualFlag
+		private static Feature _individualFlag
 		{
 			get
 			{
@@ -441,7 +441,7 @@ namespace SabreTools
 					longDescription: "Optionally, the statistics for each of the individual input DATs can be output as well.");
 			}
 		}
-		private static Feature inplaceFlag
+		private static Feature _inplaceFlag
 		{
 			get
 			{
@@ -453,7 +453,7 @@ namespace SabreTools
 					longDescription: "By default, files are written to the runtime directory (or the output directory, if set). This flag enables users to write out to the directory that the DATs originated from.");
 			}
 		}
-		private static Feature inverseFlag
+		private static Feature _inverseFlag
 		{
 			get
 			{
@@ -465,7 +465,7 @@ namespace SabreTools
 					longDescription: "Instead of the normal behavior of rebuilding using a DAT, this flag allows the user to use the DAT as a filter instead. All files that are found in the DAT will be skipped and everything else will be output in the selected format.");
 			}
 		}
-		private static Feature keepEmptyGamesFlag
+		private static Feature _keepEmptyGamesFlag
 		{
 			get
 			{
@@ -477,7 +477,7 @@ namespace SabreTools
 					longDescription: "Normally, any sets that are considered empty will not be included in the output, this flag allows these empty sets to be added to the output.");
 			}
 		}
-		private static Feature levelFlag
+		private static Feature _levelFlag
 		{
 			get
 			{
@@ -489,7 +489,7 @@ namespace SabreTools
 					longDescription: "For a DAT, or set of DATs, allow for splitting based on the lowest available level of game name. That is, if a game name is top/mid/last, then it will create an output DAT for the parent directory \"mid\" in a folder called \"top\" with a game called \"last\".");
 			}
 		}
-		private static Feature mergeFlag
+		private static Feature _mergeFlag
 		{
 			get
 			{
@@ -501,7 +501,7 @@ namespace SabreTools
 					longDescription: "By default, all DATs are processed individually with the user-specified flags. With this flag enabled, all of the input DATs are merged into a single output. This is best used with the dedup flag.");
 			}
 		}
-		private static Feature noAutomaticDateFlag
+		private static Feature _noAutomaticDateFlag
 		{
 			get
 			{
@@ -513,7 +513,7 @@ namespace SabreTools
 					longDescription: "Normally, the DAT will be created with the date in the file name in brackets. This flag removes that instead of the default.");
 			}
 		}
-		private static Feature nodumpColumnFlag
+		private static Feature _nodumpColumnFlag
 		{
 			get
 			{
@@ -525,7 +525,7 @@ namespace SabreTools
 					longDescription: "Add a new column or field for counting the number of nodumps in the DAT.");
 			}
 		}
-		private static Feature noStoreHeaderFlag
+		private static Feature _noStoreHeaderFlag
 		{
 			get
 			{
@@ -537,7 +537,7 @@ namespace SabreTools
 					longDescription: "By default, all headers that are removed from files are backed up in the database. This flag allows users to skip that step entirely, avoiding caching the headers at all.");
 			}
 		}
-		private static Feature notRunnableFlag
+		private static Feature _notRunnableFlag
 		{
 			get
 			{
@@ -549,7 +549,7 @@ namespace SabreTools
 					longDescription: "This allows users to include only unrunnable games.");
 			}
 		}
-		private static Feature matchOfTagsFlag
+		private static Feature _matchOfTagsFlag
 		{
 			get
 			{
@@ -561,7 +561,7 @@ namespace SabreTools
 					longDescription: "If filter or exclude by game name is used, this flag will allow those filters to be checked against the romof and cloneof tags as well. This can allow for more advanced set-building, especially in arcade-based sets.");
 			}
 		}
-		private static Feature onlySameFlag
+		private static Feature _onlySameFlag
 		{
 			get
 			{
@@ -573,7 +573,7 @@ namespace SabreTools
 					longDescription: "Normally, updating the description will always overwrite if the machine names are the same. With this flag, descriptions will only be overwritten if they are the same as the machine names.");
 			}
 		}
-		private static Feature outputAllFlag
+		private static Feature _outputAllFlag
 		{
 			get
 			{
@@ -585,7 +585,7 @@ namespace SabreTools
 					longDescription: "Output in all formats [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputAttractmodeFlag
+		private static Feature _outputAttractmodeFlag
 		{
 			get
 			{
@@ -597,7 +597,7 @@ namespace SabreTools
 					longDescription: "Output in AttractMode format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputCmpFlag
+		private static Feature _outputCmpFlag
 		{
 			get
 			{
@@ -609,7 +609,7 @@ namespace SabreTools
 					longDescription: "Output in ClrMamePro format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputCsvFlag
+		private static Feature _outputCsvFlag
 		{
 			get
 			{
@@ -621,7 +621,7 @@ namespace SabreTools
 					longDescription: "Output in CSV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputDoscenterFlag
+		private static Feature _outputDoscenterFlag
 		{
 			get
 			{
@@ -633,7 +633,7 @@ namespace SabreTools
 					longDescription: "Output in DOSCenter format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputListromFlag
+		private static Feature _outputListromFlag
 		{
 			get
 			{
@@ -645,7 +645,7 @@ namespace SabreTools
 					longDescription: "Output in MAME Listrom format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputListxmlFlag
+		private static Feature _outputListxmlFlag
 		{
 			get
 			{
@@ -657,7 +657,7 @@ namespace SabreTools
 					longDescription: "Output in MAME Listxml format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputMd5Flag
+		private static Feature _outputMd5Flag
 		{
 			get
 			{
@@ -669,7 +669,7 @@ namespace SabreTools
 					longDescription: "Output in MD5 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputMissFlag
+		private static Feature _outputMissFlag
 		{
 			get
 			{
@@ -681,7 +681,7 @@ namespace SabreTools
 					longDescription: "Output in Missfile format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputOfflinelistFlag
+		private static Feature _outputOfflinelistFlag
 		{
 			get
 			{
@@ -693,7 +693,7 @@ namespace SabreTools
 					longDescription: "Output in OfflineList format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputRomcenterFlag
+		private static Feature _outputRomcenterFlag
 		{
 			get
 			{
@@ -705,7 +705,7 @@ namespace SabreTools
 					longDescription: "Output in RomCenter format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSabredatFlag
+		private static Feature _outputSabredatFlag
 		{
 			get
 			{
@@ -717,7 +717,7 @@ namespace SabreTools
 					longDescription: "Output in SabreDat format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSfvFlag
+		private static Feature _outputSfvFlag
 		{
 			get
 			{
@@ -729,7 +729,7 @@ namespace SabreTools
 					longDescription: "Output in SFV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSha1Flag
+		private static Feature _outputSha1Flag
 		{
 			get
 			{
@@ -741,7 +741,7 @@ namespace SabreTools
 					longDescription: "Output in SHA-1 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSha256Flag
+		private static Feature _outputSha256Flag
 		{
 			get
 			{
@@ -753,7 +753,7 @@ namespace SabreTools
 					longDescription: "Output in SHA-256 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSha384Flag
+		private static Feature _outputSha384Flag
 		{
 			get
 			{
@@ -765,7 +765,7 @@ namespace SabreTools
 					longDescription: "Output in SHA-256 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSha512Flag
+		private static Feature _outputSha512Flag
 		{
 			get
 			{
@@ -777,7 +777,7 @@ namespace SabreTools
 					longDescription: "Output in SHA-256 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSoftwarelistFlag
+		private static Feature _outputSoftwarelistFlag
 		{
 			get
 			{
@@ -789,7 +789,7 @@ namespace SabreTools
 					longDescription: "Output in Softwarelist format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputSsvFlag
+		private static Feature _outputSsvFlag
 		{
 			get
 			{
@@ -801,7 +801,7 @@ namespace SabreTools
 					longDescription: "Output in SSV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputTsvFlag
+		private static Feature _outputTsvFlag
 		{
 			get
 			{
@@ -813,7 +813,7 @@ namespace SabreTools
 					longDescription: "Output in TSV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature outputXmlFlag
+		private static Feature _outputXmlFlag
 		{
 			get
 			{
@@ -825,7 +825,7 @@ namespace SabreTools
 					longDescription: "Output in Logiqx XML format [DEPRECIATED]");
 			}
 		} // TODO: Remove
-		private static Feature quickFlag
+		private static Feature _quickFlag
 		{
 			get
 			{
@@ -837,7 +837,7 @@ namespace SabreTools
 					longDescription: "For all archives, if this flag is enabled, it will only use the header information to get the archive entries' file information. The upside to this is that it is the fastest option. On the downside, it can only get the CRC and size from most archive formats, leading to possible issues.");
 			}
 		}
-		private static Feature quotesFlag
+		private static Feature _quotesFlag
 		{
 			get
 			{
@@ -849,7 +849,7 @@ namespace SabreTools
 					longDescription: "This flag surrounds the item by double-quotes, not including the prefix or postfix.");
 			}
 		}
-		private static Feature removeExtensionsFlag
+		private static Feature _removeExtensionsFlag
 		{
 			get
 			{
@@ -861,7 +861,7 @@ namespace SabreTools
 					longDescription: "For each item, remove the extension.");
 			}
 		}
-		private static Feature removeMd5Flag
+		private static Feature _removeMd5Flag
 		{
 			get
 			{
@@ -873,7 +873,7 @@ namespace SabreTools
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all MD5 hashes from the output file(s).");
 			}
 		}
-		private static Feature removeSha1Flag
+		private static Feature _removeSha1Flag
 		{
 			get
 			{
@@ -885,7 +885,7 @@ namespace SabreTools
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-1 hashes from the output file(s).");
 			}
 		}
-		private static Feature removeSha256Flag
+		private static Feature _removeSha256Flag
 		{
 			get
 			{
@@ -897,7 +897,7 @@ namespace SabreTools
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-256 hashes from the output file(s).");
 			}
 		}
-		private static Feature removeSha384Flag
+		private static Feature _removeSha384Flag
 		{
 			get
 			{
@@ -909,7 +909,7 @@ namespace SabreTools
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-384 hashes from the output file(s).");
 			}
 		}
-		private static Feature removeSha512Flag
+		private static Feature _removeSha512Flag
 		{
 			get
 			{
@@ -921,7 +921,7 @@ namespace SabreTools
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-512 hashes from the output file(s).");
 			}
 		}
-		private static Feature removeUnicodeFlag
+		private static Feature _removeUnicodeFlag
 		{
 			get
 			{
@@ -933,7 +933,7 @@ namespace SabreTools
 					longDescription: "By default, the character set from the original file(s) will be used for item naming. This flag removes all Unicode characters from the item names, machine names, and machine descriptions.");
 			}
 		}
-		private static Feature reverseBaseReplaceFlag
+		private static Feature _reverseBaseReplaceFlag
 		{
 			get
 			{
@@ -945,7 +945,7 @@ namespace SabreTools
 					longDescription: "By default, no item names are changed except when there is a merge occurring. This flag enables users to define a DAT or set of base DATs to use as \"replacements\" for all input DATs. Note that the first found instance of an item in the last base DAT(s) will be used and all others will be discarded. If no additional flag is given, it will default to updating names.");
 			}
 		}
-		private static Feature rombaFlag
+		private static Feature _rombaFlag
 		{
 			get
 			{
@@ -957,7 +957,7 @@ namespace SabreTools
 					longDescription: "This flag allows reading and writing of DATs and output files to and from a Romba-style depot. This also implies TorrentGZ input and output for physical files. Where appropriate, Romba depot files will be created as well.");
 			}
 		}
-		private static Feature romsFlag
+		private static Feature _romsFlag
 		{
 			get
 			{
@@ -969,7 +969,7 @@ namespace SabreTools
 					longDescription: "By default, the outputted file will include the name of the game so this flag allows for the name of the rom to be output instead. [Missfile only]");
 			}
 		}
-		private static Feature runnableFlag
+		private static Feature _runnableFlag
 		{
 			get
 			{
@@ -981,7 +981,7 @@ namespace SabreTools
 					longDescription: "This allows users to include only verified runnable games.");
 			}
 		}
-		private static Feature scanAllFlag
+		private static Feature _scanAllFlag
 		{
 			get
 			{
@@ -993,7 +993,7 @@ namespace SabreTools
 					longDescription: "This flag is the short equivalent to -7z=0 -gz=0 -rar=0 -zip=0 wrapped up. Generally this will be helpful in all cases where the content of the rebuild folder is not entirely known or is known to be mixed.");
 			}
 		}
-		private static Feature sceneDateStripFlag
+		private static Feature _sceneDateStripFlag
 		{
 			get
 			{
@@ -1005,7 +1005,7 @@ namespace SabreTools
 					longDescription: "If this flag is enabled, sets with \"scene\" names will have the date removed from the beginning. For example \"01.01.01-Game_Name-GROUP\" would become \"Game_Name-Group\".");
 			}
 		}
-		private static Feature shortFlag
+		private static Feature _shortFlag
 		{
 			get
 			{
@@ -1017,7 +1017,7 @@ namespace SabreTools
 					longDescription: "Instead of using ClrMamePro-style long names for DATs, use just the name of the folder as the name of the DAT. This can be used in conjunction with --base to output in the format of \"Original Name (Name)\" instead.");
 			}
 		}
-		private static Feature singleSetFlag
+		private static Feature _singleSetFlag
 		{
 			get
 			{
@@ -1029,7 +1029,7 @@ namespace SabreTools
 					longDescription: "This is useful for keeping all roms in a DAT in the same archive or folder.");
 			}
 		}
-		private static Feature sizeFlag
+		private static Feature _sizeFlag
 		{
 			get
 			{
@@ -1041,7 +1041,7 @@ namespace SabreTools
 					longDescription: "For a DAT, or set of DATs, allow for splitting based on the sizes of the files, specifically if the type is a Rom (most item types don't have sizes).");
 			}
 		}
-		private static Feature skipFirstOutputFlag
+		private static Feature _skipFirstOutputFlag
 		{
 			get
 			{
@@ -1053,7 +1053,7 @@ namespace SabreTools
 					longDescription: "In times where the first DAT does not need to be written out a second time, this will skip writing it. This can often speed up the output process.");
 			}
 		}
-		private static Feature skipArchivesFlag
+		private static Feature _skipArchivesFlag
 		{
 			get
 			{
@@ -1065,7 +1065,7 @@ namespace SabreTools
 					longDescription: "Skip any files that are treated like archives");
 			}
 		}
-		private static Feature skipFilesFlag
+		private static Feature _skipFilesFlag
 		{
 			get
 			{
@@ -1077,7 +1077,7 @@ namespace SabreTools
 					longDescription: "Skip any files that are not treated like archives");
 			}
 		}
-		private static Feature skipMd5Flag
+		private static Feature _skipMd5Flag
 		{
 			get
 			{
@@ -1089,7 +1089,7 @@ namespace SabreTools
 					longDescription: "This allows the user to skip calculating the MD5 for each of the files which will speed up the creation of the DAT.");
 			}
 		}
-		private static Feature skipSha1Flag
+		private static Feature _skipSha1Flag
 		{
 			get
 			{
@@ -1101,7 +1101,7 @@ namespace SabreTools
 					longDescription: "This allows the user to skip calculating the SHA-1 for each of the files which will speed up the creation of the DAT.");
 			}
 		}
-		private static Feature skipSha256Flag
+		private static Feature _skipSha256Flag
 		{
 			get
 			{
@@ -1113,7 +1113,7 @@ namespace SabreTools
 					longDescription: "This allows the user to skip calculating the SHA-256 for each of the files which will speed up the creation of the DAT.");
 			}
 		}
-		private static Feature skipSha384Flag
+		private static Feature _skipSha384Flag
 		{
 			get
 			{
@@ -1125,7 +1125,7 @@ namespace SabreTools
 					longDescription: "This allows the user to skip calculating the SHA-384 for each of the files which will speed up the creation of the DAT.");
 			}
 		}
-		private static Feature skipSha512Flag
+		private static Feature _skipSha512Flag
 		{
 			get
 			{
@@ -1137,7 +1137,7 @@ namespace SabreTools
 					longDescription: "This allows the user to skip calculating the SHA-512 for each of the files which will speed up the creation of the DAT.");
 			}
 		}
-		private static Feature superdatFlag
+		private static Feature _superdatFlag
 		{
 			get
 			{
@@ -1149,7 +1149,7 @@ namespace SabreTools
 					longDescription: "Set the type flag to \"SuperDAT\" for the output DAT as well as preserving the directory structure of the inputted folder, if applicable.");
 			}
 		}
-		private static Feature tarFlag
+		private static Feature _tarFlag
 		{
 			get
 			{
@@ -1161,7 +1161,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to Tape ARchive (TAR) files. This format is a standardized storage archive without any compression, usually used with other compression formats around it. It is widely used in backup applications and source code archives.");
 			}
 		}
-		private static Feature textFlag
+		private static Feature _textFlag
 		{
 			get
 			{
@@ -1173,7 +1173,7 @@ namespace SabreTools
 					longDescription: "Output all statistical information in generic text format. If no other format flags are enabled, this is the default output.");
 			}
 		}
-		private static Feature torrent7zipFlag
+		private static Feature _torrent7zipFlag
 		{
 			get
 			{
@@ -1185,7 +1185,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to Torrent7Zip (T7Z) files. This format is based on the LZMA container format 7Zip, but with custom header information. This is currently unused by any major application. Currently does not produce proper Torrent-compatible outputs.");
 			}
 		}
-		private static Feature torrentGzipFlag
+		private static Feature _torrentGzipFlag
 		{
 			get
 			{
@@ -1197,7 +1197,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to TorrentGZ (TGZ) files. This format is based on the GZip archive format, but with custom header information and a file name replaced by the SHA-1 of the file inside. This is primarily used by external tool Romba (https://github.com/uwedeportivo/romba), but may be used more widely in the future.");
 			}
 		}
-		private static Feature torrentLrzipFlag
+		private static Feature _torrentLrzipFlag
 		{
 			get
 			{
@@ -1209,7 +1209,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to Torrent Long-Range Zip (TLRZ) files. This format is based on the LRZip file format as defined at https://github.com/ckolivas/lrzip but with custom header information. This is currently unused by any major application.");
 			}
 		}
-		private static Feature torrentLz4Flag
+		private static Feature _torrentLz4Flag
 		{
 			get
 			{
@@ -1221,7 +1221,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to Torrent LZ4 (TLZ4) files. This format is based on the LZ4 file format as defined at https://github.com/lz4/lz4 but with custom header information. This is currently unused by any major application.");
 			}
 		}
-		private static Feature torrentRarFlag
+		private static Feature _torrentRarFlag
 		{
 			get
 			{
@@ -1233,7 +1233,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting files to folder, files will be rebuilt to Torrent RAR (TRAR) files. This format is based on the RAR propietary format but with custom header information. This is currently unused by any major application.");
 			}
 		}
-		private static Feature torrentXzFlag
+		private static Feature _torrentXzFlag
 		{
 			get
 			{
@@ -1245,7 +1245,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting files to folder, files will be rebuilt to Torrent XZ (TXZ) files. This format is based on the LZMA container format XZ, but with custom header information. This is currently unused by any major application. Currently does not produce proper Torrent-compatible outputs.");
 			}
 		}
-		private static Feature torrentZipFlag
+		private static Feature _torrentZipFlag
 		{
 			get
 			{
@@ -1257,7 +1257,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting files to folder, files will be rebuilt to TorrentZip (TZip) files. This format is based on the ZIP archive format, but with custom header information. This is primarily used by external tool RomVault (http://www.romvault.com/) and is already widely used.");
 			}
 		}
-		private static Feature torrentZpaqFlag
+		private static Feature _torrentZpaqFlag
 		{
 			get
 			{
@@ -1269,7 +1269,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to Torrent ZPAQ (TZPAQ) files. This format is based on the ZPAQ file format as defined at https://github.com/zpaq/zpaq but with custom header information. This is currently unused by any major application.");
 			}
 		}
-		private static Feature torrentZstdFlag
+		private static Feature _torrentZstdFlag
 		{
 			get
 			{
@@ -1281,7 +1281,7 @@ namespace SabreTools
 					longDescription: "Instead of outputting the files to folder, files will be rebuilt to Torrent Zstd (TZstd) files. This format is based on the Zstd file format as defined at https://github.com/skbkontur/ZstdNet but with custom header information. This is currently unused by any major application.");
 			}
 		}
-		private static Feature trimFlag
+		private static Feature _trimFlag
 		{
 			get
 			{
@@ -1293,7 +1293,7 @@ namespace SabreTools
 					longDescription: "In the cases where files will have too long a name, this allows for trimming the name of the files to the NTFS maximum length at most.");
 			}
 		}
-		private static Feature tsvFlag
+		private static Feature _tsvFlag
 		{
 			get
 			{
@@ -1305,7 +1305,7 @@ namespace SabreTools
 					longDescription: "Output all statistical information in standardized TSV format.");
 			}
 		}
-		private static Feature typeFlag
+		private static Feature _typeFlag
 		{
 			get
 			{
@@ -1317,7 +1317,7 @@ namespace SabreTools
 					longDescription: "For a DAT, or set of DATs, allow for splitting based on the types of the files, specifically if the type is a rom or a disk.");
 			}
 		}
-		private static Feature updateDatFlag
+		private static Feature _updateDatFlag
 		{
 			get
 			{
@@ -1329,7 +1329,7 @@ namespace SabreTools
 					longDescription: "Once the files that were able to rebuilt are taken care of, a DAT of the files that could not be matched will be output to the output directory.");
 			}
 		}
-		private static Feature updateDescriptionFlag
+		private static Feature _updateDescriptionFlag
 		{
 			get
 			{
@@ -1341,7 +1341,7 @@ namespace SabreTools
 					longDescription: "This flag enables updating of machine descriptions from base DATs.");
 			}
 		}
-		private static Feature updateHashesFlag
+		private static Feature _updateHashesFlag
 		{
 			get
 			{
@@ -1353,7 +1353,7 @@ namespace SabreTools
 					longDescription: "This flag enables updating of hashes from base DATs.");
 			}
 		}
-		private static Feature updateManufacturerFlag
+		private static Feature _updateManufacturerFlag
 		{
 			get
 			{
@@ -1365,7 +1365,7 @@ namespace SabreTools
 					longDescription: "This flag enables updating of machine manufacturers from base DATs.");
 			}
 		}
-		private static Feature updateNamesFlag
+		private static Feature _updateNamesFlag
 		{
 			get
 			{
@@ -1377,7 +1377,7 @@ namespace SabreTools
 					longDescription: "This flag enables updating of item names from base DATs.");
 			}
 		}
-		private static Feature updateYearFlag
+		private static Feature _updateYearFlag
 		{
 			get
 			{
@@ -1394,7 +1394,7 @@ namespace SabreTools
 
 		#region Private Int32 features
 
-		private static Feature gzInt32Input
+		private static Feature _gzInt32Input
 		{
 			get
 			{
@@ -1409,7 +1409,7 @@ namespace SabreTools
 2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
-		private static Feature rarInt32Input
+		private static Feature _rarInt32Input
 		{
 			get
 			{
@@ -1424,7 +1424,7 @@ namespace SabreTools
 2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
-		private static Feature sevenZipInt32Input
+		private static Feature _sevenZipInt32Input
 		{
 			get
 			{
@@ -1439,7 +1439,7 @@ namespace SabreTools
 2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
-		private static Feature threadsInt32Input
+		private static Feature _threadsInt32Input
 		{
 			get
 			{
@@ -1451,7 +1451,7 @@ namespace SabreTools
 					longDescription: "Optionally, set the number of threads to use for the multithreaded operations. The default is the number of available machine threads; -1 means unlimited threads created.");
 			}
 		}
-		private static Feature zipInt32Input
+		private static Feature _zipInt32Input
 		{
 			get
 			{
@@ -1471,7 +1471,7 @@ namespace SabreTools
 
 		#region Private Int64 features
 
-		private static Feature radixInt64Input
+		private static Feature _radixInt64Input
 		{
 			get
 			{
@@ -1488,7 +1488,7 @@ namespace SabreTools
 
 		#region Private List<string> features
 
-		private static Feature baseDatListInput
+		private static Feature _baseDatListInput
 		{
 			get
 			{
@@ -1500,7 +1500,7 @@ namespace SabreTools
 					longDescription: "Add a DAT or folder of DATs to the base set to be used for all operations. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature crcListInput
+		private static Feature _crcListInput
 		{
 			get
 			{
@@ -1512,7 +1512,7 @@ namespace SabreTools
 					longDescription: "Include only items with this CRC hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature datListInput
+		private static Feature _datListInput
 		{
 			get
 			{
@@ -1524,7 +1524,7 @@ namespace SabreTools
 					longDescription: "User-supplied DAT for use in all operations. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature extaListInput
+		private static Feature _extaListInput
 		{
 			get
 			{
@@ -1536,7 +1536,7 @@ namespace SabreTools
 					longDescription: "Set the extension to be used to populate the first DAT. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature extbListInput
+		private static Feature _extbListInput
 		{
 			get
 			{
@@ -1548,7 +1548,7 @@ namespace SabreTools
 					longDescription: "Set the extension to be used to populate the second DAT. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature gameDescriptionListInput
+		private static Feature _gameDescriptionListInput
 		{
 			get
 			{
@@ -1560,7 +1560,7 @@ namespace SabreTools
 					longDescription: "Include only items with this game description in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature gameNameListInput
+		private static Feature _gameNameListInput
 		{
 			get
 			{
@@ -1572,7 +1572,7 @@ namespace SabreTools
 					longDescription: "Include only items with this game name in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature gameTypeListInput
+		private static Feature _gameTypeListInput
 		{
 			get
 			{
@@ -1585,7 +1585,7 @@ namespace SabreTools
 Possible values are: None, Bios, Device, Mechanical");
 			}
 		}
-		private static Feature itemNameListInput
+		private static Feature _itemNameListInput
 		{
 			get
 			{
@@ -1597,7 +1597,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items with this item name in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature itemTypeListInput
+		private static Feature _itemTypeListInput
 		{
 			get
 			{
@@ -1609,7 +1609,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items with this item type in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature md5ListInput
+		private static Feature _md5ListInput
 		{
 			get
 			{
@@ -1621,7 +1621,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items with this MD5 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notCrcListInput
+		private static Feature _notCrcListInput
 		{
 			get
 			{
@@ -1633,7 +1633,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this CRC hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notGameDescriptionListInput
+		private static Feature _notGameDescriptionListInput
 		{
 			get
 			{
@@ -1645,7 +1645,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this game description in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notGameNameListInput
+		private static Feature _notGameNameListInput
 		{
 			get
 			{
@@ -1657,7 +1657,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this game name in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notGameTypeListInput
+		private static Feature _notGameTypeListInput
 		{
 			get
 			{
@@ -1670,7 +1670,7 @@ Possible values are: None, Bios, Device, Mechanical");
 Possible values are: None, Bios, Device, Mechanical");
 			}
 		}
-		private static Feature notItemNameListInput
+		private static Feature _notItemNameListInput
 		{
 			get
 			{
@@ -1682,7 +1682,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this item name in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notItemTypeListInput
+		private static Feature _notItemTypeListInput
 		{
 			get
 			{
@@ -1694,7 +1694,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this item type in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notMd5ListInput
+		private static Feature _notMd5ListInput
 		{
 			get
 			{
@@ -1706,7 +1706,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this MD5 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notSha1ListInput
+		private static Feature _notSha1ListInput
 		{
 			get
 			{
@@ -1718,7 +1718,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this SHA-1 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notSha256ListInput
+		private static Feature _notSha256ListInput
 		{
 			get
 			{
@@ -1730,7 +1730,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this SHA-256 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notSha384ListInput
+		private static Feature _notSha384ListInput
 		{
 			get
 			{
@@ -1742,7 +1742,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this SHA-384 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notSha512ListInput
+		private static Feature _notSha512ListInput
 		{
 			get
 			{
@@ -1754,7 +1754,7 @@ Possible values are: None, Bios, Device, Mechanical");
 					longDescription: "Include only items without this SHA-512 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature notStatusListInput
+		private static Feature _notStatusListInput
 		{
 			get
 			{
@@ -1767,7 +1767,7 @@ Possible values are: None, Bios, Device, Mechanical");
 Possible values are: None, Good, BadDump, Nodump, Verified");
 			}
 		}
-		private static Feature outputTypeListInput
+		private static Feature _outputTypeListInput
 		{
 			get
 			{
@@ -1802,7 +1802,7 @@ Possible values are:
     xml, logiqx      - Logiqx XML");
 			}
 		}
-		private static Feature sha1ListInput
+		private static Feature _sha1ListInput
 		{
 			get
 			{
@@ -1814,7 +1814,7 @@ Possible values are:
 					longDescription: "Include only items with this SHA-1 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature sha256ListInput
+		private static Feature _sha256ListInput
 		{
 			get
 			{
@@ -1826,7 +1826,7 @@ Possible values are:
 					longDescription: "Include only items with this SHA-256 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature sha384ListInput
+		private static Feature _sha384ListInput
 		{
 			get
 			{
@@ -1838,7 +1838,7 @@ Possible values are:
 					longDescription: "Include only items with this SHA-384 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature sha512ListInput
+		private static Feature _sha512ListInput
 		{
 			get
 			{
@@ -1850,7 +1850,7 @@ Possible values are:
 					longDescription: "Include only items with this SHA-512 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
 			}
 		}
-		private static Feature statusListInput
+		private static Feature _statusListInput
 		{
 			get
 			{
@@ -1868,7 +1868,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 
 		#region Private String features
 
-		private static Feature addExtensionStringInput
+		private static Feature _addExtensionStringInput
 		{
 			get
 			{
@@ -1880,7 +1880,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Add a postfix extension to each full item name.");
 			}
 		}
-		private static Feature authorStringInput
+		private static Feature _authorStringInput
 		{
 			get
 			{
@@ -1892,7 +1892,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the author header field for the output DAT(s)");
 			}
 		}
-		private static Feature categoryStringInput
+		private static Feature _categoryStringInput
 		{
 			get
 			{
@@ -1904,7 +1904,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the category header field for the output DAT(s)");
 			}
 		}
-		private static Feature commentStringInput
+		private static Feature _commentStringInput
 		{
 			get
 			{
@@ -1916,7 +1916,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the comment header field for the output DAT(s)");
 			}
 		}
-		private static Feature dateStringInput
+		private static Feature _dateStringInput
 		{
 			get
 			{
@@ -1928,7 +1928,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the date header field for the output DAT(s)");
 			}
 		}
-		private static Feature descriptionStringInput
+		private static Feature _descriptionStringInput
 		{
 			get
 			{
@@ -1940,7 +1940,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the description header field for the output DAT(s)");
 			}
 		}
-		private static Feature emailStringInput
+		private static Feature _emailStringInput
 		{
 			get
 			{
@@ -1952,7 +1952,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the email header field for the output DAT(s)");
 			}
 		}
-		private static Feature equalStringInput
+		private static Feature _equalStringInput
 		{
 			get
 			{
@@ -1964,7 +1964,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Only include items of this exact size in the output DAT. Users can specify either a regular integer number or a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192");
 			}
 		}
-		private static Feature filenameStringInput
+		private static Feature _filenameStringInput
 		{
 			get
 			{
@@ -1976,7 +1976,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					longDescription: "Set the external filename for the output DAT(s)");
 			}
 		}
-		private static Feature forcemergingStringInput
+		private static Feature _forcemergingStringInput
 		{
 			get
 			{
@@ -1989,7 +1989,7 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 Possible values are: None, Split, Merged, Nonmerged, Full");
 			}
 		}
-		private static Feature forcenodumpStringInput
+		private static Feature _forcenodumpStringInput
 		{
 			get
 			{
@@ -2002,7 +2002,7 @@ Possible values are: None, Split, Merged, Nonmerged, Full");
 Possible values are: None, Obsolete, Required, Ignore");
 			}
 		}
-		private static Feature forcepackingStringInput
+		private static Feature _forcepackingStringInput
 		{
 			get
 			{
@@ -2015,7 +2015,7 @@ Possible values are: None, Obsolete, Required, Ignore");
 Possible values are: None, Zip, Unzip");
 			}
 		}
-		private static Feature greaterStringInput
+		private static Feature _greaterStringInput
 		{
 			get
 			{
@@ -2027,7 +2027,7 @@ Possible values are: None, Zip, Unzip");
 					longDescription: "Only include items whose size is greater than or equal to this value in the output DAT. Users can specify either a regular integer number or a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192");
 			}
 		}
-		private static Feature headerStringInput
+		private static Feature _headerStringInput
 		{
 			get
 			{
@@ -2040,7 +2040,7 @@ Possible values are: None, Zip, Unzip");
 
 			}
 		}
-		private static Feature homepageStringInput
+		private static Feature _homepageStringInput
 		{
 			get
 			{
@@ -2052,7 +2052,7 @@ Possible values are: None, Zip, Unzip");
 					longDescription: "Set the homepage header field for the output DAT(s)");
 			}
 		}
-		private static Feature lessStringInput
+		private static Feature _lessStringInput
 		{
 			get
 			{
@@ -2064,7 +2064,7 @@ Possible values are: None, Zip, Unzip");
 					longDescription: "Only include items whose size is less than or equal to this value in the output DAT. Users can specify either a regular integer number or a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192");
 			}
 		}
-		private static Feature nameStringInput
+		private static Feature _nameStringInput
 		{
 			get
 			{
@@ -2076,7 +2076,7 @@ Possible values are: None, Zip, Unzip");
 					longDescription: "Set the name header field for the output DAT(s)");
 			}
 		}
-		private static Feature outputDirStringInput
+		private static Feature _outputDirStringInput
 		{
 			get
 			{
@@ -2088,7 +2088,7 @@ Possible values are: None, Zip, Unzip");
 					longDescription: "This sets an output folder to be used when the files are created. If a path is not defined, the runtime directory is used instead.");
 			}
 		}
-		private static Feature postfixStringInput
+		private static Feature _postfixStringInput
 		{
 			get
 			{
@@ -2113,7 +2113,7 @@ Some special strings that can be used:
 - %size% - Replaced with the size");
 			}
 		}
-		private static Feature prefixStringInput
+		private static Feature _prefixStringInput
 		{
 			get
 			{
@@ -2138,7 +2138,7 @@ Some special strings that can be used:
 - %size% - Replaced with the size");
 			}
 		}
-		private static Feature replaceExtensionStringInput
+		private static Feature _replaceExtensionStringInput
 		{
 			get
 			{
@@ -2150,7 +2150,7 @@ Some special strings that can be used:
 					longDescription: "When an extension exists, replace it with the provided instead.");
 			}
 		}
-		private static Feature rootStringInput
+		private static Feature _rootStringInput
 		{
 			get
 			{
@@ -2162,7 +2162,7 @@ Some special strings that can be used:
 					longDescription: "Set the rootdir (as used by SuperDAT mode) for the output DAT(s).");
 			}
 		}
-		private static Feature rootDirStringInput
+		private static Feature _rootDirStringInput
 		{
 			get
 			{
@@ -2174,7 +2174,7 @@ Some special strings that can be used:
 					longDescription: "In the case that the files will not be stored from the root directory, a new root can be set for path length calculations.");
 			}
 		}
-		private static Feature tempStringInput
+		private static Feature _tempStringInput
 		{
 			get
 			{
@@ -2186,7 +2186,7 @@ Some special strings that can be used:
 					longDescription: "Optionally, a temp folder can be supplied in the case the default temp directory is not preferred.");
 			}
 		}
-		private static Feature urlStringInput
+		private static Feature _urlStringInput
 		{
 			get
 			{
@@ -2198,7 +2198,7 @@ Some special strings that can be used:
 					longDescription: "Set the URL header field for the output DAT(s)");
 			}
 		}
-		private static Feature versionStringInput
+		private static Feature _versionStringInput
 		{
 			get
 			{
@@ -2267,64 +2267,64 @@ Some special strings that can be used:
 				"Create DAT(s) from an input directory",
 				FeatureType.Flag,
 				longDescription: "Create a DAT file from an input directory or set of files. By default, this will output a DAT named based on the input directory and the current date. It will also treat all archives as possible games and add all three hashes (CRC, MD5, SHA-1) for each file.");
-			datFromDir.AddFeature(skipMd5Flag);
-			datFromDir.AddFeature(skipSha1Flag);
-			datFromDir.AddFeature(skipSha256Flag);
-			datFromDir.AddFeature(skipSha384Flag);
-			datFromDir.AddFeature(skipSha512Flag);
-			datFromDir.AddFeature(noAutomaticDateFlag);
-			datFromDir.AddFeature(forcepackingStringInput);
-			datFromDir.AddFeature(archivesAsFilesFlag);
+			datFromDir.AddFeature(_skipMd5Flag);
+			datFromDir.AddFeature(_skipSha1Flag);
+			datFromDir.AddFeature(_skipSha256Flag);
+			datFromDir.AddFeature(_skipSha384Flag);
+			datFromDir.AddFeature(_skipSha512Flag);
+			datFromDir.AddFeature(_noAutomaticDateFlag);
+			datFromDir.AddFeature(_forcepackingStringInput);
+			datFromDir.AddFeature(_archivesAsFilesFlag);
 			// NEW
-			datFromDir.AddFeature(outputTypeListInput);
-				datFromDir[outputTypeListInput.Name].AddFeature(depreciatedFlag);
+			datFromDir.AddFeature(_outputTypeListInput);
+				datFromDir[_outputTypeListInput.Name].AddFeature(_depreciatedFlag);
 			// OLD
-			datFromDir.AddFeature(outputAllFlag);
-			datFromDir.AddFeature(outputAttractmodeFlag);
-			datFromDir.AddFeature(outputCmpFlag);
-			datFromDir.AddFeature(outputCsvFlag);
-			datFromDir.AddFeature(outputDoscenterFlag);
-			datFromDir.AddFeature(outputListromFlag);
-			datFromDir.AddFeature(outputListxmlFlag);
-			datFromDir.AddFeature(outputMissFlag);
-			datFromDir.AddFeature(outputMd5Flag);
-			datFromDir.AddFeature(outputOfflinelistFlag);
-			datFromDir.AddFeature(outputRomcenterFlag);
-			datFromDir.AddFeature(outputSabredatFlag);
-			datFromDir.AddFeature(outputSfvFlag);
-			datFromDir.AddFeature(outputSha1Flag);
-			datFromDir.AddFeature(outputSha256Flag);
-			datFromDir.AddFeature(outputSha384Flag);
-			datFromDir.AddFeature(outputSha512Flag);
-			datFromDir.AddFeature(outputSoftwarelistFlag);
-			datFromDir.AddFeature(outputSsvFlag);
-			datFromDir.AddFeature(outputTsvFlag);
-			datFromDir.AddFeature(outputXmlFlag);
-				datFromDir[outputXmlFlag].AddFeature(depreciatedFlag);
-			datFromDir.AddFeature(rombaFlag);
-			datFromDir.AddFeature(skipArchivesFlag);
-			datFromDir.AddFeature(skipFilesFlag);
-			datFromDir.AddFeature(filenameStringInput);
-			datFromDir.AddFeature(nameStringInput);
-			datFromDir.AddFeature(descriptionStringInput);
-			datFromDir.AddFeature(categoryStringInput);
-			datFromDir.AddFeature(versionStringInput);
-			datFromDir.AddFeature(authorStringInput);
-			datFromDir.AddFeature(emailStringInput);
-			datFromDir.AddFeature(homepageStringInput);
-			datFromDir.AddFeature(urlStringInput);
-			datFromDir.AddFeature(commentStringInput);
-			datFromDir.AddFeature(superdatFlag);
-			datFromDir.AddFeature(excludeOfFlag);
-			datFromDir.AddFeature(sceneDateStripFlag);
-			datFromDir.AddFeature(addBlankFilesFlag);
-			datFromDir.AddFeature(addDateFlag);
-			datFromDir.AddFeature(copyFilesFlag);
-			datFromDir.AddFeature(headerStringInput);
-			datFromDir.AddFeature(chdsAsFilesFlag);
-			datFromDir.AddFeature(tempStringInput);
-			datFromDir.AddFeature(outputDirStringInput);
-			datFromDir.AddFeature(threadsInt32Input);
+			datFromDir.AddFeature(_outputAllFlag);
+			datFromDir.AddFeature(_outputAttractmodeFlag);
+			datFromDir.AddFeature(_outputCmpFlag);
+			datFromDir.AddFeature(_outputCsvFlag);
+			datFromDir.AddFeature(_outputDoscenterFlag);
+			datFromDir.AddFeature(_outputListromFlag);
+			datFromDir.AddFeature(_outputListxmlFlag);
+			datFromDir.AddFeature(_outputMissFlag);
+			datFromDir.AddFeature(_outputMd5Flag);
+			datFromDir.AddFeature(_outputOfflinelistFlag);
+			datFromDir.AddFeature(_outputRomcenterFlag);
+			datFromDir.AddFeature(_outputSabredatFlag);
+			datFromDir.AddFeature(_outputSfvFlag);
+			datFromDir.AddFeature(_outputSha1Flag);
+			datFromDir.AddFeature(_outputSha256Flag);
+			datFromDir.AddFeature(_outputSha384Flag);
+			datFromDir.AddFeature(_outputSha512Flag);
+			datFromDir.AddFeature(_outputSoftwarelistFlag);
+			datFromDir.AddFeature(_outputSsvFlag);
+			datFromDir.AddFeature(_outputTsvFlag);
+			datFromDir.AddFeature(_outputXmlFlag);
+				datFromDir[_outputXmlFlag].AddFeature(_depreciatedFlag);
+			datFromDir.AddFeature(_rombaFlag);
+			datFromDir.AddFeature(_skipArchivesFlag);
+			datFromDir.AddFeature(_skipFilesFlag);
+			datFromDir.AddFeature(_filenameStringInput);
+			datFromDir.AddFeature(_nameStringInput);
+			datFromDir.AddFeature(_descriptionStringInput);
+			datFromDir.AddFeature(_categoryStringInput);
+			datFromDir.AddFeature(_versionStringInput);
+			datFromDir.AddFeature(_authorStringInput);
+			datFromDir.AddFeature(_emailStringInput);
+			datFromDir.AddFeature(_homepageStringInput);
+			datFromDir.AddFeature(_urlStringInput);
+			datFromDir.AddFeature(_commentStringInput);
+			datFromDir.AddFeature(_superdatFlag);
+			datFromDir.AddFeature(_excludeOfFlag);
+			datFromDir.AddFeature(_sceneDateStripFlag);
+			datFromDir.AddFeature(_addBlankFilesFlag);
+			datFromDir.AddFeature(_addDateFlag);
+			datFromDir.AddFeature(_copyFilesFlag);
+			datFromDir.AddFeature(_headerStringInput);
+			datFromDir.AddFeature(_chdsAsFilesFlag);
+			datFromDir.AddFeature(_tempStringInput);
+			datFromDir.AddFeature(_outputDirStringInput);
+			datFromDir.AddFeature(_threadsInt32Input);
 
 			#endregion
 
@@ -2346,8 +2346,8 @@ The following systems have headers that this program can work with:
   - Nintendo Famicom Disk System
   - Nintendo Super Famicom / Super Nintendo Entertainment System
   - Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
-			extract.AddFeature(outputDirStringInput);
-			extract.AddFeature(noStoreHeaderFlag);
+			extract.AddFeature(_outputDirStringInput);
+			extract.AddFeature(_noStoreHeaderFlag);
 
 			#endregion
 
@@ -2369,7 +2369,7 @@ The following systems have headers that this program can work with:
   - Nintendo Famicom Disk System
   - Nintendo Super Famicom / Super Nintendo Entertainment System
   - Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
-			restore.AddFeature(outputDirStringInput);
+			restore.AddFeature(_outputDirStringInput);
 
 			#endregion
 
@@ -2381,38 +2381,38 @@ The following systems have headers that this program can work with:
 				"Sort inputs by a set of DATs",
 				FeatureType.Flag,
 				longDescription: "This feature allows the user to quickly rebuild based on a supplied DAT file(s). By default all files will be rebuilt to uncompressed folders in the output directory.");
-			sort.AddFeature(datListInput);
-			sort.AddFeature(outputDirStringInput);
-			sort.AddFeature(depotFlag);
-			sort.AddFeature(deleteFlag);
-			sort.AddFeature(inverseFlag);
-			sort.AddFeature(quickFlag);
-			sort.AddFeature(chdsAsFilesFlag);
-			sort.AddFeature(addDateFlag);
-			sort.AddFeature(torrent7zipFlag);
-			sort.AddFeature(tarFlag);
-			sort.AddFeature(torrentGzipFlag);
-				sort[torrentGzipFlag].AddFeature(rombaFlag);
-			sort.AddFeature(torrentLrzipFlag);
-			sort.AddFeature(torrentLz4Flag);
-			sort.AddFeature(torrentRarFlag);
-			sort.AddFeature(torrentXzFlag);
-			sort.AddFeature(torrentZipFlag);
-			sort.AddFeature(torrentZpaqFlag);
-			sort.AddFeature(torrentZstdFlag);
-			sort.AddFeature(headerStringInput);
-			sort.AddFeature(sevenZipInt32Input);
-			sort.AddFeature(gzInt32Input);
-			sort.AddFeature(rarInt32Input);
-			sort.AddFeature(zipInt32Input);
-			sort.AddFeature(scanAllFlag);
-			sort.AddFeature(datMergedFlag);
-			sort.AddFeature(datSplitFlag);
-			sort.AddFeature(datNonMergedFlag);
-			sort.AddFeature(datDeviceNonMergedFlag);
-			sort.AddFeature(datFullNonMergedFlag);
-			sort.AddFeature(updateDatFlag);
-			sort.AddFeature(threadsInt32Input);
+			sort.AddFeature(_datListInput);
+			sort.AddFeature(_outputDirStringInput);
+			sort.AddFeature(_depotFlag);
+			sort.AddFeature(_deleteFlag);
+			sort.AddFeature(_inverseFlag);
+			sort.AddFeature(_quickFlag);
+			sort.AddFeature(_chdsAsFilesFlag);
+			sort.AddFeature(_addDateFlag);
+			sort.AddFeature(_torrent7zipFlag);
+			sort.AddFeature(_tarFlag);
+			sort.AddFeature(_torrentGzipFlag);
+				sort[_torrentGzipFlag].AddFeature(_rombaFlag);
+			sort.AddFeature(_torrentLrzipFlag);
+			sort.AddFeature(_torrentLz4Flag);
+			sort.AddFeature(_torrentRarFlag);
+			sort.AddFeature(_torrentXzFlag);
+			sort.AddFeature(_torrentZipFlag);
+			sort.AddFeature(_torrentZpaqFlag);
+			sort.AddFeature(_torrentZstdFlag);
+			sort.AddFeature(_headerStringInput);
+			sort.AddFeature(_sevenZipInt32Input);
+			sort.AddFeature(_gzInt32Input);
+			sort.AddFeature(_rarInt32Input);
+			sort.AddFeature(_zipInt32Input);
+			sort.AddFeature(_scanAllFlag);
+			sort.AddFeature(_datMergedFlag);
+			sort.AddFeature(_datSplitFlag);
+			sort.AddFeature(_datNonMergedFlag);
+			sort.AddFeature(_datDeviceNonMergedFlag);
+			sort.AddFeature(_datFullNonMergedFlag);
+			sort.AddFeature(_updateDatFlag);
+			sort.AddFeature(_threadsInt32Input);
 
 			#endregion
 
@@ -2425,43 +2425,43 @@ The following systems have headers that this program can work with:
 				FeatureType.Flag,
 				longDescription: "This feature allows the user to split input DATs by a number of different possible criteria. See the individual input information for details. More than one split type is allowed at a time.");
 			// NEW
-			split.AddFeature(outputTypeListInput);
-				split[outputTypeListInput.Name].AddFeature(depreciatedFlag);
+			split.AddFeature(_outputTypeListInput);
+				split[_outputTypeListInput.Name].AddFeature(_depreciatedFlag);
 			// OLD
-			split.AddFeature(outputAllFlag);
-			split.AddFeature(outputAttractmodeFlag);
-			split.AddFeature(outputCmpFlag);
-			split.AddFeature(outputCsvFlag);
-			split.AddFeature(outputDoscenterFlag);
-			split.AddFeature(outputListromFlag);
-			split.AddFeature(outputListxmlFlag);
-			split.AddFeature(outputMissFlag);
-			split.AddFeature(outputMd5Flag);
-			split.AddFeature(outputOfflinelistFlag);
-			split.AddFeature(outputRomcenterFlag);
-			split.AddFeature(outputSabredatFlag);
-			split.AddFeature(outputSfvFlag);
-			split.AddFeature(outputSha1Flag);
-			split.AddFeature(outputSha256Flag);
-			split.AddFeature(outputSha384Flag);
-			split.AddFeature(outputSha512Flag);
-			split.AddFeature(outputSoftwarelistFlag);
-			split.AddFeature(outputSsvFlag);
-			split.AddFeature(outputTsvFlag);
-			split.AddFeature(outputXmlFlag);
-				split[outputXmlFlag].AddFeature(depreciatedFlag);
-			split.AddFeature(outputDirStringInput);
-			split.AddFeature(inplaceFlag);
-			split.AddFeature(extensionFlag);
-				split[extensionFlag].AddFeature(extaListInput);
-				split[extensionFlag].AddFeature(extbListInput);
-			split.AddFeature(hashFlag);
-			split.AddFeature(levelFlag);
-				split[levelFlag].AddFeature(shortFlag);
-				split[levelFlag].AddFeature(baseFlag);
-			split.AddFeature(sizeFlag);
-				split[sizeFlag].AddFeature(radixInt64Input);
-			split.AddFeature(typeFlag);
+			split.AddFeature(_outputAllFlag);
+			split.AddFeature(_outputAttractmodeFlag);
+			split.AddFeature(_outputCmpFlag);
+			split.AddFeature(_outputCsvFlag);
+			split.AddFeature(_outputDoscenterFlag);
+			split.AddFeature(_outputListromFlag);
+			split.AddFeature(_outputListxmlFlag);
+			split.AddFeature(_outputMissFlag);
+			split.AddFeature(_outputMd5Flag);
+			split.AddFeature(_outputOfflinelistFlag);
+			split.AddFeature(_outputRomcenterFlag);
+			split.AddFeature(_outputSabredatFlag);
+			split.AddFeature(_outputSfvFlag);
+			split.AddFeature(_outputSha1Flag);
+			split.AddFeature(_outputSha256Flag);
+			split.AddFeature(_outputSha384Flag);
+			split.AddFeature(_outputSha512Flag);
+			split.AddFeature(_outputSoftwarelistFlag);
+			split.AddFeature(_outputSsvFlag);
+			split.AddFeature(_outputTsvFlag);
+			split.AddFeature(_outputXmlFlag);
+				split[_outputXmlFlag].AddFeature(_depreciatedFlag);
+			split.AddFeature(_outputDirStringInput);
+			split.AddFeature(_inplaceFlag);
+			split.AddFeature(_extensionFlag);
+				split[_extensionFlag].AddFeature(_extaListInput);
+				split[_extensionFlag].AddFeature(_extbListInput);
+			split.AddFeature(_hashFlag);
+			split.AddFeature(_levelFlag);
+				split[_levelFlag].AddFeature(_shortFlag);
+				split[_levelFlag].AddFeature(_baseFlag);
+			split.AddFeature(_sizeFlag);
+				split[_sizeFlag].AddFeature(_radixInt64Input);
+			split.AddFeature(_typeFlag);
 
 			#endregion
 
@@ -2486,16 +2486,16 @@ The stats that are outputted are as follows:
 - Items that include a SHA-384
 - Items that include a SHA-512
 - Items with Nodump status");
-			stats.AddFeature(allStatsFlag);
-			stats.AddFeature(csvFlag);
-			stats.AddFeature(htmlFlag);
-			stats.AddFeature(tsvFlag);
-			stats.AddFeature(textFlag);
-			stats.AddFeature(filenameStringInput);
-			stats.AddFeature(outputDirStringInput);
-			stats.AddFeature(baddumpColumnFlag);
-			stats.AddFeature(nodumpColumnFlag);
-			stats.AddFeature(individualFlag);
+			stats.AddFeature(_allStatsFlag);
+			stats.AddFeature(_csvFlag);
+			stats.AddFeature(_htmlFlag);
+			stats.AddFeature(_tsvFlag);
+			stats.AddFeature(_textFlag);
+			stats.AddFeature(_filenameStringInput);
+			stats.AddFeature(_outputDirStringInput);
+			stats.AddFeature(_baddumpColumnFlag);
+			stats.AddFeature(_nodumpColumnFlag);
+			stats.AddFeature(_individualFlag);
 
 			#endregion
 
@@ -2508,168 +2508,168 @@ The stats that are outputted are as follows:
 				FeatureType.Flag,
 				longDescription: "This is the multitool part of the program, allowing for almost every manipulation to a DAT, or set of DATs. This is also a combination of many different programs that performed DAT manipulation that work better together.");
 			// NEW
-			update.AddFeature(outputTypeListInput);
-				update[outputTypeListInput].AddFeature(prefixStringInput);
-				update[outputTypeListInput].AddFeature(postfixStringInput);
-				update[outputTypeListInput].AddFeature(quotesFlag);
-				update[outputTypeListInput].AddFeature(romsFlag);
-				update[outputTypeListInput].AddFeature(gamePrefixFlag);
-				update[outputTypeListInput].AddFeature(addExtensionStringInput);
-				update[outputTypeListInput].AddFeature(replaceExtensionStringInput);
-				update[outputTypeListInput].AddFeature(removeExtensionsFlag);
-				update[outputTypeListInput].AddFeature(rombaFlag);
-				update[outputTypeListInput].AddFeature(depreciatedFlag);
+			update.AddFeature(_outputTypeListInput);
+				update[_outputTypeListInput].AddFeature(_prefixStringInput);
+				update[_outputTypeListInput].AddFeature(_postfixStringInput);
+				update[_outputTypeListInput].AddFeature(_quotesFlag);
+				update[_outputTypeListInput].AddFeature(_romsFlag);
+				update[_outputTypeListInput].AddFeature(_gamePrefixFlag);
+				update[_outputTypeListInput].AddFeature(_addExtensionStringInput);
+				update[_outputTypeListInput].AddFeature(_replaceExtensionStringInput);
+				update[_outputTypeListInput].AddFeature(_removeExtensionsFlag);
+				update[_outputTypeListInput].AddFeature(_rombaFlag);
+				update[_outputTypeListInput].AddFeature(_depreciatedFlag);
 			// OLD
-			update.AddFeature(outputAllFlag);
-			update.AddFeature(outputAttractmodeFlag);
-			update.AddFeature(outputCmpFlag);
-			update.AddFeature(outputCsvFlag);
-				update[outputCsvFlag].AddFeature(prefixStringInput);
-				update[outputCsvFlag].AddFeature(postfixStringInput);
-				update[outputCsvFlag].AddFeature(quotesFlag);
-			update.AddFeature(outputDoscenterFlag);
-			update.AddFeature(outputListromFlag);
-			update.AddFeature(outputListxmlFlag);
-			update.AddFeature(outputMissFlag);
-				update[outputMissFlag].AddFeature(romsFlag);
-				update[outputMissFlag].AddFeature(gamePrefixFlag);
-				update[outputMissFlag].AddFeature(prefixStringInput);
-				update[outputMissFlag].AddFeature(postfixStringInput);
-				update[outputMissFlag].AddFeature(quotesFlag);
-				update[outputMissFlag].AddFeature(addExtensionStringInput);
-				update[outputMissFlag].AddFeature(replaceExtensionStringInput);
-				update[outputMissFlag].AddFeature(removeExtensionsFlag);
-				update[outputMissFlag].AddFeature(rombaFlag);
-			update.AddFeature(outputMd5Flag);
-				update[outputMd5Flag].AddFeature(gamePrefixFlag);
-			update.AddFeature(outputOfflinelistFlag);
-			update.AddFeature(outputRomcenterFlag);
-			update.AddFeature(outputSabredatFlag);
-			update.AddFeature(outputSfvFlag);
-				update[outputSfvFlag].AddFeature(gamePrefixFlag);
-			update.AddFeature(outputSha1Flag);
-				update[outputSha1Flag].AddFeature(gamePrefixFlag);
-			update.AddFeature(outputSha256Flag);
-				update[outputSha256Flag].AddFeature(gamePrefixFlag);
-			update.AddFeature(outputSha384Flag);
-				update[outputSha384Flag].AddFeature(gamePrefixFlag);
-			update.AddFeature(outputSha512Flag);
-				update[outputSha512Flag].AddFeature(gamePrefixFlag);
-			update.AddFeature(outputSoftwarelistFlag);
-			update.AddFeature(outputSsvFlag);
-				update[outputSsvFlag].AddFeature(prefixStringInput);
-				update[outputSsvFlag].AddFeature(postfixStringInput);
-				update[outputSsvFlag].AddFeature(quotesFlag);
-			update.AddFeature(outputTsvFlag);
-				update[outputTsvFlag].AddFeature(prefixStringInput);
-				update[outputTsvFlag].AddFeature(postfixStringInput);
-				update[outputTsvFlag].AddFeature(quotesFlag);
-			update.AddFeature(outputXmlFlag);
-				update[outputXmlFlag].AddFeature(depreciatedFlag);
+			update.AddFeature(_outputAllFlag);
+			update.AddFeature(_outputAttractmodeFlag);
+			update.AddFeature(_outputCmpFlag);
+			update.AddFeature(_outputCsvFlag);
+				update[_outputCsvFlag].AddFeature(_prefixStringInput);
+				update[_outputCsvFlag].AddFeature(_postfixStringInput);
+				update[_outputCsvFlag].AddFeature(_quotesFlag);
+			update.AddFeature(_outputDoscenterFlag);
+			update.AddFeature(_outputListromFlag);
+			update.AddFeature(_outputListxmlFlag);
+			update.AddFeature(_outputMissFlag);
+				update[_outputMissFlag].AddFeature(_romsFlag);
+				update[_outputMissFlag].AddFeature(_gamePrefixFlag);
+				update[_outputMissFlag].AddFeature(_prefixStringInput);
+				update[_outputMissFlag].AddFeature(_postfixStringInput);
+				update[_outputMissFlag].AddFeature(_quotesFlag);
+				update[_outputMissFlag].AddFeature(_addExtensionStringInput);
+				update[_outputMissFlag].AddFeature(_replaceExtensionStringInput);
+				update[_outputMissFlag].AddFeature(_removeExtensionsFlag);
+				update[_outputMissFlag].AddFeature(_rombaFlag);
+			update.AddFeature(_outputMd5Flag);
+				update[_outputMd5Flag].AddFeature(_gamePrefixFlag);
+			update.AddFeature(_outputOfflinelistFlag);
+			update.AddFeature(_outputRomcenterFlag);
+			update.AddFeature(_outputSabredatFlag);
+			update.AddFeature(_outputSfvFlag);
+				update[_outputSfvFlag].AddFeature(_gamePrefixFlag);
+			update.AddFeature(_outputSha1Flag);
+				update[_outputSha1Flag].AddFeature(_gamePrefixFlag);
+			update.AddFeature(_outputSha256Flag);
+				update[_outputSha256Flag].AddFeature(_gamePrefixFlag);
+			update.AddFeature(_outputSha384Flag);
+				update[_outputSha384Flag].AddFeature(_gamePrefixFlag);
+			update.AddFeature(_outputSha512Flag);
+				update[_outputSha512Flag].AddFeature(_gamePrefixFlag);
+			update.AddFeature(_outputSoftwarelistFlag);
+			update.AddFeature(_outputSsvFlag);
+				update[_outputSsvFlag].AddFeature(_prefixStringInput);
+				update[_outputSsvFlag].AddFeature(_postfixStringInput);
+				update[_outputSsvFlag].AddFeature(_quotesFlag);
+			update.AddFeature(_outputTsvFlag);
+				update[_outputTsvFlag].AddFeature(_prefixStringInput);
+				update[_outputTsvFlag].AddFeature(_postfixStringInput);
+				update[_outputTsvFlag].AddFeature(_quotesFlag);
+			update.AddFeature(_outputXmlFlag);
+				update[_outputXmlFlag].AddFeature(_depreciatedFlag);
 			// End OLD
-			update.AddFeature(filenameStringInput);
-			update.AddFeature(nameStringInput);
-			update.AddFeature(descriptionStringInput);
-			update.AddFeature(rootStringInput);
-			update.AddFeature(categoryStringInput);
-			update.AddFeature(versionStringInput);
-			update.AddFeature(dateStringInput);
-			update.AddFeature(authorStringInput);
-			update.AddFeature(emailStringInput);
-			update.AddFeature(homepageStringInput);
-			update.AddFeature(urlStringInput);
-			update.AddFeature(commentStringInput);
-			update.AddFeature(headerStringInput);
-			update.AddFeature(superdatFlag);
-			update.AddFeature(forcemergingStringInput);
-			update.AddFeature(forcenodumpStringInput);
-			update.AddFeature(forcepackingStringInput);
-			update.AddFeature(excludeOfFlag);
-			update.AddFeature(keepEmptyGamesFlag);
-			update.AddFeature(sceneDateStripFlag);
-			update.AddFeature(cleanFlag);
-			update.AddFeature(removeUnicodeFlag);
-			update.AddFeature(removeMd5Flag);
-			update.AddFeature(removeSha1Flag);
-			update.AddFeature(removeSha256Flag);
-			update.AddFeature(removeSha384Flag);
-			update.AddFeature(removeSha512Flag);
-			update.AddFeature(descriptionAsNameFlag);
-			update.AddFeature(datMergedFlag);
-			update.AddFeature(datSplitFlag);
-			update.AddFeature(datNonMergedFlag);
-			update.AddFeature(datDeviceNonMergedFlag);
-			update.AddFeature(datFullNonMergedFlag);
-			update.AddFeature(trimFlag);
-				update[trimFlag].AddFeature(rootDirStringInput);
-			update.AddFeature(singleSetFlag);
-			update.AddFeature(dedupFlag);
-			update.AddFeature(gameDedupFlag);
-			update.AddFeature(mergeFlag);
-				update[mergeFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffAllFlag);
-				update[diffAllFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffDuplicatesFlag);
-				update[diffDuplicatesFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffIndividualsFlag);
-				update[diffIndividualsFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffNoDuplicatesFlag);
-				update[diffNoDuplicatesFlag].AddFeature(noAutomaticDateFlag);
-			update.AddFeature(diffAgainstFlag);
-				update[diffAgainstFlag].AddFeature(baseDatListInput);
-			update.AddFeature(baseReplaceFlag);
-				update[baseReplaceFlag].AddFeature(baseDatListInput);
-				update[baseReplaceFlag].AddFeature(updateNamesFlag);
-				update[baseReplaceFlag].AddFeature(updateHashesFlag);
-				update[baseReplaceFlag].AddFeature(updateDescriptionFlag);
-					update[baseReplaceFlag][updateDescriptionFlag].AddFeature(onlySameFlag);
-				update[baseReplaceFlag].AddFeature(updateYearFlag);
-				update[baseReplaceFlag].AddFeature(updateManufacturerFlag);
-			update.AddFeature(reverseBaseReplaceFlag);
-				update[reverseBaseReplaceFlag].AddFeature(baseDatListInput);
-				update[reverseBaseReplaceFlag].AddFeature(updateNamesFlag);
-				update[reverseBaseReplaceFlag].AddFeature(updateHashesFlag);
-				update[reverseBaseReplaceFlag].AddFeature(updateDescriptionFlag);
-					update[reverseBaseReplaceFlag][updateDescriptionFlag].AddFeature(onlySameFlag);
-				update[reverseBaseReplaceFlag].AddFeature(updateYearFlag);
-				update[reverseBaseReplaceFlag].AddFeature(updateManufacturerFlag);
-			update.AddFeature(diffCascadeFlag);
-				update[diffCascadeFlag].AddFeature(skipFirstOutputFlag);
-			update.AddFeature(diffReverseCascadeFlag);
-				update[diffReverseCascadeFlag].AddFeature(skipFirstOutputFlag);
-			update.AddFeature(gameNameListInput);
-			update.AddFeature(notGameNameListInput);
-			update.AddFeature(gameDescriptionListInput);
-			update.AddFeature(notGameDescriptionListInput);
-			update.AddFeature(matchOfTagsFlag);
-			update.AddFeature(itemNameListInput);
-			update.AddFeature(notItemNameListInput);
-			update.AddFeature(itemTypeListInput);
-			update.AddFeature(notItemTypeListInput);
-			update.AddFeature(greaterStringInput);
-			update.AddFeature(lessStringInput);
-			update.AddFeature(equalStringInput);
-			update.AddFeature(crcListInput);
-			update.AddFeature(notCrcListInput);
-			update.AddFeature(md5ListInput);
-			update.AddFeature(notMd5ListInput);
-			update.AddFeature(sha1ListInput);
-			update.AddFeature(notSha1ListInput);
-			update.AddFeature(sha256ListInput);
-			update.AddFeature(notSha256ListInput);
-			update.AddFeature(sha384ListInput);
-			update.AddFeature(notSha384ListInput);
-			update.AddFeature(sha512ListInput);
-			update.AddFeature(notSha512ListInput);
-			update.AddFeature(statusListInput);
-			update.AddFeature(notStatusListInput);
-			update.AddFeature(gameTypeListInput);
-			update.AddFeature(notGameTypeListInput);
-			update.AddFeature(runnableFlag);
-			update.AddFeature(notRunnableFlag);
-			update.AddFeature(outputDirStringInput);
-			update.AddFeature(inplaceFlag);
-			update.AddFeature(threadsInt32Input);
+			update.AddFeature(_filenameStringInput);
+			update.AddFeature(_nameStringInput);
+			update.AddFeature(_descriptionStringInput);
+			update.AddFeature(_rootStringInput);
+			update.AddFeature(_categoryStringInput);
+			update.AddFeature(_versionStringInput);
+			update.AddFeature(_dateStringInput);
+			update.AddFeature(_authorStringInput);
+			update.AddFeature(_emailStringInput);
+			update.AddFeature(_homepageStringInput);
+			update.AddFeature(_urlStringInput);
+			update.AddFeature(_commentStringInput);
+			update.AddFeature(_headerStringInput);
+			update.AddFeature(_superdatFlag);
+			update.AddFeature(_forcemergingStringInput);
+			update.AddFeature(_forcenodumpStringInput);
+			update.AddFeature(_forcepackingStringInput);
+			update.AddFeature(_excludeOfFlag);
+			update.AddFeature(_keepEmptyGamesFlag);
+			update.AddFeature(_sceneDateStripFlag);
+			update.AddFeature(_cleanFlag);
+			update.AddFeature(_removeUnicodeFlag);
+			update.AddFeature(_removeMd5Flag);
+			update.AddFeature(_removeSha1Flag);
+			update.AddFeature(_removeSha256Flag);
+			update.AddFeature(_removeSha384Flag);
+			update.AddFeature(_removeSha512Flag);
+			update.AddFeature(_descriptionAsNameFlag);
+			update.AddFeature(_datMergedFlag);
+			update.AddFeature(_datSplitFlag);
+			update.AddFeature(_datNonMergedFlag);
+			update.AddFeature(_datDeviceNonMergedFlag);
+			update.AddFeature(_datFullNonMergedFlag);
+			update.AddFeature(_trimFlag);
+				update[_trimFlag].AddFeature(_rootDirStringInput);
+			update.AddFeature(_singleSetFlag);
+			update.AddFeature(_dedupFlag);
+			update.AddFeature(_gameDedupFlag);
+			update.AddFeature(_mergeFlag);
+				update[_mergeFlag].AddFeature(_noAutomaticDateFlag);
+			update.AddFeature(_diffAllFlag);
+				update[_diffAllFlag].AddFeature(_noAutomaticDateFlag);
+			update.AddFeature(_diffDuplicatesFlag);
+				update[_diffDuplicatesFlag].AddFeature(_noAutomaticDateFlag);
+			update.AddFeature(_diffIndividualsFlag);
+				update[_diffIndividualsFlag].AddFeature(_noAutomaticDateFlag);
+			update.AddFeature(_diffNoDuplicatesFlag);
+				update[_diffNoDuplicatesFlag].AddFeature(_noAutomaticDateFlag);
+			update.AddFeature(_diffAgainstFlag);
+				update[_diffAgainstFlag].AddFeature(_baseDatListInput);
+			update.AddFeature(_baseReplaceFlag);
+				update[_baseReplaceFlag].AddFeature(_baseDatListInput);
+				update[_baseReplaceFlag].AddFeature(_updateNamesFlag);
+				update[_baseReplaceFlag].AddFeature(_updateHashesFlag);
+				update[_baseReplaceFlag].AddFeature(_updateDescriptionFlag);
+					update[_baseReplaceFlag][_updateDescriptionFlag].AddFeature(_onlySameFlag);
+				update[_baseReplaceFlag].AddFeature(_updateYearFlag);
+				update[_baseReplaceFlag].AddFeature(_updateManufacturerFlag);
+			update.AddFeature(_reverseBaseReplaceFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_baseDatListInput);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateNamesFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateHashesFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateDescriptionFlag);
+					update[_reverseBaseReplaceFlag][_updateDescriptionFlag].AddFeature(_onlySameFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateYearFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateManufacturerFlag);
+			update.AddFeature(_diffCascadeFlag);
+				update[_diffCascadeFlag].AddFeature(_skipFirstOutputFlag);
+			update.AddFeature(_diffReverseCascadeFlag);
+				update[_diffReverseCascadeFlag].AddFeature(_skipFirstOutputFlag);
+			update.AddFeature(_gameNameListInput);
+			update.AddFeature(_notGameNameListInput);
+			update.AddFeature(_gameDescriptionListInput);
+			update.AddFeature(_notGameDescriptionListInput);
+			update.AddFeature(_matchOfTagsFlag);
+			update.AddFeature(_itemNameListInput);
+			update.AddFeature(_notItemNameListInput);
+			update.AddFeature(_itemTypeListInput);
+			update.AddFeature(_notItemTypeListInput);
+			update.AddFeature(_greaterStringInput);
+			update.AddFeature(_lessStringInput);
+			update.AddFeature(_equalStringInput);
+			update.AddFeature(_crcListInput);
+			update.AddFeature(_notCrcListInput);
+			update.AddFeature(_md5ListInput);
+			update.AddFeature(_notMd5ListInput);
+			update.AddFeature(_sha1ListInput);
+			update.AddFeature(_notSha1ListInput);
+			update.AddFeature(_sha256ListInput);
+			update.AddFeature(_notSha256ListInput);
+			update.AddFeature(_sha384ListInput);
+			update.AddFeature(_notSha384ListInput);
+			update.AddFeature(_sha512ListInput);
+			update.AddFeature(_notSha512ListInput);
+			update.AddFeature(_statusListInput);
+			update.AddFeature(_notStatusListInput);
+			update.AddFeature(_gameTypeListInput);
+			update.AddFeature(_notGameTypeListInput);
+			update.AddFeature(_runnableFlag);
+			update.AddFeature(_notRunnableFlag);
+			update.AddFeature(_outputDirStringInput);
+			update.AddFeature(_inplaceFlag);
+			update.AddFeature(_threadsInt32Input);
 
 			#endregion
 
@@ -2681,18 +2681,18 @@ The stats that are outputted are as follows:
 				"Verify a folder against DATs",
 				FeatureType.Flag,
 				longDescription: "When used, this will use an input DAT or set of DATs to blindly check against an input folder. The base of the folder is considered the base for the combined DATs and games are either the directories or archives within. This will only do a direct verification of the items within and will create a fixdat afterwards for missing files.");
-			verify.AddFeature(datListInput);
-			verify.AddFeature(depotFlag);
-			verify.AddFeature(tempStringInput);
-			verify.AddFeature(hashOnlyFlag);
-			verify.AddFeature(quickFlag);
-			verify.AddFeature(headerStringInput);
-			verify.AddFeature(chdsAsFilesFlag);
-			verify.AddFeature(datMergedFlag);
-			verify.AddFeature(datSplitFlag);
-			verify.AddFeature(datDeviceNonMergedFlag);
-			verify.AddFeature(datNonMergedFlag);
-			verify.AddFeature(datFullNonMergedFlag);
+			verify.AddFeature(_datListInput);
+			verify.AddFeature(_depotFlag);
+			verify.AddFeature(_tempStringInput);
+			verify.AddFeature(_hashOnlyFlag);
+			verify.AddFeature(_quickFlag);
+			verify.AddFeature(_headerStringInput);
+			verify.AddFeature(_chdsAsFilesFlag);
+			verify.AddFeature(_datMergedFlag);
+			verify.AddFeature(_datSplitFlag);
+			verify.AddFeature(_datDeviceNonMergedFlag);
+			verify.AddFeature(_datNonMergedFlag);
+			verify.AddFeature(_datFullNonMergedFlag);
 
 			#endregion
 
