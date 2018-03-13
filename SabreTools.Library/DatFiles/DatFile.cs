@@ -2027,8 +2027,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		public void DiffCascade(List<string> inputs, List<DatFile> datHeaders, string outDir, bool inplace, bool skip)
 		{
-			string post = "";
-
 			// Create a list of DatData objects representing output files
 			List<DatFile> outDats = new List<DatFile>();
 
@@ -2050,12 +2048,12 @@ namespace SabreTools.Library.DatFiles
 				else
 				{
 					diffData = new DatFile(this);
-					diffData.FileName += post;
-					diffData.Name += post;
-					diffData.Description += post;
+					diffData.FileName += innerpost;
+					diffData.Name += innerpost;
+					diffData.Description += innerpost;
 				}
-				diffData.ResetDictionary();
 
+				diffData.ResetDictionary();
 				outDatsArray[j] = diffData;
 			});
 
@@ -2388,6 +2386,8 @@ namespace SabreTools.Library.DatFiles
 		public void DeleteDictionary()
 		{
 			_items = null;
+			_sortedBy = SortedBy.Default;
+			_mergedBy = DedupeType.None;
 
 			// Reset statistics
 			_datStats.Reset();
@@ -2399,6 +2399,8 @@ namespace SabreTools.Library.DatFiles
 		public void ResetDictionary()
 		{
 			_items = new SortedDictionary<string, List<DatItem>>();
+			_sortedBy = SortedBy.Default;
+			_mergedBy = DedupeType.None;
 
 			// Reset statistics
 			_datStats.Reset();
