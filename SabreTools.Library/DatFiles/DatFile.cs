@@ -6226,6 +6226,10 @@ Please check the log folder if the stats scrolled offscreen", false);
 			{
 				output.Add(StatReportFormat.HTML, CreateOutStatsNamesHelper(outDir, ".html", reportName, overwrite));
 			}
+			if ((statDatFormat & StatReportFormat.SSV) != 0)
+			{
+				output.Add(StatReportFormat.SSV, CreateOutStatsNamesHelper(outDir, ".ssv", reportName, overwrite));
+			}
 			if ((statDatFormat & StatReportFormat.TSV) != 0)
 			{
 				output.Add(StatReportFormat.TSV, CreateOutStatsNamesHelper(outDir, ".tsv", reportName, overwrite));

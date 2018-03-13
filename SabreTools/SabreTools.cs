@@ -205,6 +205,7 @@ namespace SabreTools
 						addFileDates = true;
 						break;
 					case "all-stats":
+						Globals.Logger.User("This flag '{0}' is depreciated, pleause use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
 						statDatFormat = StatReportFormat.All;
 						break;
 					case "archives-as-files":
@@ -229,6 +230,7 @@ namespace SabreTools
 						cleanGameNames = true;
 						break;
 					case "csv":
+						Globals.Logger.User("This flag '{0}' is depreciated, pleause use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
 						statDatFormat |= StatReportFormat.CSV;
 						break;
 					case "dat-device-non-merged":
@@ -306,6 +308,7 @@ namespace SabreTools
 						hashOnly = true;
 						break;
 					case "html":
+						Globals.Logger.User("This flag '{0}' is depreciated, pleause use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
 						statDatFormat |= StatReportFormat.HTML;
 						break;
 					case "individual":
@@ -521,6 +524,7 @@ namespace SabreTools
 						outputFormat = OutputFormat.TapeArchive;
 						break;
 					case "text":
+						Globals.Logger.User("This flag '{0}' is depreciated, pleause use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
 						statDatFormat |= StatReportFormat.Textfile;
 						break;
 					case "torrent-7zip":
@@ -554,6 +558,7 @@ namespace SabreTools
 						filter.Trim = true;
 						break;
 					case "tsv":
+						Globals.Logger.User("This flag '{0}' is depreciated, pleause use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
 						statDatFormat |= StatReportFormat.TSV;
 						break;
 					case "type":
@@ -701,6 +706,12 @@ namespace SabreTools
 							{
 								datHeader.DatFormat |= dftemp;
 							}
+						}
+						break;
+					case "report-type":
+						foreach (string rt in (List<string>)feat.Value.GetValue())
+						{
+							statDatFormat |= Utilities.GetStatFormat(rt);
 						}
 						break;
 					case "sha1":

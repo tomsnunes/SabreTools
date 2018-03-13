@@ -637,21 +637,38 @@ Options:
 	  - Items that include a SHA-512
 	  - Items with Nodump status
 
-	  -as, --all-stats			Write all statistics to all available formats
+	  -srt, --report-type		 Output statistics to a specified format
+		  Add outputting the created DAT to known format. Multiple instances
+		  of this flag are allowed.
+		  
+		  Possible values are:
+		  all			  - All available DAT types
+		  csv			  - Standardized Comma-Separated Value
+		  html			 - HTML webpage
+		  ssv			  - Standardized Semicolon-Separated Value
+		  text			 - Generic textfile
+		  tsv			  - Standardized Tab-Separated Value
+
+	  -as, --all-stats			Write all statistics to all available formats [DEPRECIATED]
 		  Output all statistical information to all available formats.
+		  [DEPRECIATED]
 
-	  -csv, --csv				 Output in Comma-Separated Value format
+	  -csv, --csv				 Output in Comma-Separated Value format [DEPRECIATED]
 		  Output all statistical information in standardized CSV format.
+		  [DEPRECIATED]
 
-	  -html, --html			   Output in HTML format
+	  -html, --html			   Output in HTML format [DEPRECIATED]
 		  Output all statistical information in standardized HTML format.
+		  [DEPRECIATED]
 
-	  -tsv, --tsv				 Output in Tab-Separated Value format
+	  -tsv, --tsv				 Output in Tab-Separated Value format [DEPRECIATED]
 		  Output all statistical information in standardized TSV format.
+		  [DEPRECIATED]
 
-	  -txt, --text				Output in generic text format
+	  -txt, --text				Output in generic text format [DEPRECIATED]
 		  Output all statistical information in generic text format. If no
 		  other format flags are enabled, this is the default output.
+		  [DEPRECIATED]
 
 	  -f, --filename			  Set the external name of the DAT
 		  Set the external filename for the output DAT(s)

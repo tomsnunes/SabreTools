@@ -273,9 +273,10 @@ namespace SabreTools.Library.Data
 		Textfile = 0x01,
 		HTML = Textfile << 1,
 		CSV = HTML << 1,
-		TSV = CSV << 1,
+		SSV = CSV << 1,
+		TSV = SSV << 1,
 
-		All = Textfile | HTML | CSV | TSV,
+		All = Textfile | HTML | CSV | SSV | TSV,
 	}
 
 	/// <summary>

@@ -558,6 +558,8 @@ namespace SabreTools.Library.Tools
 					return new Reports.SeparatedValue(null, filename, ',', baddumpCol, nodumpCol);
 				case StatReportFormat.HTML:
 					return new Html(null, filename, baddumpCol, nodumpCol);
+				case StatReportFormat.SSV:
+					return new Reports.SeparatedValue(null, filename, ';', baddumpCol, nodumpCol);
 				case StatReportFormat.TSV:
 					return new Reports.SeparatedValue(null, filename, '\t', baddumpCol, nodumpCol);
 			}
@@ -915,6 +917,32 @@ namespace SabreTools.Library.Tools
 				case "mech":
 				case "mechanical":
 					return MachineType.Mechanical;
+			}
+		}
+
+		/// <summary>
+		/// Get StatReportFormat value from input string
+		/// </summary>
+		/// <param name="input">String to get value from</param>
+		/// <returns>StatReportFormat value corresponding to the string</returns>
+		public static StatReportFormat GetStatFormat(string input)
+		{
+			switch (input?.Trim().ToLowerInvariant())
+			{
+				case "all":
+					return StatReportFormat.All;
+				case "csv":
+					return StatReportFormat.CSV;
+				case "html":
+					return StatReportFormat.HTML;
+				case "ssv":
+					return StatReportFormat.SSV;
+				case "text":
+					return StatReportFormat.Textfile;
+				case "tsv":
+					return StatReportFormat.TSV;
+				default:
+					return 0x0;
 			}
 		}
 

@@ -40,11 +40,11 @@ namespace SabreTools
 				return new Feature(
 					"all-stats",
 					new List<string>() { "-as", "--all-stats" },
-					"Write all statistics to all available formats",
+					"Write all statistics to all available formats [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "Output all statistical information to all available formats.");
+					longDescription: "Output all statistical information to all available formats. [DEPRECIATED]");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _archivesAsFilesFlag
 		{
 			get
@@ -136,11 +136,11 @@ namespace SabreTools
 				return new Feature(
 					"csv",
 					new List<string>() { "-csv", "--csv" },
-					"Output in Comma-Separated Value format",
+					"Output in Comma-Separated Value format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "Output all statistical information in standardized CSV format.");
+					longDescription: "Output all statistical information in standardized CSV format. [DEPRECIATED]");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _datDeviceNonMergedFlag
 		{
 			get
@@ -424,11 +424,11 @@ namespace SabreTools
 				return new Feature(
 					"html",
 					new List<string>() { "-html", "--html" },
-					"Output in HTML format",
+					"Output in HTML format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "Output all statistical information in standardized HTML format.");
+					longDescription: "Output all statistical information in standardized HTML format. [DEPRECIATED]");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _individualFlag
 		{
 			get
@@ -1168,11 +1168,11 @@ namespace SabreTools
 				return new Feature(
 					"text",
 					new List<string>() { "-txt", "--text" },
-					"Output in generic text format",
+					"Output in generic text format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "Output all statistical information in generic text format. If no other format flags are enabled, this is the default output.");
+					longDescription: "Output all statistical information in generic text format. If no other format flags are enabled, this is the default output. [DEPRECIATED]");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _torrent7zipFlag
 		{
 			get
@@ -1300,11 +1300,11 @@ namespace SabreTools
 				return new Feature(
 					"tsv",
 					new List<string>() { "-tsv", "--tsv" },
-					"Output in Tab-Separated Value format",
+					"Output in Tab-Separated Value format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "Output all statistical information in standardized TSV format.");
+					longDescription: "Output all statistical information in standardized TSV format. [DEPRECIATED]");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _typeFlag
 		{
 			get
@@ -1800,6 +1800,26 @@ Possible values are:
     ssv              - Standardized Semicolon-Separated Value
     tsv              - Standardized Tab-Separated Value
     xml, logiqx      - Logiqx XML");
+			}
+		}
+		private static Feature _reportTypeListInput
+		{
+			get
+			{
+				return new Feature(
+					"report-type",
+					new List<string>() { "-srt", "--report-type" },
+					"Output statistics to a specified format",
+					FeatureType.List,
+					longDescription: @"Add outputting the created DAT to known format. Multiple instances of this flag are allowed.
+
+Possible values are:
+    all              - All available DAT types
+    csv              - Standardized Comma-Separated Value
+    html             - HTML webpage
+    ssv              - Standardized Semicolon-Separated Value
+    text             - Generic textfile
+    tsv              - Standardized Tab-Separated Value");
 			}
 		}
 		private static Feature _sha1ListInput
@@ -2486,6 +2506,9 @@ The stats that are outputted are as follows:
 - Items that include a SHA-384
 - Items that include a SHA-512
 - Items with Nodump status");
+			// NEW
+			stats.AddFeature(_reportTypeListInput);
+			// OLD
 			stats.AddFeature(_allStatsFlag);
 			stats.AddFeature(_csvFlag);
 			stats.AddFeature(_htmlFlag);
