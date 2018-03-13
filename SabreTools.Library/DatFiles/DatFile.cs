@@ -2943,8 +2943,8 @@ namespace SabreTools.Library.DatFiles
 						Add(parent, item);
 					}
 
-					// Otherwise, if the parent doesn't already contain the non-disk, add it
-					else if (item.Type != ItemType.Disk && !this[parent].Contains(item))
+					// Otherwise, if the parent doesn't already contain the non-disk (or a merge-equivalent), add it
+					else if (item.Type != ItemType.Disk && !this[parent].Contains(item) && !this[parent].Select(i => i.Name).Contains(((Disk)item).MergeTag))
 					{
 						// Rename the child so it's in a subfolder
 						item.Name = item.MachineName + "\\" + item.Name;
