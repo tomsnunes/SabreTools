@@ -723,7 +723,9 @@ namespace SabreTools.Library.DatItems
 						// Roms have more infomration to save
 						if (file.Type == ItemType.Rom)
 						{
-							((Rom)saveditem).Size = ((Rom)saveditem).Size;
+							((Rom)saveditem).Size = (((Rom)saveditem).Size == -1 && ((Rom)file).Size != -1
+								? ((Rom)file).Size
+								: ((Rom)saveditem).Size);
 							((Rom)saveditem).CRC = (String.IsNullOrWhiteSpace(((Rom)saveditem).CRC) && !String.IsNullOrWhiteSpace(((Rom)file).CRC)
 								? ((Rom)file).CRC
 								: ((Rom)saveditem).CRC);
