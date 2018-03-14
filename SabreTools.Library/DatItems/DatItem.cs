@@ -784,6 +784,13 @@ namespace SabreTools.Library.DatItems
 							saveditem.Name = file.Name;
 						}
 
+						// If the current machine is a child of the new machine, use the new machine instead
+						if (saveditem.CloneOf == file.MachineName || saveditem.RomOf == file.MachineName)
+						{
+							saveditem.CopyMachineInformation(file);
+							saveditem.Name = file.Name;
+						}
+
 						break;
 					}
 				}
