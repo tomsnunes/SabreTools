@@ -1788,6 +1788,7 @@ Possible values are:
     lx, listxml      - MAME Listxml
     miss, missfile   - GoodTools Missfile
     md5              - MD5
+    msx, openmsx     - openMSX Software List
     ol, offlinelist  - OfflineList XML
     rc, romcenter    - RomCenter
     sd, sabredat     - SabreDat XML

@@ -99,6 +99,7 @@
     <Compile Include="DatFiles\Logiqx.cs" />
     <Compile Include="DatFiles\Missfile.cs" />
     <Compile Include="DatFiles\OfflineList.cs" />
+    <Compile Include="DatFiles\OpenMSX.cs" />
     <Compile Include="DatFiles\RomCenter.cs" />
     <Compile Include="DatFiles\SabreDat.cs" />
     <Compile Include="DatFiles\SeparatedValue.cs" />

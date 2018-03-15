@@ -199,9 +199,10 @@ namespace SabreTools.Library.Data
 		Listxml = SoftwareList << 1,
 		OfflineList = Listxml << 1,
 		SabreDat = OfflineList << 1,
+		OpenMSX = SabreDat << 1,
 
 		// Propietary Formats
-		ClrMamePro = SabreDat << 1,
+		ClrMamePro = OpenMSX << 1,
 		RomCenter = ClrMamePro << 1,
 		DOSCenter = RomCenter << 1,
 		AttractMode = DOSCenter << 1,

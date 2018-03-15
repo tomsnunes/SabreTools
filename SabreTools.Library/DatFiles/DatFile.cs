@@ -5750,6 +5750,28 @@ namespace SabreTools.Library.DatFiles
 				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".ol.xml", overwrite));
 			}
 
+			// openMSX
+			if (((DatFormat & DatFormat.OpenMSX) != 0)
+				&& (DatFormat & DatFormat.Logiqx) == 0
+				&& (DatFormat & DatFormat.LogiqxDepreciated) == 0
+				&& (DatFormat & DatFormat.Listxml) == 0
+				&& (DatFormat & DatFormat.SabreDat) == 0
+				&& (DatFormat & DatFormat.SoftwareList) == 0
+				&& (DatFormat & DatFormat.OfflineList) == 0)
+			{
+				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
+			if (((DatFormat & DatFormat.OpenMSX) != 0
+				&& ((DatFormat & DatFormat.Logiqx) != 0
+					|| (DatFormat & DatFormat.LogiqxDepreciated) != 0
+					|| (DatFormat & DatFormat.Listxml) != 0
+					|| (DatFormat & DatFormat.SabreDat) != 0
+					|| (DatFormat & DatFormat.SoftwareList) != 0
+					|| (DatFormat & DatFormat.OfflineList) != 0)))
+			{
+				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".msx.xml", overwrite));
+			}
+
 			// Redump MD5
 			if ((DatFormat & DatFormat.RedumpMD5) != 0)
 			{

@@ -425,6 +425,16 @@ namespace SabreTools.Library.Data
 		<!ELEMENT ramoption (#PCDATA)>
 			<!ATTLIST ramoption default CDATA #IMPLIED>
 ";
+		public const string OpenMSXDTD = @"<!ELEMENT softwaredb (person*)>
+<!ELEMENT software (title, genmsxid?, system, company,year,country,dump)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT genmsxid (#PCDATA)>
+<!ELEMENT system (#PCDATA)>
+<!ELEMENT company (#PCDATA)>
+<!ELEMENT year (#PCDATA)>
+<!ELEMENT country (#PCDATA)>
+<!ELEMENT dump (#PCDATA)>
+";
 		public const string SoftwareListDTD = @"<!ELEMENT softwarelist (software+)>
 	<!ATTLIST softwarelist name CDATA #REQUIRED>
 	<!ATTLIST softwarelist description CDATA #IMPLIED>

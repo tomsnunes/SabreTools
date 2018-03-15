@@ -218,6 +218,7 @@ Options:
 			  lx, listxml	   - MAME Listxml
 			  miss, missfile   - GoodTools Missfile
 			  md5			   - MD5
+			  msx, openmsx	   - openMSX Software List
 			  ol, offlinelist  - OfflineList XML
 			  rc, romcenter	   - RomCenter
 			  sd, sabredat	   - SabreDat XML
@@ -402,6 +403,7 @@ Options:
 			  lx, listxml	   - MAME Listxml
 			  miss, missfile   - GoodTools Missfile
 			  md5			   - MD5
+			  msx, openmsx	   - openMSX Software List
 			  ol, offlinelist  - OfflineList XML
 			  rc, romcenter	   - RomCenter
 			  sd, sabredat	   - SabreDat XML
@@ -700,27 +702,28 @@ Options:
 		  this flag are allowed.
 		  
 		  Possible values are:
-		  all			  - All available DAT types
-		  am, attractmode  - AttractMode XML
-		  cmp, clrmamepro  - ClrMamePro
-		  csv			  - Standardized Comma-Separated Value
-		  dc, doscenter	- DOSCenter
-		  lr, listrom	  - MAME Listrom
-		  lx, listxml	  - MAME Listxml
-		  miss, missfile   - GoodTools Missfile
-		  md5			  - MD5
-		  ol, offlinelist  - OfflineList XML
-		  rc, romcenter	- RomCenter
-		  sd, sabredat	 - SabreDat XML
-		  sfv			  - SFV
-		  sha1			 - SHA1
-		  sha256		   - SHA256
-		  sha384		   - SHA384
-		  sha512		   - SHA512
-		  sl, softwarelist - MAME Software List XML
-		  ssv			  - Standardized Semicolon-Separated Value
-		  tsv			  - Standardized Tab-Separated Value
-		  xml, logiqx	  - Logiqx XML
+			  all			   - All available DAT types
+			  am, attractmode  - AttractMode XML
+			  cmp, clrmamepro  - ClrMamePro
+			  csv			   - Standardized Comma-Separated Value
+			  dc, doscenter	   - DOSCenter
+			  lr, listrom	   - MAME Listrom
+			  lx, listxml	   - MAME Listxml
+			  miss, missfile   - GoodTools Missfile
+			  md5			   - MD5
+			  msx, openmsx	   - openMSX Software List
+			  ol, offlinelist  - OfflineList XML
+			  rc, romcenter	   - RomCenter
+			  sd, sabredat	   - SabreDat XML
+			  sfv			   - SFV
+			  sha1			   - SHA1
+			  sha256		   - SHA256
+			  sha384		   - SHA384
+			  sha512		   - SHA512
+			  sl, softwarelist - MAME Software List XML
+			  ssv			   - Standardized Semicolon-Separated Value
+			  tsv			   - Standardized Tab-Separated Value
+			  xml, logiqx	   - Logiqx XML
 
 		  -pre, --prefix			  Set prefix for all lines
 			  Set a generic prefix to be prepended to all outputted lines.

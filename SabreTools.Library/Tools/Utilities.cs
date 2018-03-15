@@ -633,6 +633,8 @@ namespace SabreTools.Library.Tools
 					return new Missfile(baseDat);
 				case DatFormat.OfflineList:
 					return new OfflineList(baseDat);
+				case DatFormat.OpenMSX:
+					return new OpenMSX(baseDat);
 				case DatFormat.RedumpMD5:
 					return new Hashfile(baseDat, Hash.MD5);
 				case DatFormat.RedumpSFV:
@@ -742,11 +744,14 @@ namespace SabreTools.Library.Tools
 				case "lx":
 				case "listxml":
 					return DatFormat.Listxml;
+				case "md5":
+					return DatFormat.RedumpMD5;
 				case "miss":
 				case "missfile":
 					return DatFormat.MissFile;
-				case "md5":
-					return DatFormat.RedumpMD5;
+				case "msx":
+				case "openmsx":
+					return DatFormat.OpenMSX;
 				case "ol":
 				case "offlinelist":
 					return DatFormat.OfflineList;
@@ -1181,6 +1186,10 @@ namespace SabreTools.Library.Tools
 						|| second.StartsWith("<m1"))
 					{
 						return DatFormat.Listxml;
+					}
+					else if (second.StartsWith("<!doctype softwaredb"))
+					{
+						return DatFormat.OpenMSX;
 					}
 					else if (second.StartsWith("<!doctype softwarelist"))
 					{
