@@ -632,7 +632,7 @@ Copyright 2004-2013 BlueMSX Team
 Copyright 2005-2018 openMSX Team
 Generation MSXIDs by www.generation-msx.nl
 
-]]>";
+]]>\n";
 
 				// Write the header out
 				sw.Write(header);
