@@ -296,6 +296,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// TODO: Make sure that this outputs proper values since only SHA-1 is included
 		private bool ReadRom(
 			XmlReader reader,
 			Machine machine,
@@ -369,6 +370,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// TODO: Make sure that this outputs proper values since only SHA-1 is included
 		private bool ReadMegaRom(
 			XmlReader reader,
 			Machine machine,
@@ -442,6 +444,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// TODO: Make sure that this outputs proper values since only SHA-1 is included
 		private bool ReadSccPlusCart(
 			XmlReader reader,
 			Machine machine,
