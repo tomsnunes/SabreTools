@@ -3265,8 +3265,21 @@ namespace SabreTools.Library.DatFiles
 				itemRom.SHA384 = Utilities.CleanHashData(itemRom.SHA384, Constants.SHA384Length);
 				itemRom.SHA512 = Utilities.CleanHashData(itemRom.SHA512, Constants.SHA512Length);
 
+				// If we have the case where there is SHA-1 and nothing else, we don't fill in any other part of the data
+				if (itemRom.Size == -1
+					&& String.IsNullOrWhiteSpace(itemRom.CRC)
+					&& String.IsNullOrWhiteSpace(itemRom.MD5)
+					&& !String.IsNullOrWhiteSpace(itemRom.SHA1)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA256)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA384)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA512))
+				{
+					// No-op, just catch it so it doesn't go further
+					Globals.Logger.Verbose("{0}: Entry with only SHA-1 found - '{1}'", FileName, itemRom.Name);
+				}
+
 				// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-				if ((itemRom.Size == 0 || itemRom.Size == -1)
+				else if ((itemRom.Size == 0 || itemRom.Size == -1)
 					&& ((itemRom.CRC == Constants.CRCZero || String.IsNullOrWhiteSpace(itemRom.CRC))
 						|| itemRom.MD5 == Constants.MD5Zero
 						|| itemRom.SHA1 == Constants.SHA1Zero

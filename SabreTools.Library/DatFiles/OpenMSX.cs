@@ -144,6 +144,7 @@ namespace SabreTools.Library.DatFiles
 			// Otherwise, add what is possible
 			reader.MoveToContent();
 
+			int diskno = 0;
 			bool containsItems = false;
 
 			// Create a new machine
@@ -183,7 +184,8 @@ namespace SabreTools.Library.DatFiles
 						reader.Read();
 						break;
 					case "dump":
-						containsItems = ReadDump(reader.ReadSubtree(), machine, filename, sysid, srcid, keep, clean, remUnicode);
+						containsItems = ReadDump(reader.ReadSubtree(), machine, diskno, filename, sysid, srcid, keep, clean, remUnicode);
+						diskno++;
 
 						// Skip the dump now that we've processed it
 						reader.Skip();
@@ -218,6 +220,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="reader">XmlReader representing a part block</param>
 		/// <param name="machine">Machine information to pass to contained items</param>
+		/// <param name="diskno">Disk number to use when outputting to other DAT formats</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -227,6 +230,7 @@ namespace SabreTools.Library.DatFiles
 		private bool ReadDump(
 			XmlReader reader,
 			Machine machine,
+			int diskno,
 
 			// Standard Dat parsing
 			string filename,
@@ -238,7 +242,6 @@ namespace SabreTools.Library.DatFiles
 			bool clean,
 			bool remUnicode)
 		{
-			string temptype = reader.Name;
 			bool containsItems = false;
 
 			while (!reader.EOF)
@@ -254,19 +257,19 @@ namespace SabreTools.Library.DatFiles
 				switch (reader.Name)
 				{
 					case "rom":
-						containsItems = ReadRom(reader.ReadSubtree(), machine, filename, sysid, srcid, keep, clean, remUnicode);
+						containsItems = ReadRom(reader.ReadSubtree(), machine, diskno, filename, sysid, srcid, keep, clean, remUnicode);
 
 						// Skip the rom now that we've processed it
 						reader.Skip();
 						break;
 					case "megarom":
-						containsItems = ReadMegaRom(reader.ReadSubtree(), machine, filename, sysid, srcid, keep, clean, remUnicode);
+						containsItems = ReadMegaRom(reader.ReadSubtree(), machine, diskno, filename, sysid, srcid, keep, clean, remUnicode);
 
 						// Skip the megarom now that we've processed it
 						reader.Skip();
 						break;
 					case "sccpluscart":
-						containsItems = ReadSccPlusCart(reader.ReadSubtree(), machine, filename, sysid, srcid, keep, clean, remUnicode);
+						containsItems = ReadSccPlusCart(reader.ReadSubtree(), machine, diskno, filename, sysid, srcid, keep, clean, remUnicode);
 
 						// Skip the sccpluscart now that we've processed it
 						reader.Skip();
@@ -288,18 +291,19 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read rom information
 		/// </summary>
-		/// <param name="reader">XmlReader representing a part block</param>
+		/// <param name="reader">XmlReader representing a rom block</param>
 		/// <param name="machine">Machine information to pass to contained items</param>
+		/// <param name="diskno">Disk number to use when outputting to other DAT formats</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// TODO: Make sure that this outputs proper values since only SHA-1 is included
 		private bool ReadRom(
 			XmlReader reader,
 			Machine machine,
+			int diskno,
 
 			// Standard Dat parsing
 			string filename,
@@ -348,8 +352,9 @@ namespace SabreTools.Library.DatFiles
 			// Create and add the new rom
 			Rom rom = new Rom
 			{
-				Name = machine.Name + (!String.IsNullOrWhiteSpace(remark) ? " " + remark : ""),
+				Name = machine.Name + "_" + diskno + (!String.IsNullOrWhiteSpace(remark) ? " " + remark : ""),
 				Offset = offset,
+				Size = -1,
 				SHA1 = Utilities.CleanHashData(hash, Constants.SHA1Length),
 			};
 
@@ -362,18 +367,19 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read megarom information
 		/// </summary>
-		/// <param name="reader">XmlReader representing a part block</param>
+		/// <param name="reader">XmlReader representing a megarom block</param>
 		/// <param name="machine">Machine information to pass to contained items</param>
+		/// <param name="diskno">Disk number to use when outputting to other DAT formats</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// TODO: Make sure that this outputs proper values since only SHA-1 is included
 		private bool ReadMegaRom(
 			XmlReader reader,
 			Machine machine,
+			int diskno,
 
 			// Standard Dat parsing
 			string filename,
@@ -422,8 +428,9 @@ namespace SabreTools.Library.DatFiles
 			// Create and add the new rom
 			Rom rom = new Rom
 			{
-				Name = machine.Name + (!String.IsNullOrWhiteSpace(remark) ? " " + remark : ""),
+				Name = machine.Name + "_" + diskno + (!String.IsNullOrWhiteSpace(remark) ? " " + remark : ""),
 				Offset = offset,
+				Size = -1,
 				SHA1 = Utilities.CleanHashData(hash, Constants.SHA1Length),
 			};
 
@@ -436,18 +443,19 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read sccpluscart information
 		/// </summary>
-		/// <param name="reader">XmlReader representing a part block</param>
+		/// <param name="reader">XmlReader representing a sccpluscart block</param>
 		/// <param name="machine">Machine information to pass to contained items</param>
+		/// <param name="diskno">Disk number to use when outputting to other DAT formats</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// TODO: Make sure that this outputs proper values since only SHA-1 is included
 		private bool ReadSccPlusCart(
 			XmlReader reader,
 			Machine machine,
+			int diskno,
 
 			// Standard Dat parsing
 			string filename,
@@ -493,7 +501,8 @@ namespace SabreTools.Library.DatFiles
 			// Create and add the new rom
 			Rom rom = new Rom
 			{
-				Name = machine.Name + (!String.IsNullOrWhiteSpace(remark) ? " " + remark : ""),
+				Name = machine.Name + "_" + diskno + (!String.IsNullOrWhiteSpace(remark) ? " " + remark : ""),
+				Size = -1,
 				SHA1 = Utilities.CleanHashData(hash, Constants.SHA1Length),
 			};
 
