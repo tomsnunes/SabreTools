@@ -1815,7 +1815,28 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("Replacing items in '{0}' from the base DAT", path.Split('¬')[0]);
 
 				// First we parse in the DAT internally
-				DatFile intDat = new DatFile();
+				DatFile intDat = new DatFile()
+				{
+					DatFormat = (this.DatFormat != 0 ? this.DatFormat : 0),
+
+					// Filtering that needs to be copied over
+					ExcludeOf = this.ExcludeOf,
+					OneRom = this.OneRom,
+					KeepEmptyGames = this.KeepEmptyGames,
+					SceneDateStrip = this.SceneDateStrip,
+					DedupeRoms = this.DedupeRoms,
+					StripHash = this.StripHash,
+					Prefix = this.Prefix,
+					Postfix = this.Postfix,
+					AddExtension = this.AddExtension,
+					ReplaceExtension = this.ReplaceExtension,
+					RemoveExtension = this.RemoveExtension,
+					Romba = this.Romba,
+					GameName = this.GameName,
+					Quotes = this.Quotes,
+					UseRomName = this.UseRomName,
+				};
+
 				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// If we are matching based on hashes of any sort
