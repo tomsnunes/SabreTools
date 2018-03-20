@@ -287,7 +287,12 @@ Options:
 	  -xof, --exclude-of		  Exclude romof, cloneof, sampleof tags
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
-		  
+
+	  -orpg, --one-rom-per-game   Try to ensure each rom has its own game
+		  In some cases, it is beneficial to have every rom put into its own
+		  output set as a subfolder of the original parent. This flag enables
+		  outputting each rom to its own game for this purpose.
+
 	  -keg, --keep-empty-games	  Keep originally empty sets from the input(s)
 		  Normally, any sets that are considered empty will not be included in
 		  the output, this flag allows these empty sets to be added to the
@@ -839,6 +844,11 @@ Options:
 	  -xof, --exclude-of		  Exclude romof, cloneof, sampleof tags
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
+
+	  -orpg, --one-rom-per-game   Try to ensure each rom has its own game
+		  In some cases, it is beneficial to have every rom put into its own
+		  output set as a subfolder of the original parent. This flag enables
+		  outputting each rom to its own game for this purpose.
 
 	  -sds, --scene-date-strip	Remove date from scene-named sets
 		  If this flag is enabled, sets with "scene" names will have the date

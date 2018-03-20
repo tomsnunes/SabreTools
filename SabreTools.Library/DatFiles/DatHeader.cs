@@ -32,6 +32,7 @@ namespace SabreTools.Library.DatFiles
 		private ForcePacking _forcePacking;
 		private DatFormat _datFormat;
 		private bool _excludeOf;
+		private bool _oneRom;
 		private bool _keepEmptyGames;
 		private bool _sceneDateStrip;
 		private DedupeType _dedupeRoms;
@@ -148,6 +149,11 @@ namespace SabreTools.Library.DatFiles
 			get { return _excludeOf; }
 			set { _excludeOf = value; }
 		}
+		public bool OneRom
+		{
+			get { return _oneRom; }
+			set { _oneRom = value; }
+		}
 		public bool KeepEmptyGames
 		{
 			get { return _keepEmptyGames; }
@@ -249,6 +255,7 @@ namespace SabreTools.Library.DatFiles
 				_forcePacking = this._forcePacking,
 				_datFormat = this._datFormat,
 				_excludeOf = this._excludeOf,
+				_oneRom = this._oneRom,
 				_keepEmptyGames = this._keepEmptyGames,
 				_sceneDateStrip = this._sceneDateStrip,
 				_dedupeRoms = this._dedupeRoms,

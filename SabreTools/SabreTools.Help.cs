@@ -561,6 +561,18 @@ namespace SabreTools
 					longDescription: "If filter or exclude by game name is used, this flag will allow those filters to be checked against the romof and cloneof tags as well. This can allow for more advanced set-building, especially in arcade-based sets.");
 			}
 		}
+		private static Feature _oneRomPerGameFlag
+		{
+			get
+			{
+				return new Feature(
+					"one-rom-per-game",
+					new List<string>() { "-orpg", "--one-rom-per-game" },
+					"Try to ensure each rom has its own game",
+					FeatureType.Flag,
+					longDescription: "In some cases, it is beneficial to have every rom put into its own output set as a subfolder of the original parent. This flag enables outputting each rom to its own game for this purpose.");
+			}
+		}
 		private static Feature _onlySameFlag
 		{
 			get
@@ -2361,6 +2373,7 @@ Some special strings that can be used:
 			datFromDir.AddFeature(_commentStringInput);
 			datFromDir.AddFeature(_superdatFlag);
 			datFromDir.AddFeature(_excludeOfFlag);
+			datFromDir.AddFeature(_oneRomPerGameFlag);
 			datFromDir.AddFeature(_sceneDateStripFlag);
 			datFromDir.AddFeature(_addBlankFilesFlag);
 			datFromDir.AddFeature(_addDateFlag);
@@ -2633,6 +2646,7 @@ The stats that are outputted are as follows:
 			update.AddFeature(_forcenodumpStringInput);
 			update.AddFeature(_forcepackingStringInput);
 			update.AddFeature(_excludeOfFlag);
+			update.AddFeature(_oneRomPerGameFlag);
 			update.AddFeature(_keepEmptyGamesFlag);
 			update.AddFeature(_sceneDateStripFlag);
 			update.AddFeature(_cleanFlag);

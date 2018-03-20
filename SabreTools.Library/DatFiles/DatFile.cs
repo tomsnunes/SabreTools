@@ -451,6 +451,27 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.ExcludeOf = value;
 			}
 		}
+		public bool OneRom
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.OneRom;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ExcludeOf = value;
+			}
+		}
 		public bool KeepEmptyGames
 		{
 			get
@@ -1721,23 +1742,24 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("Adding DAT: {0}", input.Split('¬')[0]);
 				datHeaders[i] = new DatFile()
 				{
-					DatFormat = (DatFormat != 0 ? DatFormat : 0),
+					DatFormat = (this.DatFormat != 0 ? this.DatFormat : 0),
 
 					// Filtering that needs to be copied over
-					ExcludeOf = ExcludeOf,
-					KeepEmptyGames = KeepEmptyGames,
-					SceneDateStrip = SceneDateStrip,
-					DedupeRoms = DedupeRoms,
-					StripHash = StripHash,
-					Prefix = Prefix,
-					Postfix = Postfix,
-					AddExtension = AddExtension,
-					ReplaceExtension = ReplaceExtension,
-					RemoveExtension = RemoveExtension,
-					Romba = Romba,
-					GameName = GameName,
-					Quotes = Quotes,
-					UseRomName = UseRomName,
+					ExcludeOf = this.ExcludeOf,
+					OneRom = this.OneRom,
+					KeepEmptyGames = this.KeepEmptyGames,
+					SceneDateStrip = this.SceneDateStrip,
+					DedupeRoms = this.DedupeRoms,
+					StripHash = this.StripHash,
+					Prefix = this.Prefix,
+					Postfix = this.Postfix,
+					AddExtension = this.AddExtension,
+					ReplaceExtension = this.ReplaceExtension,
+					RemoveExtension = this.RemoveExtension,
+					Romba = this.Romba,
+					GameName = this.GameName,
+					Quotes = this.Quotes,
+					UseRomName = this.UseRomName,
 				};
 
 				datHeaders[i].Parse(input, i, i, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
@@ -2490,6 +2512,22 @@ namespace SabreTools.Library.DatFiles
 			{
 				Globals.Logger.Warning(ex.ToString());
 			}
+		}
+
+		/// <summary>
+		/// Ensure that all roms are in their own game (or at least try to ensure)
+		/// </summary>
+		private void OneRomPerGame()
+		{
+			// For each rom, we want to update the game to be "<game name>/<rom name>"
+			Parallel.ForEach(Keys, Globals.ParallelOptions, key =>
+			{
+				List<DatItem> items = this[key];
+				for (int i = 0; i < items.Count; i++)
+				{
+					items[i].MachineName += "/" + items[i].Name;
+				}
+			});
 		}
 
 		/// <summary>
@@ -5584,6 +5622,12 @@ namespace SabreTools.Library.DatFiles
 			if (stats)
 			{
 				WriteStatsToScreen(recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
+			}
+
+			// Run the one rom per game logic, if required
+			if (OneRom)
+			{
+				OneRomPerGame();
 			}
 
 			// Bucket and dedupe according to the flag
