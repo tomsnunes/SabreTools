@@ -1024,6 +1024,14 @@ Options:
 				  will only be overwritten if they are the same as the machine
 				  names.
 
+		  -ugt, --update-game-type	  Update machine type from base DATs
+			  This flag enables updating of machine type from base DATs.
+			  [Both base-replace and reverse-base-replace]
+			 
+		  -up, --update-parents		  Update machine parents from base DATs
+			  This flag enables updating of machine parents (romof, cloneof,
+			  sampleof) from base DATs. [Both base-replace and reverse-base-replace]
+			 
 		  -uy, --update-year		  Update machine years from base DATs
 			  This flag enables updating of machine years from base DATs.
 			 [Both base-replace and reverse-base-replace]

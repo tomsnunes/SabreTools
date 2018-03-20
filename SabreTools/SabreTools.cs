@@ -570,6 +570,9 @@ namespace SabreTools
 					case "update-description":
 						replaceMode |= ReplaceMode.Description;
 						break;
+					case "update-game-type":
+						replaceMode |= ReplaceMode.MachineType;
+						break;
 					case "update-hashes":
 						replaceMode |= ReplaceMode.Hash;
 						break;
@@ -578,6 +581,9 @@ namespace SabreTools
 						break;
 					case "update-names":
 						replaceMode |= ReplaceMode.ItemName;
+						break;
+					case "update-parents":
+						replaceMode |= ReplaceMode.Parents;
 						break;
 					case "update-year":
 						replaceMode |= ReplaceMode.Year;

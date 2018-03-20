@@ -1341,6 +1341,18 @@ namespace SabreTools
 					longDescription: "This flag enables updating of machine descriptions from base DATs.");
 			}
 		}
+		private static Feature _updateGameTypeFlag
+		{
+			get
+			{
+				return new Feature(
+					"update-game-type",
+					new List<string>() { "-ugt", "--update-game-type" },
+					"Update machine type from base DATs",
+					FeatureType.Flag,
+					longDescription: "This flag enables updating of machine type from base DATs.");
+			}
+		}
 		private static Feature _updateHashesFlag
 		{
 			get
@@ -1375,6 +1387,18 @@ namespace SabreTools
 					"Update item names from base DATs",
 					FeatureType.Flag,
 					longDescription: "This flag enables updating of item names from base DATs.");
+			}
+		}
+		private static Feature _updateParentsFlag
+		{
+			get
+			{
+				return new Feature(
+					"update-parents",
+					new List<string>() { "-up", "--update-parents" },
+					"Update machine parents from base DATs",
+					FeatureType.Flag,
+					longDescription: "This flag enables updating of machine parents (romof, cloneof, sampleof) from base DATs.");
 			}
 		}
 		private static Feature _updateYearFlag
@@ -2647,16 +2671,20 @@ The stats that are outputted are as follows:
 				update[_baseReplaceFlag].AddFeature(_updateHashesFlag);
 				update[_baseReplaceFlag].AddFeature(_updateDescriptionFlag);
 					update[_baseReplaceFlag][_updateDescriptionFlag].AddFeature(_onlySameFlag);
+				update[_baseReplaceFlag].AddFeature(_updateGameTypeFlag);
 				update[_baseReplaceFlag].AddFeature(_updateYearFlag);
 				update[_baseReplaceFlag].AddFeature(_updateManufacturerFlag);
+				update[_baseReplaceFlag].AddFeature(_updateParentsFlag);
 			update.AddFeature(_reverseBaseReplaceFlag);
 				update[_reverseBaseReplaceFlag].AddFeature(_baseDatListInput);
 				update[_reverseBaseReplaceFlag].AddFeature(_updateNamesFlag);
 				update[_reverseBaseReplaceFlag].AddFeature(_updateHashesFlag);
 				update[_reverseBaseReplaceFlag].AddFeature(_updateDescriptionFlag);
 					update[_reverseBaseReplaceFlag][_updateDescriptionFlag].AddFeature(_onlySameFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateGameTypeFlag);
 				update[_reverseBaseReplaceFlag].AddFeature(_updateYearFlag);
 				update[_reverseBaseReplaceFlag].AddFeature(_updateManufacturerFlag);
+				update[_reverseBaseReplaceFlag].AddFeature(_updateParentsFlag);
 			update.AddFeature(_diffCascadeFlag);
 				update[_diffCascadeFlag].AddFeature(_skipFirstOutputFlag);
 			update.AddFeature(_diffReverseCascadeFlag);

@@ -1903,8 +1903,10 @@ namespace SabreTools.Library.DatFiles
 
 				// If we are matching based on names of any sort
 				if ((replaceMode & ReplaceMode.Description) != 0
+					|| (replaceMode & ReplaceMode.MachineType) != 0
 					|| (replaceMode & ReplaceMode.Year) != 0
-					|| (replaceMode & ReplaceMode.Manufacturer) != 0)
+					|| (replaceMode & ReplaceMode.Manufacturer) != 0
+					|| (replaceMode & ReplaceMode.Parents) != 0)
 				{
 					// For comparison's sake, we want to use Machine Name as the base ordering
 					BucketBy(SortedBy.Game, DedupeType.Full);
@@ -1928,6 +1930,10 @@ namespace SabreTools.Library.DatFiles
 										newDatItem.MachineDescription = this[key][0].MachineDescription;
 									}
 								}
+								if ((replaceMode & ReplaceMode.MachineType) != 0)
+								{
+									newDatItem.MachineType = this[key][0].MachineType;
+								}
 								if ((replaceMode & ReplaceMode.Year) != 0)
 								{
 									newDatItem.Year = this[key][0].Year;
@@ -1935,6 +1941,12 @@ namespace SabreTools.Library.DatFiles
 								if ((replaceMode & ReplaceMode.Manufacturer) != 0)
 								{
 									newDatItem.Manufacturer = this[key][0].Manufacturer;
+								}
+								if ((replaceMode & ReplaceMode.Parents) != 0)
+								{
+									newDatItem.CloneOf = this[key][0].CloneOf;
+									newDatItem.RomOf = this[key][0].RomOf;
+									newDatItem.SampleOf = this[key][0].SampleOf;
 								}
 							}
 

@@ -260,8 +260,10 @@ namespace SabreTools.Library.Data
 
 		// Sorted by machine name
 		Description = Hash << 1,
-		Year = Description << 1,
+		MachineType = Description << 1,
+		Year = MachineType << 1,
 		Manufacturer = Year << 1,
+		Parents = Manufacturer << 1,
 	}
 
 	/// <summary>
