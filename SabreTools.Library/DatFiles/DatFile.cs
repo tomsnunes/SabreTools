@@ -2898,8 +2898,7 @@ namespace SabreTools.Library.DatFiles
 						DatItem datItem = (DatItem)item.Clone();
 						newdevs.AddRange(datItem.Devices ?? new List<string>());
 						datItem.CopyMachineInformation(copyFrom);
-						if (this[game].Where(i => i.Name.ToLowerInvariant() == datItem.Name.ToLowerInvariant()).Count() == 0
-							&& !this[game].Contains(datItem))
+						if (this[game].Where(i => i.Name.ToLowerInvariant() == datItem.Name.ToLowerInvariant()).Count() == 0)
 						{
 							foundnew = true;
 							Add(game, datItem);
@@ -2938,8 +2937,7 @@ namespace SabreTools.Library.DatFiles
 							DatItem datItem = (DatItem)item.Clone();
 							newslotopts.AddRange(datItem.SlotOptions ?? new List<string>());
 							datItem.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name.ToLowerInvariant() == datItem.Name.ToLowerInvariant()).Count() == 0
-								&& !this[game].Contains(datItem))
+							if (this[game].Where(i => i.Name.ToLowerInvariant() == datItem.Name.ToLowerInvariant()).Count() == 0)
 							{
 								foundnew = true;
 								Add(game, datItem);
