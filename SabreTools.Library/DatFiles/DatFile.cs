@@ -1909,25 +1909,25 @@ namespace SabreTools.Library.DatFiles
 									else if (newDatItem.Type == ItemType.Disk)
 									{
 										Disk newDiskItem = (Disk)newDatItem;
-										if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
+										if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Disk)dupes[0]).MD5))
 										{
-											newDiskItem.MD5 = ((Rom)dupes[0]).MD5;
+											newDiskItem.MD5 = ((Disk)dupes[0]).MD5;
 										}
-										if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
+										if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA1))
 										{
-											newDiskItem.SHA1 = ((Rom)dupes[0]).SHA1;
+											newDiskItem.SHA1 = ((Disk)dupes[0]).SHA1;
 										}
-										if (String.IsNullOrEmpty(newDiskItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
+										if (String.IsNullOrEmpty(newDiskItem.SHA256) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA256))
 										{
-											newDiskItem.SHA256 = ((Rom)dupes[0]).SHA256;
+											newDiskItem.SHA256 = ((Disk)dupes[0]).SHA256;
 										}
-										if (String.IsNullOrEmpty(newDiskItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
+										if (String.IsNullOrEmpty(newDiskItem.SHA384) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA384))
 										{
-											newDiskItem.SHA384 = ((Rom)dupes[0]).SHA384;
+											newDiskItem.SHA384 = ((Disk)dupes[0]).SHA384;
 										}
-										if (String.IsNullOrEmpty(newDiskItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
+										if (String.IsNullOrEmpty(newDiskItem.SHA512) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA512))
 										{
-											newDiskItem.SHA512 = ((Rom)dupes[0]).SHA512;
+											newDiskItem.SHA512 = ((Disk)dupes[0]).SHA512;
 										}
 
 										newDatItem = (Disk)newDiskItem.Clone();
