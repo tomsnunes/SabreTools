@@ -2546,7 +2546,8 @@ namespace SabreTools.Library.DatFiles
 				List<DatItem> items = this[key];
 				for (int i = 0; i < items.Count; i++)
 				{
-					items[i].MachineName += "/" + items[i].Name;
+					string[] splitname = items[i].Name.Split('.');
+					items[i].MachineName += "/" + string.Join(".", splitname.Take(splitname.Length > 1 ? splitname.Length - 1 : 1));
 				}
 			});
 		}
