@@ -231,19 +231,16 @@ namespace SabreTools.Library.DatFiles
 			// If no items were found for this machine, add a Blank placeholder
 			if (!containsItems)
 			{
-				if (this.KeepEmptyGames)
+				Blank blank = new Blank()
 				{
-					Blank blank = new Blank()
-					{
-						SystemID = sysid,
-						System = filename,
-						SourceID = srcid,
-					};
-					blank.CopyMachineInformation(machine);
+					SystemID = sysid,
+					System = filename,
+					SourceID = srcid,
+				};
+				blank.CopyMachineInformation(machine);
 
-					// Now process and add the rom
-					ParseAddHelper(blank, clean, remUnicode);
-				}
+				// Now process and add the rom
+				ParseAddHelper(blank, clean, remUnicode);
 			}
 		}
 

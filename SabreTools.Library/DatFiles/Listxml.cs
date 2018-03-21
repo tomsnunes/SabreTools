@@ -185,6 +185,7 @@ namespace SabreTools.Library.DatFiles
 				RomOf = reader.GetAttribute("romof") ?? "",
 				SampleOf = reader.GetAttribute("sampleof") ?? "",
 				Devices = new List<string>(),
+				SlotOptions = new List<string>(),
 
 				MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
 			};
@@ -495,19 +496,16 @@ namespace SabreTools.Library.DatFiles
 			// If no items were found for this machine, add a Blank placeholder
 			if (!containsItems)
 			{
-				if (this.KeepEmptyGames)
+				Blank blank = new Blank()
 				{
-					Blank blank = new Blank()
-					{
-						SystemID = sysid,
-						System = filename,
-						SourceID = srcid,
-					};
-					blank.CopyMachineInformation(machine);
+					SystemID = sysid,
+					System = filename,
+					SourceID = srcid,
+				};
+				blank.CopyMachineInformation(machine);
 
-					// Now process and add the rom
-					ParseAddHelper(blank, clean, remUnicode);
-				}
+				// Now process and add the rom
+				ParseAddHelper(blank, clean, remUnicode);
 			}
 		}
 
@@ -539,12 +537,12 @@ namespace SabreTools.Library.DatFiles
 				// Get the roms from the machine
 				switch (reader.Name)
 				{
-					case "slotoption": // These get added as devices currently
+					case "slotoption":
 						// string slotoption_name = reader.GetAttribute("name");
 						string devname = reader.GetAttribute("devname");
-						if (!machine.Devices.Contains(devname))
+						if (!machine.SlotOptions.Contains(devname))
 						{
-							machine.Devices.Add(devname);
+							machine.SlotOptions.Add(devname);
 						}
 						// bool? slotoption_default = Utilities.GetYesNo(reader.GetAttribute("default"));
 						reader.Read();

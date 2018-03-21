@@ -462,14 +462,7 @@ namespace SabreTools.Library.DatFiles
 								break;
 							default:
 								// By default, create a new Blank, just in case
-								if (this.KeepEmptyGames)
-								{
-									datItem = new Blank();
-								}
-								else
-								{
-									datItem = null;
-								}
+								datItem = new Blank();
 								break;
 						}
 
