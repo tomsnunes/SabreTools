@@ -1838,6 +1838,7 @@ namespace SabreTools.Library.DatFiles
 				};
 
 				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+				filter.FilterDatFile(intDat);
 
 				// If we are matching based on hashes of any sort
 				if ((replaceMode & ReplaceMode.ItemName) != 0
@@ -2702,8 +2703,8 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			while (AddRomsFromDevices(true));
-			AddRomsFromDevices(false);
+			AddRomsFromDevices(false, false);
+			while (AddRomsFromDevices(true, false));
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
@@ -2724,8 +2725,8 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			while (AddRomsFromDevices(true));
-			AddRomsFromDevices(false);
+			while (AddRomsFromDevices(true, true));
+			AddRomsFromDevices(false, true);
 			AddRomsFromParent();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
@@ -2733,9 +2734,6 @@ namespace SabreTools.Library.DatFiles
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
-
-			// Finally, remove all sets that are labeled as bios or device
-			//RemoveBiosAndDeviceSets(logger);
 		}
 
 		/// <summary>
@@ -2853,10 +2851,11 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Use device_ref and slotoption tags to add roms to the children
+		/// Use device_ref and optionally slotoption tags to add roms to the children
 		/// </summary>
 		/// <param name="dev">True if only child device sets are touched, false for non-device sets (default)</param>
-		private bool AddRomsFromDevices(bool dev = false)
+		/// <param name="slotoptions">True if slotoptions tags are used as well, false otherwise</param>
+		private bool AddRomsFromDevices(bool dev = false, bool slotoptions = false)
 		{
 			bool foundnew = false;
 			List<string> games = Keys;
@@ -2875,7 +2874,10 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If the game has no devices, we continue
-				if (this[game][0].Devices == null || this[game][0].Devices.Count == 0)
+				if (this[game][0].Devices == null
+					|| this[game][0].Devices.Count == 0
+					|| (slotoptions && this[game][0].SlotOptions == null)
+					|| (slotoptions && this[game][0].SlotOptions.Count == 0))
 				{
 					continue;
 				}
@@ -2914,6 +2916,47 @@ namespace SabreTools.Library.DatFiles
 					if (!this[game][0].Devices.Contains(device))
 					{
 						this[game][0].Devices.Add(device);
+					}
+				}
+
+				// If we're checking slotoptions too
+				if (slotoptions)
+				{
+					// Determine if the game has any slotoptions or not
+					List<string> slotopts = this[game][0].SlotOptions;
+					List<string> newslotopts = new List<string>();
+					foreach (string slotopt in slotopts)
+					{
+						// If the slotoption doesn't exist then we continue
+						if (this[slotopt].Count == 0)
+						{
+							continue;
+						}
+
+						// Otherwise, copy the items from the slotoption to the current game
+						DatItem copyFrom = this[game][0];
+						List<DatItem> slotItems = this[slotopt];
+						foreach (DatItem item in slotItems)
+						{
+							DatItem datItem = (DatItem)item.Clone();
+							newslotopts.AddRange(datItem.SlotOptions ?? new List<string>());
+							datItem.CopyMachineInformation(copyFrom);
+							if (this[game].Where(i => i.Name.ToLowerInvariant() == datItem.Name.ToLowerInvariant()).Count() == 0
+								&& !this[game].Contains(datItem))
+							{
+								foundnew = true;
+								Add(game, datItem);
+							}
+						}
+					}
+
+					// Now that every slotoption is accounted for, add the new list of slotoptions, if they don't already exist
+					foreach (string slotopt in newslotopts)
+					{
+						if (!this[game][0].SlotOptions.Contains(slotopt))
+						{
+							this[game][0].SlotOptions.Add(slotopt);
+						}
 					}
 				}
 			}
@@ -3294,6 +3337,26 @@ namespace SabreTools.Library.DatFiles
 				case SplitType.Split:
 					CreateSplitSets(DedupeType.None);
 					break;
+			}
+
+			// Finally, we remove any blanks, if we aren't supposed to have any
+			if (!KeepEmptyGames)
+			{
+				foreach (string key in Keys)
+				{
+					List<DatItem> items = this[key];
+					List<DatItem> newitems = new List<DatItem>();
+					foreach (DatItem item in items)
+					{
+						if (item.Type != ItemType.Blank)
+						{
+							newitems.Add(item);
+						}
+					}
+
+					this.Remove(key);
+					this.AddRange(key, newitems);
+				}
 			}
 		}
 
