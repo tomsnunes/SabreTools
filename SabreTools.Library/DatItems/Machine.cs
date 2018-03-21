@@ -28,6 +28,7 @@ namespace SabreTools.Library.DatItems
 		public string Board;
 		public string RebuildTo;
 		public List<string> Devices;
+		public List<string> SlotOptions;
 		public List<Tuple<string, string>> Infos;
 		public MachineType MachineType;
 
@@ -55,6 +56,7 @@ namespace SabreTools.Library.DatItems
 			Board = null;
 			RebuildTo = null;
 			Devices = null;
+			SlotOptions = null;
 			Infos = null;
 			MachineType = MachineType.NULL;
 		}
@@ -81,6 +83,7 @@ namespace SabreTools.Library.DatItems
 			Board = null;
 			RebuildTo = null;
 			Devices = null;
+			SlotOptions = null;
 			Infos = null;
 			MachineType = MachineType.NULL;
 		}
@@ -112,6 +115,7 @@ namespace SabreTools.Library.DatItems
 				Board = this.Board,
 				RebuildTo = this.RebuildTo,
 				Devices = this.Devices,
+				SlotOptions = this.SlotOptions,
 				Infos = this.Infos,
 				MachineType = this.MachineType,
 			};

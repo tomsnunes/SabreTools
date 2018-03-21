@@ -339,6 +339,27 @@ namespace SabreTools.Library.DatItems
 				_machine.Devices = value;
 			}
 		}
+		public List<string> SlotOptions
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.SlotOptions;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.SlotOptions = value;
+			}
+		}
 		public MachineType MachineType
 		{
 			get
