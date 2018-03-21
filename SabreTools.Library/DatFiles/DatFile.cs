@@ -2708,9 +2708,6 @@ namespace SabreTools.Library.DatFiles
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
-
-			// Finally, remove all sets that are labeled as bios or device
-			//RemoveBiosAndDeviceSets(logger);
 		}
 
 		/// <summary>
