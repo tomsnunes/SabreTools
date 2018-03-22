@@ -56,20 +56,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.FileName;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.FileName = value;
 			}
 		}
@@ -77,20 +69,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Name;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Name = value;
 			}
 		}
@@ -98,20 +82,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Description;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Description = value;
 			}
 		}
@@ -119,20 +95,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.RootDir;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.RootDir = value;
 			}
 		}
@@ -140,20 +108,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Category;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Category = value;
 			}
 		}
@@ -161,20 +121,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Version;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Version = value;
 			}
 		}
@@ -182,20 +134,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Date;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Date = value;
 			}
 		}
@@ -203,20 +147,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Author;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Author = value;
 			}
 		}
@@ -224,20 +160,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Email;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Email = value;
 			}
 		}
@@ -245,20 +173,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Homepage;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Homepage = value;
 			}
 		}
@@ -266,20 +186,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Url;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Url = value;
 			}
 		}
@@ -287,20 +199,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Comment;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Comment = value;
 			}
 		}
@@ -308,20 +212,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Header;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Header = value;
 			}
 		}
@@ -329,20 +225,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Type;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Type = value;
 			}
 		}
@@ -350,20 +238,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.ForceMerging;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.ForceMerging = value;
 			}
 		}
@@ -371,20 +251,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.ForceNodump;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.ForceNodump = value;
 			}
 		}
@@ -392,20 +264,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.ForcePacking;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.ForcePacking = value;
 			}
 		}
@@ -413,20 +277,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.DatFormat;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.DatFormat = value;
 			}
 		}
@@ -434,20 +290,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.ExcludeOf;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.ExcludeOf = value;
 			}
 		}
@@ -455,20 +303,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.ExcludeFields;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.ExcludeFields = value;
 			}
 		}
@@ -476,41 +316,25 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.OneRom;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.ExcludeOf = value;
+				EnsureDatHeader();
+				_datHeader.OneRom = value;
 			}
 		}
 		public bool KeepEmptyGames
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.KeepEmptyGames;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.KeepEmptyGames = value;
 			}
 		}
@@ -518,20 +342,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.SceneDateStrip;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.SceneDateStrip = value;
 			}
 		}
@@ -539,20 +355,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.DedupeRoms;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.DedupeRoms = value;
 			}
 		}
@@ -560,20 +368,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.StripHash;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.StripHash = value;
 			}
 		}
@@ -591,20 +391,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Prefix;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Prefix = value;
 			}
 		}
@@ -612,20 +404,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Postfix;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Postfix = value;
 			}
 		}
@@ -633,20 +417,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.AddExtension;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.AddExtension = value;
 			}
 		}
@@ -654,20 +430,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.ReplaceExtension;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.ReplaceExtension = value;
 			}
 		}
@@ -675,20 +443,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.RemoveExtension;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.RemoveExtension = value;
 			}
 		}
@@ -696,20 +456,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Romba;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Romba = value;
 			}
 		}
@@ -717,20 +469,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.GameName;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.GameName = value;
 			}
 		}
@@ -738,20 +482,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.Quotes;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.Quotes = value;
 			}
 		}
@@ -761,20 +497,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				return _datHeader.UseRomName;
 			}
 			set
 			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
+				EnsureDatHeader();
 				_datHeader.UseRomName = value;
 			}
 		}
@@ -784,20 +512,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.ReportFormat;
 			}
 			set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.ReportFormat = value;
 			}
 		}
@@ -805,20 +525,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.Count;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.Count = value;
 			}
 		}
@@ -826,20 +538,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.ArchiveCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.ArchiveCount = value;
 			}
 		}
@@ -847,20 +551,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.BiosSetCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.BiosSetCount = value;
 			}
 		}
@@ -868,20 +564,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.DiskCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.DiskCount = value;
 			}
 		}
@@ -889,20 +577,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.ReleaseCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.ReleaseCount = value;
 			}
 		}
@@ -910,20 +590,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.RomCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.RomCount = value;
 			}
 		}
@@ -931,20 +603,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.SampleCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.SampleCount = value;
 			}
 		}
@@ -952,20 +616,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.TotalSize;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.TotalSize = value;
 			}
 		}
@@ -973,20 +629,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.CRCCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.CRCCount = value;
 			}
 		}
@@ -994,20 +642,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.MD5Count;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.MD5Count = value;
 			}
 		}
@@ -1015,20 +655,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.SHA1Count;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.SHA1Count = value;
 			}
 		}
@@ -1036,20 +668,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.SHA256Count;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.SHA256Count = value;
 			}
 		}
@@ -1057,20 +681,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.SHA384Count;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.SHA384Count = value;
 			}
 		}
@@ -1078,20 +694,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.SHA512Count;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.SHA512Count = value;
 			}
 		}
@@ -1099,20 +707,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.BaddumpCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.BaddumpCount = value;
 			}
 		}
@@ -1120,20 +720,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.GoodCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.GoodCount = value;
 			}
 		}
@@ -1141,20 +733,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.NodumpCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.NodumpCount = value;
 			}
 		}
@@ -1162,20 +746,12 @@ namespace SabreTools.Library.DatFiles
 		{
 			get
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				return _datStats.VerifiedCount;
 			}
 			private set
 			{
-				if (_datStats == null)
-				{
-					_datStats = new DatStats();
-				}
-
+				EnsureDatStats();
 				_datStats.VerifiedCount = value;
 			}
 		}
@@ -1413,7 +989,29 @@ namespace SabreTools.Library.DatFiles
 				Remove(key, item);
 			}
 		}
-		
+
+		/// <summary>
+		/// Ensure the DatHeader
+		/// </summary>
+		private void EnsureDatHeader()
+		{
+			if (_datHeader == null)
+			{
+				_datHeader = new DatHeader();
+			}
+		}
+
+		/// <summary>
+		/// Ensure the DatStats
+		/// </summary>
+		private void EnsureDatStats()
+		{
+			if (_datStats == null)
+			{
+				_datStats = new DatStats();
+			}
+		}
+
 		/// <summary>
 		/// Ensure the items dictionary
 		/// </summary>
