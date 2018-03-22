@@ -233,12 +233,12 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = (!ExcludeFields.Contains(Field.MachineName) ? rom.MachineName : "") + ";"
-							+ (!ExcludeFields.Contains(Field.Description) ? rom.MachineDescription : "") + ";"
+				string state = (!ExcludeFields[(int)Field.MachineName] ? rom.MachineName : "") + ";"
+							+ (!ExcludeFields[(int)Field.Description] ? rom.MachineDescription : "") + ";"
 							+ FileName + ";"
-							+ (!ExcludeFields.Contains(Field.CloneOf) ? rom.CloneOf : "") + ";"
-							+ (!ExcludeFields.Contains(Field.Year) ? rom.Year : "") + ";"
-							+ (!ExcludeFields.Contains(Field.Manufacturer) ? rom.Manufacturer : "") + ";"
+							+ (!ExcludeFields[(int)Field.CloneOf] ? rom.CloneOf : "") + ";"
+							+ (!ExcludeFields[(int)Field.Year] ? rom.Year : "") + ";"
+							+ (!ExcludeFields[(int)Field.Manufacturer] ? rom.Manufacturer : "") + ";"
 							/* + rom.Category */ + ";"
 							/* + rom.Players */ + ";"
 							/* + rom.Rotation */ + ";"
@@ -248,7 +248,7 @@ namespace SabreTools.Library.DatFiles
 							/* + rom.DisplayType */ + ";"
 							/* + rom.AltRomname */ + ";"
 							/* + rom.AltTitle */ + ";"
-							+ (!ExcludeFields.Contains(Field.Comment) ? rom.Comment : "") + ";"
+							+ (!ExcludeFields[(int)Field.Comment] ? rom.Comment : "") + ";"
 							/* + rom.Buttons */ + "\n";
 
 				sw.Write(state);
