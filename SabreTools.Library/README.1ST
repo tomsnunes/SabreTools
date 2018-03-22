@@ -288,6 +288,10 @@ Options:
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
 
+	  -ef, --exclude-field		  Exclude a game/rom field from outputs
+		  Exclude any valid item or machine field from outputs. Examples
+		  include: romof, publisher, and offset.
+
 	  -orpg, --one-rom-per-game   Try to ensure each rom has its own game
 		  In some cases, it is beneficial to have every rom put into its own
 		  output set as a subfolder of the original parent. This flag enables
@@ -844,6 +848,10 @@ Options:
 	  -xof, --exclude-of		  Exclude romof, cloneof, sampleof tags
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
+
+	  -ef, --exclude-field		  Exclude a game/rom field from outputs
+		  Exclude any valid item or machine field from outputs. Examples
+		  include: romof, publisher, and offset.
 
 	  -orpg, --one-rom-per-game   Try to ensure each rom has its own game
 		  In some cases, it is beneficial to have every rom put into its own

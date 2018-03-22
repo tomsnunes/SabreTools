@@ -356,7 +356,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					longDescription: "If this flag is enabled, then the romof, cloneof, and sampleof tags will be omitted from the outputted DAT.");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _extensionFlag
 		{
 			get
@@ -1571,7 +1571,7 @@ namespace SabreTools
 					FeatureType.List,
 					longDescription: "Exclude any valid item or machine field from outputs. Examples include: romof, publisher, and offset.");
 			}
-		} // TODO: ADD THIS TO USED FLAGS
+		}
 		private static Feature _extaListInput
 		{
 			get
@@ -2397,6 +2397,7 @@ Some special strings that can be used:
 			datFromDir.AddFeature(_commentStringInput);
 			datFromDir.AddFeature(_superdatFlag);
 			datFromDir.AddFeature(_excludeOfFlag);
+			datFromDir.AddFeature(_excludeFieldListInput);
 			datFromDir.AddFeature(_oneRomPerGameFlag);
 			datFromDir.AddFeature(_sceneDateStripFlag);
 			datFromDir.AddFeature(_addBlankFilesFlag);
@@ -2670,6 +2671,7 @@ The stats that are outputted are as follows:
 			update.AddFeature(_forcenodumpStringInput);
 			update.AddFeature(_forcepackingStringInput);
 			update.AddFeature(_excludeOfFlag);
+			update.AddFeature(_excludeFieldListInput);
 			update.AddFeature(_oneRomPerGameFlag);
 			update.AddFeature(_keepEmptyGamesFlag);
 			update.AddFeature(_sceneDateStripFlag);
