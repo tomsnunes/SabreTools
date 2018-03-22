@@ -455,18 +455,23 @@ namespace SabreTools
 						break;
 					case "remove-md5":
 						datHeader.StripHash |= Hash.MD5;
+						datHeader.ExcludeFields[(int)Field.MD5] = true;
 						break;
 					case "remove-sha1":
 						datHeader.StripHash |= Hash.SHA1;
+						datHeader.ExcludeFields[(int)Field.SHA1] = true;
 						break;
 					case "remove-sha256":
 						datHeader.StripHash |= Hash.SHA256;
+						datHeader.ExcludeFields[(int)Field.SHA256] = true;
 						break;
 					case "remove-sha384":
 						datHeader.StripHash |= Hash.SHA384;
+						datHeader.ExcludeFields[(int)Field.SHA384] = true;
 						break;
-					case "remremovesha512":
+					case "remove-sha512":
 						datHeader.StripHash |= Hash.SHA512;
+						datHeader.ExcludeFields[(int)Field.SHA512] = true;
 						break;
 					case "remove-unicode":
 						removeUnicode = true;
