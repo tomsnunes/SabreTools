@@ -814,7 +814,9 @@ namespace SabreTools.Library.DatFiles
 								+ (!ExcludeFields[(int)Field.MachineType] && (rom.MachineType & MachineType.Bios) != 0 ? " isbios=\"yes\"" : "")
 								+ (!ExcludeFields[(int)Field.MachineType] && (rom.MachineType & MachineType.Device) != 0 ? " isdevice=\"yes\"" : "")
 								+ (!ExcludeFields[(int)Field.MachineType] && (rom.MachineType & MachineType.Mechanical) != 0 ? " ismechanical=\"yes\"" : "")
-								+ (!ExcludeFields[(int)Field.Runnable] && rom.Runnable == true ? " runnable=\"yes\"" : (rom.Runnable == false ? " runnable=\"no\"" : ""))
+								+ (!ExcludeFields[(int)Field.Runnable] && rom.Runnable == true
+									? " runnable=\"yes\""
+									: (!ExcludeFields[(int)Field.Runnable] && rom.Runnable == false ? " runnable=\"no\"" : ""))
 								+ (!ExcludeFields[(int)Field.CloneOf] && !String.IsNullOrWhiteSpace(rom.CloneOf) && (rom.MachineName.ToLowerInvariant() != rom.CloneOf.ToLowerInvariant())
 									? " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\""
 									: "")
