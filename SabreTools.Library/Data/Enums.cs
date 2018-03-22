@@ -358,6 +358,68 @@
 	#region DatItem related
 
 	/// <summary>
+	/// List of valid field types within a DatItem/Machine
+	/// </summary>
+	public enum Field
+	{
+		NULL,
+
+		// Generic DatItem
+		Name,
+		PartName,
+		PartInterface,
+		Features,
+		AreaName,
+		AreaSize,
+
+		// Machine
+		MachineName,
+		Comment,
+		Description,
+		Year,
+		Manufacturer,
+		Publisher,
+		RomOf,
+		CloneOf,
+		SampleOf,
+		Supported,
+		SourceFile,
+		Runnable,
+		Board,
+		RebuildTo,
+		Devices,
+		SlotOptions,
+		Infos,
+		MachineType,
+
+		// BiosSet
+		Default,
+
+		// Disk
+		MD5,
+		SHA1,
+		SHA256,
+		SHA384,
+		SHA512,
+		Merge,
+		Region,
+		Index,
+		Writable,
+		Optional,
+		Status,
+
+		// Release
+		Language,
+		Date,
+
+		// Rom
+		Bios,
+		Size,
+		CRC,
+		Offset,
+	}
+
+	/// <summary>
 	/// Determine what type of file an item is
 	/// </summary>
 	public enum ItemType

@@ -118,6 +118,7 @@ namespace SabreTools
 			List<string> exta = new List<string>();
 			List<string> extb = new List<string>();
 			List<string> inputs = new List<string>();
+			List<Field> updateFields = new List<Field>();
 
 			// Get the first argument as a feature flag
 			string feature = args[0];
@@ -637,6 +638,12 @@ namespace SabreTools
 					case "dat":
 						datfiles.AddRange((List<string>)feat.Value.GetValue());
 						break;
+					case "exclude-field": // TODO: Use this
+						foreach (string field in (List<string>)feat.Value.GetValue())
+						{
+							datHeader.ExcludeFields.Add(Utilities.GetField(field));
+						}
+						break;
 					case "exta":
 						exta.AddRange((List<string>)feat.Value.GetValue());
 						break;
@@ -739,6 +746,12 @@ namespace SabreTools
 						foreach (string stat in (List<string>)feat.Value.GetValue())
 						{
 							filter.ItemStatuses |= Utilities.GetItemStatus(stat);
+						}
+						break;
+					case "update-field": // TODO: Use this
+						foreach (string field in (List<string>)feat.Value.GetValue())
+						{
+							updateFields.Add(Utilities.GetField(field));
 						}
 						break;
 

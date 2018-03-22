@@ -32,6 +32,7 @@ namespace SabreTools.Library.DatFiles
 		private ForcePacking _forcePacking;
 		private DatFormat _datFormat;
 		private bool _excludeOf;
+		private List<Field> _excludeFields;
 		private bool _oneRom;
 		private bool _keepEmptyGames;
 		private bool _sceneDateStrip;
@@ -149,6 +150,11 @@ namespace SabreTools.Library.DatFiles
 			get { return _excludeOf; }
 			set { _excludeOf = value; }
 		}
+		public List<Field> ExcludeFields
+		{
+			get { return _excludeFields; }
+			set { _excludeFields = value; }
+		}
 		public bool OneRom
 		{
 			get { return _oneRom; }
@@ -255,6 +261,7 @@ namespace SabreTools.Library.DatFiles
 				_forcePacking = this._forcePacking,
 				_datFormat = this._datFormat,
 				_excludeOf = this._excludeOf,
+				_excludeFields = this._excludeFields,
 				_oneRom = this._oneRom,
 				_keepEmptyGames = this._keepEmptyGames,
 				_sceneDateStrip = this._sceneDateStrip,

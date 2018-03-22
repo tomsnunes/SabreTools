@@ -451,6 +451,27 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.ExcludeOf = value;
 			}
 		}
+		public List<Field> ExcludeFields
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.ExcludeFields;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ExcludeFields = value;
+			}
+		}
 		public bool OneRom
 		{
 			get

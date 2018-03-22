@@ -787,6 +787,106 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get Field value from input string
+		/// </summary>
+		/// <param name="input">String to get value from</param>
+		/// <returns>Field value corresponding to the string</returns>
+		public static Field GetField(string input)
+		{
+			switch (input?.ToLowerInvariant())
+			{
+				case "areaname":
+					return Field.AreaName;
+				case "areasize":
+					return Field.AreaSize;
+				case "bios":
+					return Field.Bios;
+				case "board":
+					return Field.Board;
+				case "cloneof":
+					return Field.CloneOf;
+				case "comment":
+					return Field.Comment;
+				case "crc":
+					return Field.CRC;
+				case "default":
+					return Field.Default;
+				case "date":
+					return Field.Date;
+				case "description":
+					return Field.Description;
+				case "devices":
+					return Field.Devices;
+				case "features":
+					return Field.Features;
+				case "gamename":
+				case "machinename":
+					return Field.MachineName;
+				case "gametype":
+				case "machinetype":
+					return Field.MachineType;
+				case "index":
+					return Field.Index;
+				case "infos":
+					return Field.Infos;
+				case "language":
+					return Field.Language;
+				case "manufacturer":
+					return Field.Manufacturer;
+				case "md5":
+					return Field.MD5;
+				case "merge":
+					return Field.Merge;
+				case "name":
+					return Field.Name;
+				case "offset":
+					return Field.Offset;
+				case "optional":
+					return Field.Optional;
+				case "partinterface":
+					return Field.PartInterface;
+				case "partname":
+					return Field.PartName;
+				case "publisher":
+					return Field.Publisher;
+				case "rebuildto":
+					return Field.RebuildTo;
+				case "region":
+					return Field.Region;
+				case "romof":
+					return Field.RomOf;
+				case "runnable":
+					return Field.Runnable;
+				case "sampleof":
+					return Field.SampleOf;
+				case "sha1":
+					return Field.SHA1;
+				case "sha256":
+					return Field.SHA256;
+				case "sha384":
+					return Field.SHA384;
+				case "sha512":
+					return Field.SHA512;
+				case "size":
+					return Field.Size;
+				case "slotoptions":
+					return Field.SlotOptions;
+				case "sourcefile":
+					return Field.SourceFile;
+				case "status":
+					return Field.Status;
+				case "supported":
+					return Field.Supported;
+				case "writable":
+					return Field.Writable;
+				case "year":
+					return Field.Year;
+				default:
+					return Field.NULL;
+			}
+		}
+
+		/// <summary>
 		/// Get ForceMerging value from input string
 		/// </summary>
 		/// <param name="forcemerge">String to get value from</param>

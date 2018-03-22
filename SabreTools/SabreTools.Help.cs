@@ -1560,6 +1560,18 @@ namespace SabreTools
 					longDescription: "User-supplied DAT for use in all operations. Multiple instances of this flag are allowed.");
 			}
 		}
+		private static Feature _excludeFieldListInput 
+		{
+			get
+			{
+				return new Feature(
+					"exclude-field",
+					new List<string>() { "-ef", "--exclude-field" },
+					"Exclude a game/rom field from outputs",
+					FeatureType.List,
+					longDescription: "Exclude any valid item or machine field from outputs. Examples include: romof, publisher, and offset.");
+			}
+		} // TODO: ADD THIS TO USED FLAGS
 		private static Feature _extaListInput
 		{
 			get
@@ -1920,6 +1932,18 @@ Possible values are:
 Possible values are: None, Good, BadDump, Nodump, Verified");
 			}
 		}
+		private static Feature _updateFieldListInput
+		{
+			get
+			{
+				return new Feature(
+					"update-field",
+					new List<string>() { "-uf", "--update-field" },
+					"Update a game/rom field from base DAT(s)",
+					FeatureType.List,
+					longDescription: "Update any valid item or machine field from base DAT(s). Examples include: romof, publisher, and offset.");
+			}
+		} // TODO: ADD THIS TO USED FLAGS
 
 		#endregion
 
