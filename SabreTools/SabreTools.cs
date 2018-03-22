@@ -292,7 +292,9 @@ namespace SabreTools
 						break;
 					case "exclude-of": // TODO: Remove entire flag when transitioning to exclude-fields
 						datHeader.ExcludeFields[(int)Field.CloneOf] = true;
+						datHeader.ExcludeFields[(int)Field.MachineType] = true;
 						datHeader.ExcludeFields[(int)Field.RomOf] = true;
+						datHeader.ExcludeFields[(int)Field.Runnable] = true;
 						datHeader.ExcludeFields[(int)Field.SampleOf] = true;
 						break;
 					case "extension":
