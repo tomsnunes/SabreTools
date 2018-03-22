@@ -290,8 +290,12 @@ namespace SabreTools
 					case "diff-reverse-cascade":
 						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
-					case "exclude-of":
+					case "exclude-of": // TODO: Remove entire flag when transitioning to exclude-fields
 						datHeader.ExcludeOf = true;
+
+						datHeader.ExcludeFields.Add(Field.CloneOf);
+						datHeader.ExcludeFields.Add(Field.RomOf);
+						datHeader.ExcludeFields.Add(Field.SampleOf);
 						break;
 					case "extension":
 						splittingMode |= SplittingMode.Extension;
