@@ -345,21 +345,21 @@ namespace SabreTools.Library.DatFiles
 
 				if (rom.Type == ItemType.Rom)
 				{
-					state += "¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
-					"¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
-					"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
-					"¬" + HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
-					"¬" + HttpUtility.HtmlEncode(rom.Name) +
-					"¬" + ((Rom)rom).CRC.ToLowerInvariant() +
-					"¬" + (((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
+					state += "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
+					"¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
+					"¬" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(rom.MachineName) : "") +
+					"¬" + (!ExcludeFields[(int)Field.Description] ? HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) : "") +
+					"¬" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") +
+					"¬" + (!ExcludeFields[(int)Field.CRC] ? ((Rom)rom).CRC.ToLowerInvariant() : "") +
+					"¬" + (!ExcludeFields[(int)Field.Size] && ((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
 				}
 				else if (rom.Type == ItemType.Disk)
 				{
-					state += "¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
-					"¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
-					"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
-					"¬" + HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
-					"¬" + HttpUtility.HtmlEncode(rom.Name) +
+					state += "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
+					"¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
+					"¬" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(rom.MachineName) : "") +
+					"¬" + (!ExcludeFields[(int)Field.Description] ? HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) : "") +
+					"¬" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") +
 					"¬¬¬¬¬\n";
 				}
 

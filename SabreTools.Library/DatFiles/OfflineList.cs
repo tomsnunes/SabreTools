@@ -961,12 +961,12 @@ namespace SabreTools.Library.DatFiles
 				state += "\t\t<game>\n"
 							+ "\t\t\t<imageNumber>1</imageNumber>\n"
 							+ "\t\t\t<releaseNumber>1</releaseNumber>\n"
-							+ "\t\t\t<title>" + HttpUtility.HtmlEncode(rom.Name) + "</title>\n"
+							+ "\t\t\t<title>" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "</title>\n"
 							+ "\t\t\t<saveType>None</saveType>\n";
 
 				if (rom.Type == ItemType.Rom)
 				{
-					state += "\t\t\t<romSize>" + ((Rom)rom).Size + "</romSize>\n";
+					state += "\t\t\t<romSize>" + (!ExcludeFields[(int)Field.Size] ? ((Rom)rom).Size.ToString() : "") + "</romSize>\n";
 				}
 
 				state += "\t\t\t<publisher>None</publisher>\n"
@@ -978,8 +978,8 @@ namespace SabreTools.Library.DatFiles
 				{
 					state += "\t\t\t<files>\n"
 						+ (((Disk)rom).MD5 != null
-							? "\t\t\t\t<romMD5 extension=\".chd\">" + ((Disk)rom).MD5.ToUpperInvariant() + "</romMD5>\n"
-							: "\t\t\t\t<romSHA1 extension=\".chd\">" + ((Disk)rom).SHA1.ToUpperInvariant() + "</romSHA1>\n")
+							? "\t\t\t\t<romMD5 extension=\".chd\">" + (!ExcludeFields[(int)Field.MD5] ? ((Disk)rom).MD5.ToUpperInvariant() : "") + "</romMD5>\n"
+							: "\t\t\t\t<romSHA1 extension=\".chd\">" + (!ExcludeFields[(int)Field.SHA1] ? ((Disk)rom).SHA1.ToUpperInvariant() : "") + "</romSHA1>\n")
 						+ "\t\t\t</files>\n";
 				}
 				else if (rom.Type == ItemType.Rom)
@@ -988,10 +988,10 @@ namespace SabreTools.Library.DatFiles
 
 					state += "\t\t\t<files>\n"
 						+ (((Rom)rom).CRC != null
-							? "\t\t\t\t<romCRC extension=\"" + tempext + "\">" + ((Rom)rom).CRC.ToUpperInvariant() + "</romMD5>\n"
+							? "\t\t\t\t<romCRC extension=\"" + tempext + "\">" + (!ExcludeFields[(int)Field.CRC] ? ((Rom)rom).CRC.ToUpperInvariant() : "") + "</romCRC>\n"
 							: ((Rom)rom).MD5 != null
-								? "\t\t\t\t<romMD5 extension=\"" + tempext + "\">" + ((Rom)rom).MD5.ToUpperInvariant() + "</romMD5>\n"
-								: "\t\t\t\t<romSHA1 extension=\"" + tempext + "\">" + ((Rom)rom).SHA1.ToUpperInvariant() + "</romSHA1>\n")
+								? "\t\t\t\t<romMD5 extension=\"" + tempext + "\">" + (!ExcludeFields[(int)Field.MD5] ? ((Rom)rom).MD5.ToUpperInvariant() : "") + "</romMD5>\n"
+								: "\t\t\t\t<romSHA1 extension=\"" + tempext + "\">" + (!ExcludeFields[(int)Field.SHA1] ? ((Rom)rom).SHA1.ToUpperInvariant() : "") + "</romSHA1>\n")
 						+ "\t\t\t</files>\n";
 				}
 

@@ -286,20 +286,7 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.DatFormat = value;
 			}
 		}
-		public bool ExcludeOf
-		{
-			get
-			{
-				EnsureDatHeader();
-				return _datHeader.ExcludeOf;
-			}
-			set
-			{
-				EnsureDatHeader();
-				_datHeader.ExcludeOf = value;
-			}
-		}
-		public List<Field> ExcludeFields
+		public bool[] ExcludeFields
 		{
 			get
 			{
@@ -1364,7 +1351,7 @@ namespace SabreTools.Library.DatFiles
 					DatFormat = (this.DatFormat != 0 ? this.DatFormat : 0),
 
 					// Filtering that needs to be copied over
-					ExcludeOf = this.ExcludeOf,
+					ExcludeFields = (bool[])this.ExcludeFields.Clone(),
 					OneRom = this.OneRom,
 					KeepEmptyGames = this.KeepEmptyGames,
 					SceneDateStrip = this.SceneDateStrip,
@@ -1439,7 +1426,7 @@ namespace SabreTools.Library.DatFiles
 					DatFormat = (this.DatFormat != 0 ? this.DatFormat : 0),
 
 					// Filtering that needs to be copied over
-					ExcludeOf = this.ExcludeOf,
+					ExcludeFields = (bool[])this.ExcludeFields.Clone(),
 					OneRom = this.OneRom,
 					KeepEmptyGames = this.KeepEmptyGames,
 					SceneDateStrip = this.SceneDateStrip,

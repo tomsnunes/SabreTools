@@ -233,12 +233,12 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = rom.MachineName + ";"
-							+ rom.MachineDescription + ";"
+				string state = (!ExcludeFields.Contains(Field.MachineName) ? rom.MachineName : "") + ";"
+							+ (!ExcludeFields.Contains(Field.Description) ? rom.MachineDescription : "") + ";"
 							+ FileName + ";"
-							+ rom.CloneOf + ";"
-							+ rom.Year + ";"
-							+ rom.Manufacturer + ";"
+							+ (!ExcludeFields.Contains(Field.CloneOf) ? rom.CloneOf : "") + ";"
+							+ (!ExcludeFields.Contains(Field.Year) ? rom.Year : "") + ";"
+							+ (!ExcludeFields.Contains(Field.Manufacturer) ? rom.Manufacturer : "") + ";"
 							/* + rom.Category */ + ";"
 							/* + rom.Players */ + ";"
 							/* + rom.Rotation */ + ";"
@@ -248,7 +248,7 @@ namespace SabreTools.Library.DatFiles
 							/* + rom.DisplayType */ + ";"
 							/* + rom.AltRomname */ + ";"
 							/* + rom.AltTitle */ + ";"
-							+ rom.Comment + ";"
+							+ (!ExcludeFields.Contains(Field.Comment) ? rom.Comment : "") + ";"
 							/* + rom.Buttons */ + "\n";
 
 				sw.Write(state);

@@ -662,12 +662,12 @@ Generation MSXIDs by www.generation-msx.nl
 				}
 
 				string state = "<software>\n"
-							+ "\t<title>" + HttpUtility.HtmlEncode(rom.MachineName) + "</title>\n"
+							+ "\t<title>" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(rom.MachineName) : "") + "</title>\n"
 							// + "\t<genmsxid>" + msxid + "</genmsxid>\n"
 							// + "\t<system>" + system + "</system>\n"
-							+ "\t<company>" + rom.Manufacturer + "</company>\n"
-							+ "\t<year>" + rom.Year + "</year>\n";
-							// + "\t<country>" + rom.Year + "</country>\n";
+							+ "\t<company>" + (!ExcludeFields[(int)Field.Manufacturer] ? rom.Manufacturer : "") + "</company>\n"
+							+ "\t<year>" + (!ExcludeFields[(int)Field.Year] ? rom.Year : "") + "</year>\n";
+							// + "\t<country>" + country + "</country>\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -742,9 +742,9 @@ Generation MSXIDs by www.generation-msx.nl
 						state += "\t\t<dump>"
 							// + "<original value=\"true\">GoodMSX</original>"
 							+ "<rom>"
-							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Offset) ? "<start>" + ((Rom)rom).Offset + "</start>" : "")
+							+ (!ExcludeFields[(int)Field.Offset] && !String.IsNullOrWhiteSpace(((Rom)rom).Offset) ? "<start>" + ((Rom)rom).Offset + "</start>" : "")
 							// + "<type>Normal</type>"
-							+ "<hash>" + ((Rom)rom).SHA1 + "</hash>"
+							+ "<hash>" + (!ExcludeFields[(int)Field.SHA1] ? ((Rom)rom).SHA1 : "") + "</hash>"
 							// + "<remark></remark>"
 							+ "</rom></dump>\n";
 							break;

@@ -350,7 +350,7 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = "ROMs required for driver \"" + rom.MachineName + "\".\n" +
+				string state = "ROMs required for driver \"" + (!ExcludeFields[(int)Field.MachineName] ? rom.MachineName : "") + "\".\n" +
 							"Name                                   Size Checksum\n";
 
 				sw.Write(state);
@@ -432,24 +432,24 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a baddump, put the first indicator
-						if (((Disk)rom).ItemStatus == ItemStatus.BadDump)
+						if (!ExcludeFields[(int)Field.Status] && ((Disk)rom).ItemStatus == ItemStatus.BadDump)
 						{
 							state += " BAD";
 						}
 
 						// If we have a nodump, write out the indicator
-						if (((Disk)rom).ItemStatus == ItemStatus.Nodump)
+						if (!ExcludeFields[(int)Field.Status] && ((Disk)rom).ItemStatus == ItemStatus.Nodump)
 						{
 							state += " NO GOOD DUMP KNOWN";
 						}
 						// Otherwise, write out the SHA-1 hash
-						else
+						else if (!ExcludeFields[(int)Field.SHA1])
 						{
 							state += " SHA1(" + ((Disk)rom).SHA1 + ")";
 						}
 
 						// If we have a baddump, put the second indicator
-						if (((Disk)rom).ItemStatus == ItemStatus.BadDump)
+						if (!ExcludeFields[(int)Field.Status] && ((Disk)rom).ItemStatus == ItemStatus.BadDump)
 						{
 							state += " BAD_DUMP";
 						}
@@ -474,25 +474,25 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a baddump, put the first indicator
-						if (((Rom)rom).ItemStatus == ItemStatus.BadDump)
+						if (!ExcludeFields[(int)Field.Status] && ((Rom)rom).ItemStatus == ItemStatus.BadDump)
 						{
 							state += " BAD";
 						}
 
 						// If we have a nodump, write out the indicator
-						if (((Rom)rom).ItemStatus == ItemStatus.Nodump)
+						if (!ExcludeFields[(int)Field.Status] && ((Rom)rom).ItemStatus == ItemStatus.Nodump)
 						{
 							state += " NO GOOD DUMP KNOWN";
 						}
 						// Otherwise, write out the CRC and SHA-1 hashes
 						else
 						{
-							state += " CRC(" + ((Rom)rom).CRC + ")";
-							state += " SHA1(" + ((Rom)rom).SHA1 + ")";
+							state += (!ExcludeFields[(int)Field.CRC] ? " CRC(" + ((Rom)rom).CRC + ")" : "");
+							state += (!ExcludeFields[(int)Field.SHA1] ? " SHA1(" + ((Rom)rom).SHA1 + ")" : "");
 						}
 
 						// If we have a baddump, put the second indicator
-						if (((Rom)rom).ItemStatus == ItemStatus.BadDump)
+						if (!ExcludeFields[(int)Field.Status] && ((Rom)rom).ItemStatus == ItemStatus.BadDump)
 						{
 							state += " BAD_DUMP";
 						}

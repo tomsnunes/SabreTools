@@ -162,19 +162,19 @@ namespace SabreTools.Library.DatFiles
 				// If we're in Romba mode, the state is consistent
 				if (Romba)
 				{
-					state += rom.Name + "\n";
+					state += (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 				}
 				// Otherwise, use any flags
 				else
 				{
 					if (!UseRomName && rom.MachineName != lastgame)
 					{
-						state += rom.Name + "\n";
+						state += (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						lastgame = rom.MachineName;
 					}
 					else if (UseRomName)
 					{
-						state += rom.Name + "\n";
+						state += (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 					}
 				}
 

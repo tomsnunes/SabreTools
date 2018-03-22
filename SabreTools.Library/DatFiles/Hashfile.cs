@@ -208,57 +208,79 @@ namespace SabreTools.Library.DatFiles
 					case Hash.MD5:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.MD5] ? ((Rom)rom).MD5 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.MD5] ? ((Disk)rom).MD5 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						break;
 					case Hash.CRC:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
+							state += (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "")
+								+ " " + (!ExcludeFields[(int)Field.CRC] ? ((Rom)rom).CRC : "") + "\n";
 						}
 						break;
 					case Hash.SHA1:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA1] ? ((Rom)rom).SHA1 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA1] ? ((Disk)rom).SHA1 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						break;
 					case Hash.SHA256:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA256 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA256] ? ((Rom)rom).SHA256 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA256 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA256] ? ((Disk)rom).SHA256 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						break;
 					case Hash.SHA384:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA384 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA384] ? ((Rom)rom).SHA384 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA384 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA384] ? ((Disk)rom).SHA384 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						break;
 					case Hash.SHA512:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA512 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA512] ? ((Rom)rom).SHA512 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA512 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += (!ExcludeFields[(int)Field.SHA512] ? ((Disk)rom).SHA512 : "")
+								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
+								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
 						break;
 				}

@@ -42,6 +42,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// TODO: Pull parsing into this file instead of relying on CMP
 		public override void ParseFile(
 			// Standard Dat parsing
 			string filename,
@@ -211,7 +212,7 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = "game (\n\tname \"" + rom.MachineName + ".zip\"\n";
+				string state = "game (\n\tname \"" + (!ExcludeFields[(int)Field.MachineName] ? rom.MachineName + ".zip" : "") + "\"\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -235,7 +236,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			try
 			{
-				string state = (String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
+				string state = (!ExcludeFields[(int)Field.SampleOf] && String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -283,10 +284,10 @@ namespace SabreTools.Library.DatFiles
 						// We don't output these at all for DosCenter
 						break;
 					case ItemType.Rom:
-						state += "\tfile ( name " + ((Rom)rom).Name
-							+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
-							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
-							+ (!String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
+						state += "\tfile ( name " + (!ExcludeFields[(int)Field.Name] ? ((Rom)rom).Name : "")
+							+ (!ExcludeFields[(int)Field.Size] && ((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
+							+ (!ExcludeFields[(int)Field.Date] && !String.IsNullOrWhiteSpace(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
+							+ (!ExcludeFields[(int)Field.CRC] && !String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
 							+ " )\n";
 						break;
 				}

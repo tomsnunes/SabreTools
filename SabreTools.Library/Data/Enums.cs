@@ -360,9 +360,9 @@
 	/// <summary>
 	/// List of valid field types within a DatItem/Machine
 	/// </summary>
-	public enum Field
+	public enum Field : int
 	{
-		NULL,
+		NULL = 0,
 
 		// Generic DatItem
 		Name,

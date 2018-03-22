@@ -31,8 +31,7 @@ namespace SabreTools.Library.DatFiles
 		private ForceNodump _forceNodump;
 		private ForcePacking _forcePacking;
 		private DatFormat _datFormat;
-		private bool _excludeOf;
-		private List<Field> _excludeFields;
+		private bool[] _excludeFields = new bool[Enum.GetNames(typeof(Field)).Length];
 		private bool _oneRom;
 		private bool _keepEmptyGames;
 		private bool _sceneDateStrip;
@@ -145,12 +144,7 @@ namespace SabreTools.Library.DatFiles
 			get { return _datFormat; }
 			set { _datFormat = value; }
 		}
-		public bool ExcludeOf
-		{
-			get { return _excludeOf; }
-			set { _excludeOf = value; }
-		}
-		public List<Field> ExcludeFields
+		public bool[] ExcludeFields
 		{
 			get { return _excludeFields; }
 			set { _excludeFields = value; }
@@ -260,7 +254,6 @@ namespace SabreTools.Library.DatFiles
 				_forceNodump = this._forceNodump,
 				_forcePacking = this._forcePacking,
 				_datFormat = this._datFormat,
-				_excludeOf = this._excludeOf,
 				_excludeFields = this._excludeFields,
 				_oneRom = this._oneRom,
 				_keepEmptyGames = this._keepEmptyGames,

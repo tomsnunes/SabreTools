@@ -291,11 +291,9 @@ namespace SabreTools
 						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
 					case "exclude-of": // TODO: Remove entire flag when transitioning to exclude-fields
-						datHeader.ExcludeOf = true;
-
-						datHeader.ExcludeFields.Add(Field.CloneOf);
-						datHeader.ExcludeFields.Add(Field.RomOf);
-						datHeader.ExcludeFields.Add(Field.SampleOf);
+						datHeader.ExcludeFields[(int)Field.CloneOf] = true;
+						datHeader.ExcludeFields[(int)Field.RomOf] = true;
+						datHeader.ExcludeFields[(int)Field.SampleOf] = true;
 						break;
 					case "extension":
 						splittingMode |= SplittingMode.Extension;
@@ -645,7 +643,7 @@ namespace SabreTools
 					case "exclude-field": // TODO: Use this
 						foreach (string field in (List<string>)feat.Value.GetValue())
 						{
-							datHeader.ExcludeFields.Add(Utilities.GetField(field));
+							datHeader.ExcludeFields[(int)Utilities.GetField(field)] = true;
 						}
 						break;
 					case "exta":
