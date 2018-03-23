@@ -884,7 +884,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all MD5 hashes from the output file(s).");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _removeSha1Flag
 		{
 			get
@@ -896,7 +896,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-1 hashes from the output file(s).");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _removeSha256Flag
 		{
 			get
@@ -908,7 +908,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-256 hashes from the output file(s).");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _removeSha384Flag
 		{
 			get
@@ -920,7 +920,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-384 hashes from the output file(s).");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _removeSha512Flag
 		{
 			get
@@ -932,7 +932,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-512 hashes from the output file(s).");
 			}
-		}
+		} // TODO: Remove
 		private static Feature _removeUnicodeFlag
 		{
 			get

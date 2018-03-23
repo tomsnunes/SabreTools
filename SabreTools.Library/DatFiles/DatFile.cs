@@ -351,19 +351,6 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.DedupeRoms = value;
 			}
 		}
-		public Hash StripHash
-		{
-			get
-			{
-				EnsureDatHeader();
-				return _datHeader.StripHash;
-			}
-			set
-			{
-				EnsureDatHeader();
-				_datHeader.StripHash = value;
-			}
-		}
 		public SortedBy SortedBy
 		{
 			get { return _sortedBy; }
@@ -1356,7 +1343,6 @@ namespace SabreTools.Library.DatFiles
 					KeepEmptyGames = this.KeepEmptyGames,
 					SceneDateStrip = this.SceneDateStrip,
 					DedupeRoms = this.DedupeRoms,
-					StripHash = this.StripHash,
 					Prefix = this.Prefix,
 					Postfix = this.Postfix,
 					AddExtension = this.AddExtension,
@@ -1431,7 +1417,6 @@ namespace SabreTools.Library.DatFiles
 					KeepEmptyGames = this.KeepEmptyGames,
 					SceneDateStrip = this.SceneDateStrip,
 					DedupeRoms = this.DedupeRoms,
-					StripHash = this.StripHash,
 					Prefix = this.Prefix,
 					Postfix = this.Postfix,
 					AddExtension = this.AddExtension,
@@ -2180,81 +2165,6 @@ namespace SabreTools.Library.DatFiles
 				Remove(key);
 				AddRange(key, newItems);
 			}
-		}
-
-		/// <summary>
-		/// Strip the given hash types from the DAT
-		/// </summary>
-		private void StripHashesFromItems()
-		{
-			// Output the logging statement
-			Globals.Logger.User("Stripping requested hashes");
-
-			// Now process all of the roms
-			List<string> keys = Keys;
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
-			{
-				List<DatItem> items = this[key];
-				for (int j = 0; j < items.Count; j++)
-				{
-					DatItem item = items[j];
-					if (item.Type == ItemType.Rom)
-					{
-						Rom rom = (Rom)item;
-						if ((StripHash & Hash.MD5) != 0)
-						{
-							rom.MD5 = null;
-						}
-						if ((StripHash & Hash.SHA1) != 0)
-						{
-							rom.SHA1 = null;
-						}
-						if ((StripHash & Hash.SHA256) != 0)
-						{
-							rom.SHA256 = null;
-						}
-						if ((StripHash & Hash.SHA384) != 0)
-						{
-							rom.SHA384 = null;
-						}
-						if ((StripHash & Hash.SHA512) != 0)
-						{
-							rom.SHA512 = null;
-						}
-
-						items[j] = rom;
-					}
-					else if (item.Type == ItemType.Disk)
-					{
-						Disk disk = (Disk)item;
-						if ((StripHash & Hash.MD5) != 0)
-						{
-							disk.MD5 = null;
-						}
-						if ((StripHash & Hash.SHA1) != 0)
-						{
-							disk.SHA1 = null;
-						}
-						if ((StripHash & Hash.SHA256) != 0)
-						{
-							disk.SHA256 = null;
-						}
-						if ((StripHash & Hash.SHA384) != 0)
-						{
-							disk.SHA384 = null;
-						}
-						if ((StripHash & Hash.SHA512) != 0)
-						{
-							disk.SHA512 = null;
-						}
-
-						items[j] = disk;
-					}
-				}
-
-				Remove(key);
-				AddRange(key, items);
-			});
 		}
 
 		/// <summary>
@@ -5331,12 +5241,6 @@ namespace SabreTools.Library.DatFiles
 
 			// Output the number of items we're going to be writing
 			Globals.Logger.User("A total of {0} items will be written out to '{1}'", Count, FileName);
-
-			// If we are removing hashes, do that now
-			if (StripHash != 0x0)
-			{
-				StripHashesFromItems();
-			}
 
 			// If we are removing scene dates, do that now
 			if (SceneDateStrip)

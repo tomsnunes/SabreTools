@@ -169,11 +169,6 @@ namespace SabreTools.Library.DatFiles
 			get { return _dedupeRoms; }
 			set { _dedupeRoms = value; }
 		}
-		public Hash StripHash
-		{
-			get { return _stripHash; }
-			set { _stripHash = value; }
-		}
 
 		// Data specific to the Miss DAT type
 		public bool UseRomName
