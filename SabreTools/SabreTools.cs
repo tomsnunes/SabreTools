@@ -290,7 +290,8 @@ namespace SabreTools
 					case "diff-reverse-cascade":
 						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
-					case "exclude-of": // TODO: Remove entire flag when transitioning to exclude-fields
+					case "exclude-of":
+						Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
 						datHeader.ExcludeFields[(int)Field.CloneOf] = true;
 						datHeader.ExcludeFields[(int)Field.MachineType] = true;
 						datHeader.ExcludeFields[(int)Field.RomOf] = true;
@@ -454,18 +455,23 @@ namespace SabreTools
 						datHeader.RemoveExtension = true;
 						break;
 					case "remove-md5":
+						Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
 						datHeader.ExcludeFields[(int)Field.MD5] = true;
 						break;
 					case "remove-sha1":
+						Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
 						datHeader.ExcludeFields[(int)Field.SHA1] = true;
 						break;
 					case "remove-sha256":
+						Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
 						datHeader.ExcludeFields[(int)Field.SHA256] = true;
 						break;
 					case "remove-sha384":
+						Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
 						datHeader.ExcludeFields[(int)Field.SHA384] = true;
 						break;
 					case "remove-sha512":
+						Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
 						datHeader.ExcludeFields[(int)Field.SHA512] = true;
 						break;
 					case "remove-unicode":
