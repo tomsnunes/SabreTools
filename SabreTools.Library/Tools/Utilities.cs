@@ -2139,11 +2139,11 @@ namespace SabreTools.Library.Tools
 				}
 				catch (NotSupportedException)
 				{
-					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
 				}
 				catch (NotImplementedException)
 				{
-					Globals.Logger.Warning("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Warning("Stream does not support seeking to starting offset. Stream position not changed");
 				}
 
 				// Get the BaseFile from the information
@@ -2156,11 +2156,11 @@ namespace SabreTools.Library.Tools
 				}
 				catch (NotSupportedException)
 				{
-					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
 				}
 				catch (NotImplementedException)
 				{
-					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
 				}
 
 				if (!keepReadOpen)
@@ -2206,11 +2206,11 @@ namespace SabreTools.Library.Tools
 				}
 				catch (NotSupportedException)
 				{
-					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
 				}
 				catch (NotImplementedException)
 				{
-					Globals.Logger.Warning("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
 				}
 
 				byte[] buffer = new byte[8 * 1024];
@@ -2298,11 +2298,11 @@ namespace SabreTools.Library.Tools
 				}
 				catch (NotSupportedException)
 				{
-					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
 				}
 				catch (NotImplementedException)
 				{
-					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+					Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
 				}
 
 				if (!keepReadOpen)
