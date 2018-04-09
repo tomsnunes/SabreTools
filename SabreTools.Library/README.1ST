@@ -541,6 +541,10 @@ Options:
 		  information in the output DAT. The output format is standardized as
 		  "yyyy/MM/dd HH:mm:ss".
 
+	  -ind, --individual		  Process input DATs individually
+		  In cases where DATs would be processed in bulk, this flag allows them
+		  to be processed on their own instead.
+
 	  -t7z, --torrent-7zip		Enable Torrent7Zip output
 		  Instead of outputting the files to folder, files will be rebuilt to
 		  Torrent7Zip (T7Z) files. This format is based on the LZMA container
@@ -696,9 +700,9 @@ Options:
 		  Add a new column or field for counting the number of nodumps in the
 		  DAT.
 
-	  -ind, --individual		  Show individual statistics
-		  Optionally, the statistics for each of the individual input DATs can
-		  be output as well.
+	  -ind, --individual		  Process input DATs individually
+		  In cases where DATs would be processed in bulk, this flag allows them
+		  to be processed on their own instead.
 
   -ud, --update			   Update and manipulate DAT(s)
 	  This is the multitool part of the program, allowing for almost every
@@ -1294,6 +1298,10 @@ Options:
 		  Normally, CHDs would be processed using their internal hash to
 		  compare against the input DATs. This flag forces all CHDs to be
 		  treated like regular files.
+
+	  -ind, --individual		  Process input DATs individually
+		  In cases where DATs would be processed in bulk, this flag allows them
+		  to be processed on their own instead.
 
 	  -dm, --dat-merged		   Force creating merged sets
 		  Preprocess the DAT to have parent sets contain all items from the
