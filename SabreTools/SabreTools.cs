@@ -880,7 +880,8 @@ namespace SabreTools
 				// If we're using the sorter
 				case "Sort":
 					InitSort(datfiles, inputs, outDir, depot, quickScan, addFileDates, delete, inverse,
-						outputFormat, datHeader.Romba, sevenzip, gz, rar, zip, updateDat, datHeader.Header, splitType, chdsAsFiles);
+						outputFormat, datHeader.Romba, sevenzip, gz, rar, zip, updateDat, datHeader.Header,
+						splitType, chdsAsFiles, individual);
 					break;
 				// Split a DAT by the split type
 				case "Split":
@@ -901,7 +902,7 @@ namespace SabreTools
 				// If we're using the verifier
 				case "Verify":
 					VerifyInputs(inputs, feature);
-					InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles);
+					InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles, individual);
 					break;
 				// If nothing is set, show the help
 				default:

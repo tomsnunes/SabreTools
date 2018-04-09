@@ -148,6 +148,7 @@ namespace SabreTools
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="individual">True if DATs should be sorted individually, false if they should be done in bulk</param>
 		private static void InitSort(
 			List<string> datfiles,
 			List<string> inputs,
@@ -166,7 +167,8 @@ namespace SabreTools
 			bool updateDat,
 			string headerToCheckAgainst,
 			SplitType splitType,
-			bool chdsAsFiles)
+			bool chdsAsFiles,
+			bool individual)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -174,27 +176,52 @@ namespace SabreTools
 			// Get a list of files from the input datfiles
 			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
 
-			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
+			// If we are in individual mode, process each DAT on their own, appending the DAT name to the output dir
+			if (individual)
+			{				
+				foreach (string datfile in datfiles)
+				{
+					DatFile datdata = new DatFile();
+					datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 
-			// Add all of the input DATs into one huge internal DAT
-			DatFile datdata = new DatFile();
-			foreach (string datfile in datfiles)
-			{
-				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
+					// If we have the depot flag, respect it
+					if (depot)
+					{
+						datdata.RebuildDepot(inputs, Path.Combine(outDir, datdata.FileName), date, delete, inverse, outputFormat, romba,
+						updateDat, headerToCheckAgainst);
+					}
+					else
+					{
+						datdata.RebuildGeneric(inputs, Path.Combine(outDir, datdata.FileName), quickScan, date, delete, inverse, outputFormat, romba, asl,
+						updateDat, headerToCheckAgainst, chdsAsFiles);
+					}
+				}
 			}
-
-			watch.Stop();
-
-			// If we have the depot flag, repsect it
-			if (depot)
-			{
-				datdata.RebuildDepot(inputs, outDir, date, delete, inverse, outputFormat, romba,
-				updateDat, headerToCheckAgainst);
-			}
+			// Otherwise, process all DATs into the same output
 			else
 			{
-				datdata.RebuildGeneric(inputs, outDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
-				updateDat, headerToCheckAgainst, chdsAsFiles);
+				InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
+
+				// Add all of the input DATs into one huge internal DAT
+				DatFile datdata = new DatFile();
+				foreach (string datfile in datfiles)
+				{
+					datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
+				}
+
+				watch.Stop();
+
+				// If we have the depot flag, respect it
+				if (depot)
+				{
+					datdata.RebuildDepot(inputs, outDir, date, delete, inverse, outputFormat, romba,
+					updateDat, headerToCheckAgainst);
+				}
+				else
+				{
+					datdata.RebuildGeneric(inputs, outDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+					updateDat, headerToCheckAgainst, chdsAsFiles);
+				}
 			}
 		}
 
@@ -363,6 +390,7 @@ namespace SabreTools
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="individual">True if DATs should be verified individually, false if they should be done in bulk</param>
 		private static void InitVerify(
 			List<string> datfiles,
 			List<string> inputs,
@@ -371,7 +399,8 @@ namespace SabreTools
 			bool quickScan,
 			string headerToCheckAgainst,
 			SplitType splitType,
-			bool chdsAsFiles)
+			bool chdsAsFiles,
+			bool individual)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
@@ -379,25 +408,48 @@ namespace SabreTools
 			// Get a list of files from the input datfiles
 			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
 
-			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
-
-			// Add all of the input DATs into one huge internal DAT
-			DatFile datdata = new DatFile();
-			foreach (string datfile in datfiles)
+			// If we are in individual mode, process each DAT on their own
+			if (individual)
 			{
-				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
-			}
+				foreach (string datfile in datfiles)
+				{
+					DatFile datdata = new DatFile();
+					datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 
-			watch.Stop();
-
-			// If we have the depot flag, repsect it
-			if (depot)
-			{
-				datdata.VerifyDepot(inputs, headerToCheckAgainst);
+					// If we have the depot flag, respect it
+					if (depot)
+					{
+						datdata.VerifyDepot(inputs, headerToCheckAgainst);
+					}
+					else
+					{
+						datdata.VerifyGeneric(inputs, hashOnly, quickScan, headerToCheckAgainst, chdsAsFiles);
+					}
+				}
 			}
+			// Otherwise, process all DATs into the same output
 			else
 			{
-				datdata.VerifyGeneric(inputs, hashOnly, quickScan, headerToCheckAgainst, chdsAsFiles);
+				InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
+
+				// Add all of the input DATs into one huge internal DAT
+				DatFile datdata = new DatFile();
+				foreach (string datfile in datfiles)
+				{
+					datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
+				}
+
+				watch.Stop();
+
+				// If we have the depot flag, respect it
+				if (depot)
+				{
+					datdata.VerifyDepot(inputs, headerToCheckAgainst);
+				}
+				else
+				{
+					datdata.VerifyGeneric(inputs, hashOnly, quickScan, headerToCheckAgainst, chdsAsFiles);
+				}
 			}
 		}
 
