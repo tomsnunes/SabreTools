@@ -436,9 +436,9 @@ namespace SabreTools
 				return new Feature(
 					"individual",
 					new List<string>() { "-ind", "--individual" },
-					"Show individual statistics",
+					"Process input DATs individually",
 					FeatureType.Flag,
-					longDescription: "Optionally, the statistics for each of the individual input DATs can be output as well.");
+					longDescription: "In cases where DATs would be processed in bulk, this flag allows them to be processed on their own instead.");
 			}
 		}
 		private static Feature _inplaceFlag
@@ -2472,6 +2472,7 @@ The following systems have headers that this program can work with:
 			sort.AddFeature(_quickFlag);
 			sort.AddFeature(_chdsAsFilesFlag);
 			sort.AddFeature(_addDateFlag);
+			sort.AddFeature(_individualFlag);
 			sort.AddFeature(_torrent7zipFlag);
 			sort.AddFeature(_tarFlag);
 			sort.AddFeature(_torrentGzipFlag);
@@ -2780,6 +2781,7 @@ The stats that are outputted are as follows:
 			verify.AddFeature(_quickFlag);
 			verify.AddFeature(_headerStringInput);
 			verify.AddFeature(_chdsAsFilesFlag);
+			verify.AddFeature(_individualFlag);
 			verify.AddFeature(_datMergedFlag);
 			verify.AddFeature(_datSplitFlag);
 			verify.AddFeature(_datDeviceNonMergedFlag);
