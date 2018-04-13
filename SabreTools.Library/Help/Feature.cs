@@ -236,8 +236,28 @@ namespace SabreTools.Library.Help
 			// Add the pre-space first
 			output += CreatePadding(pre);
 
+			// Preprocess the flags, if necessary
+			string[] newflags = new string[_flags.Count];
+			_flags.CopyTo(newflags);
+			switch (_featureType)
+			{
+				case FeatureType.Int32:
+				case FeatureType.Int64:
+				case FeatureType.List:
+				case FeatureType.String:
+					for (int i = 0; i < newflags.Length; i++)
+					{
+						newflags[i] += "=";
+					}
+					break;
+				case FeatureType.Flag:
+				default:
+					// No-op
+					break;
+			}
+
 			// Now add all flags
-			output += String.Join(", ", _flags);
+			output += String.Join(", ", newflags);
 
 			// If we have a midpoint set, check to see if the string needs padding
 			if (midpoint > 0 && output.Length < midpoint)
@@ -359,8 +379,28 @@ namespace SabreTools.Library.Help
 			// Add the pre-space first
 			output += CreatePadding(preAdjusted);
 
+			// Preprocess the flags, if necessary
+			string[] newflags = new string[_flags.Count];
+			_flags.CopyTo(newflags);
+			switch (_featureType)
+			{
+				case FeatureType.Int32:
+				case FeatureType.Int64:
+				case FeatureType.List:
+				case FeatureType.String:
+					for (int i = 0; i < newflags.Length; i++)
+					{
+						newflags[i] += "=";
+					}
+					break;
+				case FeatureType.Flag:
+				default:
+					// No-op
+					break;
+			}
+
 			// Now add all flags
-			output += String.Join(", ", _flags);
+			output += String.Join(", ", newflags);
 
 			// If we have a midpoint set, check to see if the string needs padding
 			if (midpoint > 0 && output.Length < midpointAdjusted)

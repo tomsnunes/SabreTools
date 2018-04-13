@@ -2183,7 +2183,7 @@ Possible values are: None, Zip, Unzip");
 Some special strings that can be used:
 - %game% / %machine% - Replaced with the Game/Machine name
 - %name% - Replaced with the Rom name
-- %%manufacturer%% - Replaced with game Manufacturer
+- %manufacturer% - Replaced with game Manufacturer
 - %publisher% - Replaced with game Publisher
 - %crc% - Replaced with the CRC
 - %md5% - Replaced with the MD5
@@ -2208,7 +2208,7 @@ Some special strings that can be used:
 Some special strings that can be used:
 - %game% / %machine% - Replaced with the Game/Machine name
 - %name% - Replaced with the Rom name
-- %%manufacturer%% - Replaced with game Manufacturer
+- %manufacturer% - Replaced with game Manufacturer
 - %publisher% - Replaced with game Publisher
 - %crc% - Replaced with the CRC
 - %md5% - Replaced with the MD5

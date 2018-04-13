@@ -196,41 +196,42 @@ Options:
 		  Normally, the DAT will be created with the date in the file name in
 		  brackets. This flag removes that instead of the default.
 
-	  -fp, --forcepacking		 Set force packing
+	  -fp=, --forcepacking=	   Set force packing
 		  Set the forcepacking tag to the given value.
 		  Possible values are: None, Zip, Unzip
 
-	  -aaf, --archives-as-files	 Treat archives as files
+	  -aaf, --archives-as-files   Treat archives as files
 		  Instead of trying to enumerate the files within archives, treat the
 		  archives as files themselves. This is good for uncompressed sets that
 		  include archives that should be read as-is.
 
-	  -ot, --output-type		  Output DATs to a specified format
+	  -ot=, --output-type=		Output DATs to a specified format
 		  Add outputting the created DAT to known format. Multiple instances of
 		  this flag are allowed.
+		  
 		  Possible values are:
-			  all			   - All available DAT types
-			  am, attractmode  - AttractMode XML
-			  cmp, clrmamepro  - ClrMamePro
-			  csv			   - Standardized Comma-Separated Value
-			  dc, doscenter	   - DOSCenter
-			  lr, listrom	   - MAME Listrom
-			  lx, listxml	   - MAME Listxml
-			  miss, missfile   - GoodTools Missfile
-			  md5			   - MD5
-			  msx, openmsx	   - openMSX Software List
-			  ol, offlinelist  - OfflineList XML
-			  rc, romcenter	   - RomCenter
-			  sd, sabredat	   - SabreDat XML
-			  sfv			   - SFV
-			  sha1			   - SHA1
-			  sha256		   - SHA256
-			  sha384		   - SHA384
-			  sha512		   - SHA512
-			  sl, softwarelist - MAME Software List XML
-			  ssv			   - Standardized Semicolon-Separated Value
-			  tsv			   - Standardized Tab-Separated Value
-			  xml, logiqx	   - Logiqx XML
+		  all				- All available DAT types
+		  am, attractmode	- AttractMode XML
+		  cmp, clrmamepro	- ClrMamePro
+		  csv				- Standardized Comma-Separated Value
+		  dc, doscenter		- DOSCenter
+		  lr, listrom		- MAME Listrom
+		  lx, listxml		- MAME Listxml
+		  miss, missfile	- GoodTools Missfile
+		  md5				- MD5
+		  msx, openmsx		- openMSX Software List
+		  ol, offlinelist	- OfflineList XML
+		  rc, romcenter		- RomCenter
+		  sd, sabredat		- SabreDat XML
+		  sfv				- SFV
+		  sha1				- SHA1
+		  sha256			- SHA256
+		  sha384			- SHA384
+		  sha512			- SHA512
+		  sl, softwarelist	- MAME Software List XML
+		  ssv				- Standardized Semicolon-Separated Value
+		  tsv				- Standardized Tab-Separated Value
+		  xml, logiqx		- Logiqx XML
 
 		  -dpc, --depreciated		 Output 'game' instead of 'machine'
 			  By default, Logiqx XML DATs output with the more modern "machine"
@@ -242,41 +243,41 @@ Options:
 		  from a Romba-style depot. This also implies TorrentGZ input and
 		  output for physical files. Where appropriate, Romba depot files will
 		  be created as well.
-			
+
 	  -ska, --skip-archives	   Skip all archives
 		  Skip any files that are treated like archives
 
 	  -skf, --skip-files		  Skip all non-archives
 		  Skip any files that are not treated like archives
 
-	  -f, --filename			  Set the external name of the DAT
+	  -f=, --filename=			Set the external name of the DAT
 		  Set the external filename for the output DAT(s)
 
-	  -n, --name				  Set the internal name of the DAT
+	  -n=, --name=				Set the internal name of the DAT
 		  Set the name header field for the output DAT(s)
 
-	  -de, --description		  Set the description of the DAT
+	  -de=, --description=		Set the description of the DAT
 		  Set the description header field for the output DAT(s)
 
-	  -c, --category			  Set the category of the DAT
+	  -c=, --category=			Set the category of the DAT
 		  Set the category header field for the output DAT(s)
 
-	  -v, --version			   Set the version of the DAT
+	  -v=, --version=			 Set the version of the DAT
 		  Set the version header field for the output DAT(s)
 
-	  -au, --author			   Set the author of the DAT
+	  -au=, --author=			 Set the author of the DAT
 		  Set the author header field for the output DAT(s)
 
-	  -em, --email				Set a new email of the DAT
+	  -em=, --email=			  Set a new email of the DAT
 		  Set the email header field for the output DAT(s)
 
-	  -hp, --homepage			 Set a new homepage of the DAT
+	  -hp=, --homepage=		   Set a new homepage of the DAT
 		  Set the homepage header field for the output DAT(s)
 
-	  -u, --url				   Set a new URL of the DAT
+	  -u=, --url=				 Set a new URL of the DAT
 		  Set the URL header field for the output DAT(s)
 
-	  -co, --comment			  Set a new comment of the DAT
+	  -co=, --comment=			Set a new comment of the DAT
 		  Set the comment header field for the output DAT(s)
 
 	  -sd, --superdat			 Enable SuperDAT creation
@@ -288,7 +289,7 @@ Options:
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
 
-	  -ef, --exclude-field		  Exclude a game/rom field from outputs
+	  -ef=, --exclude-field=	  Exclude a game/rom field from outputs
 		  Exclude any valid item or machine field from outputs. Examples
 		  include: romof, publisher, and offset.
 
@@ -296,11 +297,6 @@ Options:
 		  In some cases, it is beneficial to have every rom put into its own
 		  output set as a subfolder of the original parent. This flag enables
 		  outputting each rom to its own game for this purpose.
-
-	  -keg, --keep-empty-games	  Keep originally empty sets from the input(s)
-		  Normally, any sets that are considered empty will not be included in
-		  the output, this flag allows these empty sets to be added to the
-		  output.
 
 	  -sds, --scene-date-strip	Remove date from scene-named sets
 		  If this flag is enabled, sets with "scene" names will have the date
@@ -323,7 +319,7 @@ Options:
 		  helpful in cases where the temp folder is located on an SSD and the
 		  user wants to take advantage of this.
 
-	  -h, --header				Set a header skipper to use, blank means all
+	  -h=, --header=			  Set a header skipper to use, blank means all
 		  Set the header special field for the output DAT(s). In file
 		  rebuilding, this flag allows for either all copier headers (using "")
 		  or specific copier headers by name (such as "fds.xml") to determine
@@ -334,15 +330,15 @@ Options:
 		  compare against the input DATs. This flag forces all CHDs to be
 		  treated like regular files.
 
-	  -t, --temp				  Set the temporary directory to use
+	  -t=, --temp=				Set the temporary directory to use
 		  Optionally, a temp folder can be supplied in the case the default
 		  temp directory is not preferred.
 
-	  -out, --output-dir		  Output directory
+	  -out=, --output-dir=		Output directory
 		  This sets an output folder to be used when the files are created. If
 		  a path is not defined, the runtime directory is used instead.
 
-	  -mt, --threads			  Amount of threads to use (default = # cores)
+	  -mt=, --threads=			Amount of threads to use (default = # cores)
 		  Optionally, set the number of threads to use for the multithreaded
 		  operations. The default is the number of available machine threads;
 		  -1 means unlimited threads created.
@@ -364,7 +360,7 @@ Options:
 	  - Nintendo Super Famicom / Super Nintendo Entertainment System
 	  - Nintendo Super Famicom / Super Nintendo Entertainment System SPC
 
-	  -out, --output-dir		  Output directory
+	  -out=, --output-dir=		Output directory
 		  This sets an output folder to be used when the files are created. If
 		  a path is not defined, the runtime directory is used instead.
 
@@ -389,122 +385,20 @@ Options:
 	  - Nintendo Super Famicom / Super Nintendo Entertainment System
 	  - Nintendo Super Famicom / Super Nintendo Entertainment System SPC
 
-	  -out, --output-dir		  Output directory
+	  -out=, --output-dir=		Output directory
 		  This sets an output folder to be used when the files are created. If
 		  a path is not defined, the runtime directory is used instead.
-
-  -sp, --split				Split input DATs by a given criteria
-	  This feature allows the user to split input DATs by a number of different
-	  possible criteria. See the individual input information for details. More
-	  than one split type is allowed at a time.
-
-	  -ot, --output-type		  Output DATs to a specified format
-		  Add outputting the created DAT to known format. Multiple instances of
-		  this flag are allowed.
-		  
-		  Possible values are:
-			  all			   - All available DAT types
-			  am, attractmode  - AttractMode XML
-			  cmp, clrmamepro  - ClrMamePro
-			  csv			   - Standardized Comma-Separated Value
-			  dc, doscenter	   - DOSCenter
-			  lr, listrom	   - MAME Listrom
-			  lx, listxml	   - MAME Listxml
-			  miss, missfile   - GoodTools Missfile
-			  md5			   - MD5
-			  msx, openmsx	   - openMSX Software List
-			  ol, offlinelist  - OfflineList XML
-			  rc, romcenter	   - RomCenter
-			  sd, sabredat	   - SabreDat XML
-			  sfv			   - SFV
-			  sha1			   - SHA1
-			  sha256		   - SHA256
-			  sha384		   - SHA384
-			  sha512		   - SHA512
-			  sl, softwarelist - MAME Software List XML
-			  ssv			   - Standardized Semicolon-Separated Value
-			  tsv			   - Standardized Tab-Separated Value
-			  xml, logiqx	   - Logiqx XML
-
-		  -dpc, --depreciated		 Output 'game' instead of 'machine'
-			  By default, Logiqx XML DATs output with the more modern "machine"
-			  tag for each set. This flag allows users to output the older
-			  "game" tag instead, for compatibility reasons. [Logiqx only]
-
-	  -out, --output-dir		  Output directory
-		  This sets an output folder to be used when the files are created. If
-		  a path is not defined, the runtime directory is used instead.
-
-	  -ip, --inplace			  Write to the input directories, where possible
-		  By default, files are written to the runtime directory (or the output
-		  directory, if set). This flag enables users to write out to the
-		  directory that the DATs originated from.
-
-	  -es, --extension			Split DAT(s) by two file extensions
-		  For a DAT, or set of DATs, allow for splitting based on a list of
-		  input extensions. This can allow for combined DAT files, such as
-		  those combining two separate systems, to be split. Files with any
-		  extensions not listed in the input lists will be included in both
-		  outputted DAT files.
-
-		  -exta, --exta			   Set extension to be included in first DAT
-			  Set the extension to be used to populate the first DAT. Multiple
-			  instances of this flag are allowed.
-
-		  -extb, --extb			   Set extension to be included in second DAT
-			  Set the extension to be used to populate the second DAT. Multiple
-			  instances of this flag are allowed.
-
-	  -hs, --hash				 Split DAT(s) or folder by best-available hashes
-		  For a DAT, or set of DATs, allow for splitting based on the best
-		  available hash for each file within. The order of preference for the
-		  outputted DATs is as follows: Nodump, SHA-512, SHA-384, SHA-256,
-		  SHA-1, MD5, CRC (or worse).
-
-	  -ls, --level				Split a SuperDAT or folder by lowest available level
-		  For a DAT, or set of DATs, allow for splitting based on the lowest
-		  available level of game name. That is, if a game name is
-		  top/mid/last, then it will create an output DAT for the parent
-		  directory "mid" in a folder called "top" with a game called "last".
-
-		  -s, --short				 Use short output names
-			  Instead of using ClrMamePro-style long names for DATs, use just
-			  the name of the folder as the name of the DAT. This can be used
-			  in conjunction with --base to output in the format of "Original
-			  Name (Name)" instead.
-
-		  -ba, --base				 Use source DAT as base name for outputs
-			  If splitting an entire folder of DATs, some output files may be
-			  normally overwritten since the names would be the same. With this
-			  flag, the original DAT name is used in the output name, in the
-			  format of "Original Name(Dir - Name)". This can be used in
-			  conjunction with --short to output in the format of "Original
-			  Name (Name)" instead.
-
-	  -szs, --size				Split DAT(s) or folder by file sizes
-		  For a DAT, or set of DATs, allow for splitting based on the sizes of
-		  the files, specifically if the type is a Rom (most item types don't
-		  have sizes).
-
-		  -rad, --radix			   Set the midpoint to split at
-			  Set the size at which all roms less than the size are put in the
-			  first DAT, and everything greater than or equal goes in the
-			  second.
-
-	  -ts, --type				 Split DAT(s) or folder by file types (rom/disk)
-		  For a DAT, or set of DATs, allow for splitting based on the types of
-		  the files, specifically if the type is a rom or a disk.
 
   -ss, --sort				 Sort inputs by a set of DATs
 	  This feature allows the user to quickly rebuild based on a supplied DAT
 	  file(s). By default all files will be rebuilt to uncompressed folders in
 	  the output directory.
 
-	  -dat, --dat				 Input DAT to be used
+	  -dat=, --dat=			   Input DAT to be used
 		  User-supplied DAT for use in all operations. Multiple instances of
 		  this flag are allowed.
 
-	  -out, --output-dir		  Output directory
+	  -out=, --output-dir=		Output directory
 		  This sets an output folder to be used when the files are created. If
 		  a path is not defined, the runtime directory is used instead.
 
@@ -573,6 +467,32 @@ Options:
 			  and output for physical files. Where appropriate, Romba depot
 			  files will be created as well.
 
+	  -tlrz, --torrent-lrzip	  Enable Torrent Long-Range Zip output [UNIMPLEMENTED]
+		  Instead of outputting the files to folder, files will be rebuilt to
+		  Torrent Long-Range Zip (TLRZ) files. This format is based on the
+		  LRZip file format as defined at https://github.com/ckolivas/lrzip but
+		  with custom header information. This is currently unused by any major
+		  application.
+
+	  -tlz4, --torrent-lz4		Enable Torrent LZ4 output [UNIMPLEMENTED]
+		  Instead of outputting the files to folder, files will be rebuilt to
+		  Torrent LZ4 (TLZ4) files. This format is based on the LZ4 file format
+		  as defined at https://github.com/lz4/lz4 but with custom header
+		  information. This is currently unused by any major application.
+
+	  -trar, --torrent-rar		Enable Torrent RAR output [UNIMPLEMENTED]
+		  Instead of outputting files to folder, files will be rebuilt to
+		  Torrent RAR (TRAR) files. This format is based on the RAR propietary
+		  format but with custom header information. This is currently unused
+		  by any major application.
+
+	  -txz, --torrent-xz		  Enable Torrent XZ output [UNSUPPORTED]
+		  Instead of outputting files to folder, files will be rebuilt to
+		  Torrent XZ (TXZ) files. This format is based on the LZMA container
+		  format XZ, but with custom header information. This is currently
+		  unused by any major application. Currently does not produce proper
+		  Torrent-compatible outputs.
+
 	  -tzip, --torrent-zip		Enable Torrent Zip output
 		  Instead of outputting files to folder, files will be rebuilt to
 		  TorrentZip (TZip) files. This format is based on the ZIP archive
@@ -580,16 +500,30 @@ Options:
 		  external tool RomVault (http://www.romvault.com/) and is already
 		  widely used.
 
-	  -h, --header				Set a header skipper to use, blank means all
+	  -tzpaq, --torrent-zpaq	  Enable Torrent ZPAQ output [UNIMPLEMENTED]
+		  Instead of outputting the files to folder, files will be rebuilt to
+		  Torrent ZPAQ (TZPAQ) files. This format is based on the ZPAQ file
+		  format as defined at https://github.com/zpaq/zpaq but with custom
+		  header information. This is currently unused by any major
+		  application.
+
+	  -tzstd, --torrent-zstd	  Enable Torrent Zstd output [UNIMPLEMENTED]
+		  Instead of outputting the files to folder, files will be rebuilt to
+		  Torrent Zstd (TZstd) files. This format is based on the Zstd file
+		  format as defined at https://github.com/skbkontur/ZstdNet but with
+		  custom header information. This is currently unused by any major
+		  application.
+
+	  -h=, --header=			  Set a header skipper to use, blank means all
 		  Set the header special field for the output DAT(s). In file
 		  rebuilding, this flag allows for either all copier headers (using "")
 		  or specific copier headers by name (such as "fds.xml") to determine
 		  if a file matches or not.
 
-	  -7z, --7z				   Set scanning level for 7zip archives (default 1)
-	  -gz, --gz				   Set scanning level for GZip archives (default 1)
-	  -rar, --rar				 Set scanning level for RAR archives (default 1)
-	  -zip, --zip				 Set scanning level for Zip archives (default 1)
+	  -7z=, --7z=				 Set scanning level for 7zip archives (default 1)
+	  -gz=, --gz=				 Set scanning level for GZip archives (default 1)
+	  -rar=, --rar=			   Set scanning level for RAR archives (default 1)
+	  -zip=, --zip=			   Set scanning level for Zip archives (default 1)
 		  Scan archives in one of the following ways:
 		  0 - Hash both archive and its contents
 		  1 - Only hash contents of the archive
@@ -630,10 +564,112 @@ Options:
 		  the files that could not be matched will be output to the output
 		  directory.
 
-	  -mt, --threads			  Amount of threads to use (default = # cores)
+	  -mt=, --threads=			Amount of threads to use (default = # cores)
 		  Optionally, set the number of threads to use for the multithreaded
 		  operations. The default is the number of available machine threads;
 		  -1 means unlimited threads created.
+
+  -sp, --split				Split input DATs by a given criteria
+	  This feature allows the user to split input DATs by a number of different
+	  possible criteria. See the individual input information for details. More
+	  than one split type is allowed at a time.
+
+	  -ot=, --output-type=		Output DATs to a specified format
+		  Add outputting the created DAT to known format. Multiple instances of
+		  this flag are allowed.
+		  
+		  Possible values are:
+		  all				- All available DAT types
+		  am, attractmode	- AttractMode XML
+		  cmp, clrmamepro	- ClrMamePro
+		  csv				- Standardized Comma-Separated Value
+		  dc, doscenter		- DOSCenter
+		  lr, listrom		- MAME Listrom
+		  lx, listxml		- MAME Listxml
+		  miss, missfile	- GoodTools Missfile
+		  md5				- MD5
+		  msx, openmsx		- openMSX Software List
+		  ol, offlinelist	- OfflineList XML
+		  rc, romcenter		- RomCenter
+		  sd, sabredat		- SabreDat XML
+		  sfv				- SFV
+		  sha1				- SHA1
+		  sha256			- SHA256
+		  sha384			- SHA384
+		  sha512			- SHA512
+		  sl, softwarelist	- MAME Software List XML
+		  ssv				- Standardized Semicolon-Separated Value
+		  tsv				- Standardized Tab-Separated Value
+		  xml, logiqx		- Logiqx XML
+
+		  -dpc, --depreciated		 Output 'game' instead of 'machine'
+			  By default, Logiqx XML DATs output with the more modern "machine"
+			  tag for each set. This flag allows users to output the older
+			  "game" tag instead, for compatibility reasons. [Logiqx only]
+
+	  -out=, --output-dir=		Output directory
+		  This sets an output folder to be used when the files are created. If
+		  a path is not defined, the runtime directory is used instead.
+
+	  -ip, --inplace			  Write to the input directories, where possible
+		  By default, files are written to the runtime directory (or the output
+		  directory, if set). This flag enables users to write out to the
+		  directory that the DATs originated from.
+
+	  -es, --extension			Split DAT(s) by two file extensions
+		  For a DAT, or set of DATs, allow for splitting based on a list of
+		  input extensions. This can allow for combined DAT files, such as
+		  those combining two separate systems, to be split. Files with any
+		  extensions not listed in the input lists will be included in both
+		  outputted DAT files.
+
+		  -exta=, --exta=			 Set extension to be included in first DAT
+			  Set the extension to be used to populate the first DAT. Multiple
+			  instances of this flag are allowed.
+
+		  -extb=, --extb=			 Set extension to be included in second DAT
+			  Set the extension to be used to populate the second DAT. Multiple
+			  instances of this flag are allowed.
+
+	  -hs, --hash				 Split DAT(s) or folder by best-available hashes
+		  For a DAT, or set of DATs, allow for splitting based on the best
+		  available hash for each file within. The order of preference for the
+		  outputted DATs is as follows: Nodump, SHA-512, SHA-384, SHA-256,
+		  SHA-1, MD5, CRC (or worse).
+
+	  -ls, --level				Split a SuperDAT or folder by lowest available level
+		  For a DAT, or set of DATs, allow for splitting based on the lowest
+		  available level of game name. That is, if a game name is
+		  top/mid/last, then it will create an output DAT for the parent
+		  directory "mid" in a folder called "top" with a game called "last".
+
+		  -s, --short				 Use short output names
+			  Instead of using ClrMamePro-style long names for DATs, use just
+			  the name of the folder as the name of the DAT. This can be used
+			  in conjunction with --base to output in the format of "Original
+			  Name (Name)" instead.
+
+		  -ba, --base				 Use source DAT as base name for outputs
+			  If splitting an entire folder of DATs, some output files may be
+			  normally overwritten since the names would be the same. With this
+			  flag, the original DAT name is used in the output name, in the
+			  format of "Original Name(Dir - Name)". This can be used in
+			  conjunction with --short to output in the format of "Original
+			  Name (Name)" instead.
+
+	  -szs, --size				Split DAT(s) or folder by file sizes
+		  For a DAT, or set of DATs, allow for splitting based on the sizes of
+		  the files, specifically if the type is a Rom (most item types don't
+		  have sizes).
+
+		  -rad=, --radix=			 Set the midpoint to split at
+			  Set the size at which all roms less than the size are put in the
+			  first DAT, and everything greater than or equal goes in the
+			  second.
+
+	  -ts, --type				 Split DAT(s) or folder by file types (rom/disk)
+		  For a DAT, or set of DATs, allow for splitting based on the types of
+		  the files, specifically if the type is a rom or a disk.
 
   -st, --stats				Get statistics on all input DATs
 	  This will output by default the combined statistics for all input DAT
@@ -652,9 +688,9 @@ Options:
 	  - Items that include a SHA-512
 	  - Items with Nodump status
 
-	  -srt, --report-type		 Output statistics to a specified format
-		  Add outputting the created DAT to known format. Multiple instances
-		  of this flag are allowed.
+	  -srt=, --report-type=	   Output statistics to a specified format
+		  Add outputting the created DAT to known format. Multiple instances of
+		  this flag are allowed.
 		  
 		  Possible values are:
 		  all			  - All available DAT types
@@ -685,10 +721,10 @@ Options:
 		  other format flags are enabled, this is the default output.
 		  [DEPRECIATED]
 
-	  -f, --filename			  Set the external name of the DAT
+	  -f=, --filename=			Set the external name of the DAT
 		  Set the external filename for the output DAT(s)
 
-	  -out, --output-dir		  Output directory
+	  -out=, --output-dir=		Output directory
 		  This sets an output folder to be used when the files are created. If
 		  a path is not defined, the runtime directory is used instead.
 
@@ -709,45 +745,45 @@ Options:
 	  manipulation to a DAT, or set of DATs. This is also a combination of many
 	  different programs that performed DAT manipulation that work better
 	  together.
-		
-	  -ot, --output-type		  Output DATs to a specified format
+
+	  -ot=, --output-type=		Output DATs to a specified format
 		  Add outputting the created DAT to known format. Multiple instances of
 		  this flag are allowed.
 		  
 		  Possible values are:
-			  all			   - All available DAT types
-			  am, attractmode  - AttractMode XML
-			  cmp, clrmamepro  - ClrMamePro
-			  csv			   - Standardized Comma-Separated Value
-			  dc, doscenter	   - DOSCenter
-			  lr, listrom	   - MAME Listrom
-			  lx, listxml	   - MAME Listxml
-			  miss, missfile   - GoodTools Missfile
-			  md5			   - MD5
-			  msx, openmsx	   - openMSX Software List
-			  ol, offlinelist  - OfflineList XML
-			  rc, romcenter	   - RomCenter
-			  sd, sabredat	   - SabreDat XML
-			  sfv			   - SFV
-			  sha1			   - SHA1
-			  sha256		   - SHA256
-			  sha384		   - SHA384
-			  sha512		   - SHA512
-			  sl, softwarelist - MAME Software List XML
-			  ssv			   - Standardized Semicolon-Separated Value
-			  tsv			   - Standardized Tab-Separated Value
-			  xml, logiqx	   - Logiqx XML
+		  all				- All available DAT types
+		  am, attractmode	- AttractMode XML
+		  cmp, clrmamepro	- ClrMamePro
+		  csv				- Standardized Comma-Separated Value
+		  dc, doscenter		- DOSCenter
+		  lr, listrom		- MAME Listrom
+		  lx, listxml		- MAME Listxml
+		  miss, missfile	- GoodTools Missfile
+		  md5				- MD5
+		  msx, openmsx		- openMSX Software List
+		  ol, offlinelist	- OfflineList XML
+		  rc, romcenter		- RomCenter
+		  sd, sabredat		- SabreDat XML
+		  sfv				- SFV
+		  sha1				- SHA1
+		  sha256			- SHA256
+		  sha384			- SHA384
+		  sha512			- SHA512
+		  sl, softwarelist	- MAME Software List XML
+		  ssv				- Standardized Semicolon-Separated Value
+		  tsv				- Standardized Tab-Separated Value
+		  xml, logiqx		- Logiqx XML
 
-		  -pre, --prefix			  Set prefix for all lines
+		  -pre=, --prefix=			Set prefix for all lines
 			  Set a generic prefix to be prepended to all outputted lines.
 
-		  -post, --postfix			Set postfix for all lines
+		  -post=, --postfix=		  Set postfix for all lines
 			  Set a generic postfix to be appended to all outputted lines.
-
-			  Some special strings that can be used for both prefix and postfix:
+			  
+			  Some special strings that can be used for prefix and postfix:
 			  - %game% / %machine% - Replaced with the Game/Machine name
 			  - %name% - Replaced with the Rom name
-			  - %%manufacturer%% - Replaced with game Manufacturer
+			  - %manufacturer% - Replaced with game Manufacturer
 			  - %publisher% - Replaced with game Publisher
 			  - %crc% - Replaced with the CRC
 			  - %md5% - Replaced with the MD5
@@ -770,10 +806,10 @@ Options:
 			  This flag allows for the name of the game to be used as a prefix
 			  to each file.
 
-		  -ae, --add-extension		Add an extension to each item
+		  -ae=, --add-extension=	  Add an extension to each item
 			  Add a postfix extension to each full item name.
 
-		  -rep, --replace-extension   Replace all extensions with specified
+		  -rep=, --replace-extension= Replace all extensions with specified
 			  When an extension exists, replace it with the provided instead.
 
 		  -rme, --remove-extensions   Remove all extensions from all items
@@ -790,43 +826,43 @@ Options:
 			  tag for each set. This flag allows users to output the older
 			  "game" tag instead, for compatibility reasons. [Logiqx only]
 
-	  -f, --filename			  Set the external name of the DAT
+	  -f=, --filename=			Set the external name of the DAT
 		  Set the external filename for the output DAT(s)
 
-	  -n, --name				  Set the internal name of the DAT
+	  -n=, --name=				Set the internal name of the DAT
 		  Set the name header field for the output DAT(s)
 
-	  -de, --description		  Set the description of the DAT
+	  -de=, --description=		Set the description of the DAT
 		  Set the description header field for the output DAT(s)
 
-	  -r, --root				  Set a new rootdir
+	  -r=, --root=				Set a new rootdir
 		  Set the rootdir (as used by SuperDAT mode) for the output DAT(s).
 
-	  -c, --category			  Set the category of the DAT
+	  -c=, --category=			Set the category of the DAT
 		  Set the category header field for the output DAT(s)
 
-	  -v, --version			   Set the version of the DAT
+	  -v=, --version=			 Set the version of the DAT
 		  Set the version header field for the output DAT(s)
 
-	  -da, --date				 Set a new date
+	  -da=, --date=			   Set a new date
 		  Set the date header field for the output DAT(s)
 
-	  -au, --author			   Set the author of the DAT
+	  -au=, --author=			 Set the author of the DAT
 		  Set the author header field for the output DAT(s)
 
-	  -em, --email				Set a new email of the DAT
+	  -em=, --email=			  Set a new email of the DAT
 		  Set the email header field for the output DAT(s)
 
-	  -hp, --homepage			 Set a new homepage of the DAT
+	  -hp=, --homepage=		   Set a new homepage of the DAT
 		  Set the homepage header field for the output DAT(s)
 
-	  -u, --url				   Set a new URL of the DAT
+	  -u=, --url=				 Set a new URL of the DAT
 		  Set the URL header field for the output DAT(s)
 
-	  -co, --comment			  Set a new comment of the DAT
+	  -co=, --comment=			Set a new comment of the DAT
 		  Set the comment header field for the output DAT(s)
 
-	  -h, --header				Set a header skipper to use, blank means all
+	  -h=, --header=			  Set a header skipper to use, blank means all
 		  Set the header special field for the output DAT(s). In file
 		  rebuilding, this flag allows for either all copier headers (using "")
 		  or specific copier headers by name (such as "fds.xml") to determine
@@ -837,15 +873,15 @@ Options:
 		  preserving the directory structure of the inputted folder, if
 		  applicable.
 
-	  -fm, --forcemerging		 Set force merging
+	  -fm=, --forcemerging=	   Set force merging
 		  Set the forcemerging tag to the given value.
 		  Possible values are: None, Split, Merged, Nonmerged, Full
 
-	  -fn, --forcenodump		  Set force nodump
+	  -fn=, --forcenodump=		Set force nodump
 		  Set the forcenodump tag to the given value.
 		  Possible values are: None, Obsolete, Required, Ignore
 
-	  -fp, --forcepacking		 Set force packing
+	  -fp=, --forcepacking=	   Set force packing
 		  Set the forcepacking tag to the given value.
 		  Possible values are: None, Zip, Unzip
 
@@ -853,7 +889,7 @@ Options:
 		  If this flag is enabled, then the romof, cloneof, and sampleof tags
 		  will be omitted from the outputted DAT.
 
-	  -ef, --exclude-field		  Exclude a game/rom field from outputs
+	  -ef=, --exclude-field=	  Exclude a game/rom field from outputs
 		  Exclude any valid item or machine field from outputs. Examples
 		  include: romof, publisher, and offset.
 
@@ -861,6 +897,11 @@ Options:
 		  In some cases, it is beneficial to have every rom put into its own
 		  output set as a subfolder of the original parent. This flag enables
 		  outputting each rom to its own game for this purpose.
+
+	  -keg, --keep-empty-games	Keep originally empty sets from the input(s)
+		  Normally, any sets that are considered empty will not be included in
+		  the output, this flag allows these empty sets to be added to the
+		  output.
 
 	  -sds, --scene-date-strip	Remove date from scene-named sets
 		  If this flag is enabled, sets with "scene" names will have the date
@@ -933,7 +974,7 @@ Options:
 		  In the cases where files will have too long a name, this allows for
 		  trimming the name of the files to the NTFS maximum length at most.
 
-		  -rd, --root-dir			 Set the root directory for calc
+		  -rd=, --root-dir=		   Set the root directory for calc
 			  In the case that the files will not be stored from the root
 			  directory, a new root can be set for path length calculations.
 
@@ -1003,27 +1044,27 @@ Options:
 		  diffing, which may be more useful in some cases. This is heavily
 		  influenced by the diffing model used by Romba.
 
-		  -bd, --base-dat			 Add a base DAT for processing
+		  -bd=, --base-dat=		   Add a base DAT for processing
 			  Add a DAT or folder of DATs to the base set to be used for all
 			  operations. Multiple instances of this flag are allowed.
 
 	  -br, --base-replace		 Replace from base DATs in order
 		  By default, no item names are changed except when there is a merge
 		  occurring. This flag enables users to define a DAT or set of base
-		  DATs to use as "replacements" for all input DATs. Note that the
-		  first found instance of an item in the base DAT(s) will be used and
-		  all others will be discarded. If no additional flag is given, it
-		  will default to updating names.
+		  DATs to use as "replacements" for all input DATs. Note that the first
+		  found instance of an item in the base DAT(s) will be used and all
+		  others will be discarded. If no additional flag is given, it will
+		  default to updating names.
 
 	  -rbr, --reverse-base-replace Replace item names from base DATs in reverse
 		  By default, no item names are changed except when there is a merge
 		  occurring. This flag enables users to define a DAT or set of base
-		  DATs to use as "replacements" for all input DATs. Note that the
-		  first found instance of an item in the last base DAT(s) will be used
-		  and all others will be discarded. If no additional flag is given, it
-		  will default to updating names.
+		  DATs to use as "replacements" for all input DATs. Note that the first
+		  found instance of an item in the last base DAT(s) will be used and
+		  all others will be discarded. If no additional flag is given, it will
+		  default to updating names.
 
-		  -bd, --base-dat			 Add a base DAT for processing
+		  -bd=, --base-dat=		   Add a base DAT for processing
 			  Add a DAT or folder of DATs to the base set to be used for all
 			  operations. Multiple instances of this flag are allowed.
 			  [Both base-replace and reverse-base-replace]
@@ -1046,25 +1087,26 @@ Options:
 				  will only be overwritten if they are the same as the machine
 				  names.
 
-		  -ugt, --update-game-type	  Update machine type from base DATs
+		  -ugt, --update-game-type	Update machine type from base DATs
 			  This flag enables updating of machine type from base DATs.
 			  [Both base-replace and reverse-base-replace]
-			 
-		  -up, --update-parents		  Update machine parents from base DATs
-			  This flag enables updating of machine parents (romof, cloneof,
-			  sampleof) from base DATs. [Both base-replace and reverse-base-replace]
-			 
+
 		  -uy, --update-year		  Update machine years from base DATs
 			  This flag enables updating of machine years from base DATs.
-			 [Both base-replace and reverse-base-replace]
+			  [Both base-replace and reverse-base-replace]
 
 		  -um, --update-manufacturer  Update machine manufacturers from base DATs
 			  This flag enables updating of machine manufacturers from base
 			  DATs. [Both base-replace and reverse-base-replace]
 
+		  -up, --update-parents	   Update machine parents from base DATs
+			  This flag enables updating of machine parents (romof, cloneof,
+			  sampleof) from base DATs. [Both base-replace and
+			  reverse-base-replace]
+
 	  -dc, --diff-cascade		 Enable cascaded diffing
-		  This flag allows for a special type of diffing in which the first
-		  DAT is considered a base, and for each additional input DAT, it only
+		  This flag allows for a special type of diffing in which the first DAT
+		  is considered a base, and for each additional input DAT, it only
 		  leaves the files that are not in one of the previous DATs. This can
 		  allow for the creation of rollback sets or even just reduce the
 		  amount of duplicates across multiple sets.
@@ -1074,32 +1116,31 @@ Options:
 		  is considered a base, and for each additional input DAT, it only
 		  leaves the files that are not in one of the previous DATs. This can
 		  allow for the creation of rollback sets or even just reduce the
-		  amount of duplicates across multiple sets. [Both diff-cascade and
-		  diff-reverse-cascade]
+		  amount of duplicates across multiple sets.
 
 		  -sf, --skip-first-output	Skip output of first DAT
 			  In times where the first DAT does not need to be written out a
 			  second time, this will skip writing it. This can often speed up
-			  the output process.
+			  the output process. [Both diff-cascade and diff-reverse-cascade]
 
-	  -gn, --game-name			Filter by game name
+	  -gn=, --game-name=		  Filter by game name
 		  Include only items with this game name in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -ngn, --not-game-name	   Filter by not game name
+	  -ngn=, --not-game-name=	 Filter by not game name
 		  Include only items without this game name in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -gd, --game-description	 Filter by game description
+	  -gd=, --game-description=   Filter by game description
 		  Include only items with this game description in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -ngd, --not-game-description Filter by not game description
+	  -ngd=, --not-game-description= Filter by not game description
 		  Include only items without this game description in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
@@ -1111,126 +1152,126 @@ Options:
 		  This can allow for more advanced set-building, especially in
 		  arcade-based sets.
 
-	  -rn, --item-name			Filter by item name
+	  -rn=, --item-name=		  Filter by item name
 		  Include only items with this item name in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -nrn, --not-item-name	   Filter by not item name
+	  -nrn=, --not-item-name=	 Filter by not item name
 		  Include only items without this item name in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -rt, --item-type			Filter by item type
+	  -rt=, --item-type=		  Filter by item type
 		  Include only items with this item type in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -nrt, --not-item-type	   Filter by not item type
+	  -nrt=, --not-item-type=	 Filter by not item type
 		  Include only items without this item type in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -sgt, --greater			 Filter by size >=
+	  -sgt=, --greater=		   Filter by size >=
 		  Only include items whose size is greater than or equal to this value
 		  in the output DAT. Users can specify either a regular integer number
 		  or a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192
 
-	  -slt, --less				Filter by size =<
+	  -slt=, --less=			  Filter by size =<
 		  Only include items whose size is less than or equal to this value in
 		  the output DAT. Users can specify either a regular integer number or
 		  a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192
 
-	  -seq, --equal			   Filter by size ==
+	  -seq=, --equal=			 Filter by size ==
 		  Only include items of this exact size in the output DAT. Users can
 		  specify either a regular integer number or a number with a standard
 		  postfix. e.g. 8kb => 8000 or 8kib => 8192
 
-	  -crc, --crc				 Filter by CRC hash
+	  -crc=, --crc=			   Filter by CRC hash
 		  Include only items with this CRC hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -ncrc, --not-crc			Filter by not CRC hash
+	  -ncrc=, --not-crc=		  Filter by not CRC hash
 		  Include only items without this CRC hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -md5, --md5				 Filter by MD5 hash
+	  -md5=, --md5=			   Filter by MD5 hash
 		  Include only items with this MD5 hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -nmd5, --not-md5			Filter by not MD5 hash
+	  -nmd5=, --not-md5=		  Filter by not MD5 hash
 		  Include only items without this MD5 hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -sha1, --sha1			   Filter by SHA-1 hash
+	  -sha1=, --sha1=			 Filter by SHA-1 hash
 		  Include only items with this SHA-1 hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
-	  -nsha1, --not-sha1		  Filter by not SHA-1 hash
+	  -nsha1=, --not-sha1=		Filter by not SHA-1 hash
 		  Include only items without this SHA-1 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -sha256, --sha256		   Filter by SHA-256 hash
+	  -sha256=, --sha256=		 Filter by SHA-256 hash
 		  Include only items with this SHA-256 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -nsha256, --not-sha256	  Filter by not SHA-256 hash
+	  -nsha256=, --not-sha256=	Filter by not SHA-256 hash
 		  Include only items without this SHA-256 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -sha384, --sha384		   Filter by SHA-384 hash
+	  -sha384=, --sha384=		 Filter by SHA-384 hash
 		  Include only items with this SHA-384 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -nsha384, --not-sha384	  Filter by not SHA-384 hash
+	  -nsha384=, --not-sha384=	Filter by not SHA-384 hash
 		  Include only items without this SHA-384 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -sha512, --sha512		   Filter by SHA-512 hash
+	  -sha512=, --sha512=		 Filter by SHA-512 hash
 		  Include only items with this SHA-512 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -nsha512, --not-sha512	  Filter by not SHA-512 hash
+	  -nsha512=, --not-sha512=	Filter by not SHA-512 hash
 		  Include only items without this SHA-512 hash in the output.
 		  Additionally, the user can specify an exact match or full C#-style
 		  regex for pattern matching. Multiple instances of this flag are
 		  allowed.
 
-	  -is, --status			   Include only items with a given status
+	  -is=, --status=			 Include only items with a given status
 		  Include only items with this item status in the output. Multiple
 		  instances of this flag are allowed.
 		  Possible values are: None, Good, BadDump, Nodump, Verified
 
-	  -nis, --not-status		  Exclude only items with a given status
+	  -nis=, --not-status=		Exclude only items with a given status
 		  Include only items without this item status in the output. Multiple
 		  instances of this flag are allowed.
 		  Possible values are: None, Good, BadDump, Nodump, Verified
 
-	  -gt, --game-type			Include only games with a given type
+	  -gt=, --game-type=		  Include only games with a given type
 		  Include only items with this game type in the output. Multiple
 		  instances of this flag are allowed.
 		  Possible values are: None, Bios, Device, Mechanical
 
-	  -ngt, --not-game-type	   Exclude only games with a given type
+	  -ngt=, --not-game-type=	 Exclude only games with a given type
 		  Include only items without this game type in the output. Multiple
 		  instances of this flag are allowed.
 		  Possible values are: None, Bios, Device, Mechanical
@@ -1241,7 +1282,7 @@ Options:
 	  -nrun, --not-runnable	   Include only items that are not marked runnable
 		  This allows users to include only unrunnable games.
 
-	  -out, --output-dir		  Output directory
+	  -out=, --output-dir=		Output directory
 		  This sets an output folder to be used when the files are created. If
 		  a path is not defined, the runtime directory is used instead.
 
@@ -1250,7 +1291,7 @@ Options:
 		  directory, if set). This flag enables users to write out to the
 		  directory that the DATs originated from.
 
-	  -mt, --threads			  Amount of threads to use (default = # cores)
+	  -mt=, --threads=			Amount of threads to use (default = # cores)
 		  Optionally, set the number of threads to use for the multithreaded
 		  operations. The default is the number of available machine threads;
 		  -1 means unlimited threads created.
@@ -1262,7 +1303,7 @@ Options:
 	  within. This will only do a direct verification of the items within and
 	  will create a fixdat afterwards for missing files.
 
-	  -dat, --dat				 Input DAT to be used
+	  -dat=, --dat=			   Input DAT to be used
 		  User-supplied DAT for use in all operations. Multiple instances of
 		  this flag are allowed.
 
@@ -1271,7 +1312,7 @@ Options:
 		  If this flag is used, all input directories will be assumed to be
 		  romba-style depots.
 
-	  -t, --temp				  Set the temporary directory to use
+	  -t=, --temp=				Set the temporary directory to use
 		  Optionally, a temp folder can be supplied in the case the default
 		  temp directory is not preferred.
 
@@ -1288,7 +1329,7 @@ Options:
 		  can only get the CRC and size from most archive formats, leading to
 		  possible issues.
 
-	  -h, --header				Set a header skipper to use, blank means all
+	  -h=, --header=			  Set a header skipper to use, blank means all
 		  Set the header special field for the output DAT(s). In file
 		  rebuilding, this flag allows for either all copier headers (using "")
 		  or specific copier headers by name (such as "fds.xml") to determine
