@@ -1377,7 +1377,7 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 	Convert a DAT file to XML and put it in a new folder
 
 	Long form:
-		SabreTools.exe --update --output-xml --output-dir==OutDir
+		SabreTools.exe --update --output-type=xml --output-dir==OutDir
 		Path\To\DatFile.dat
 
 	Short form:
@@ -1388,7 +1388,7 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 	Note: This would output the created files to the SabreTools folder
 
 	Long form:
-		SabreTools.exe --update --output-cmp --exclude-of Path\To\Dats
+		SabreTools.exe --update --output-type=cmp --exclude-of Path\To\Dats
 
 	Short form:
 		SabreTools.exe -ud -oc -xof Path\To\Dats
@@ -1397,7 +1397,7 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 	Create an XML DAT from a folder of zipped sets setting a custom name
 
 	Long form:
-		SabreTools.exe --dfd --output-xml --name=DatName Path\To\Files
+		SabreTools.exe --dfd --output-type=xml --name=DatName Path\To\Files
 
 	Short form:
 		SabreTools.exe -d -ox -n=DatName Path\To\Files
@@ -1407,8 +1407,8 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 	and outputting in TorrentZip format
 
 	Long form:
-		SabreTools.exe --sort --dat=Fix.dat --tzip --output-dir==FixDir InDir1
-		InDir2
+		SabreTools.exe --sort --dat=Fix.dat --torrent-zip --output-dir==FixDir
+		InDir1 InDir2
 
 	Short form:
 		SabreTools.exe -ss -dat=Fix.dat -tzip -out=FixDir InDir2 InDir2
