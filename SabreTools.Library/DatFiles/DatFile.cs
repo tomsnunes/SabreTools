@@ -3859,7 +3859,7 @@ namespace SabreTools.Library.DatFiles
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool? isZip, string headerToCheckAgainst)
 		{
 			// Set the output value
-			bool rebuilt = false;
+			bool rebuilt = true;
 
 			// If the DatItem is a Disk, force rebuilding to a folder except if TGZ
 			if (datItem.Type == ItemType.Disk && outputFormat != OutputFormat.TorrentGzip)
@@ -3893,7 +3893,7 @@ namespace SabreTools.Library.DatFiles
 				// If we don't have any duplicates, continue
 				if (dupes.Count == 0)
 				{
-					return rebuilt;
+					return false;
 				}
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
@@ -3952,7 +3952,7 @@ namespace SabreTools.Library.DatFiles
 				// If the stream is null, then continue
 				if (fileStream == null)
 				{
-					return rebuilt;
+					return false;
 				}
 
 				// Seek to the beginning of the stream
@@ -4036,7 +4036,7 @@ namespace SabreTools.Library.DatFiles
 				// If the stream is null, then continue
 				if (fileStream == null)
 				{
-					return rebuilt;
+					return false;
 				}
 
 				// Get the item from the current file
@@ -4126,7 +4126,7 @@ namespace SabreTools.Library.DatFiles
 				// If the stream is null, then continue
 				if (fileStream == null)
 				{
-					return rebuilt;
+					return false;
 				}
 
 				// Check to see if we have a matching header first
@@ -4154,7 +4154,7 @@ namespace SabreTools.Library.DatFiles
 							// If we don't have any duplicates, continue
 							if (dupes.Count == 0)
 							{
-								return rebuilt;
+								return false;
 							}
 
 							Globals.Logger.User("Headerless matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
