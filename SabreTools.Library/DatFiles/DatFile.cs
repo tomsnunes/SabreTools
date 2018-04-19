@@ -3896,7 +3896,7 @@ namespace SabreTools.Library.DatFiles
 					return false;
 				}
 
-				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
+				// If we have a very specific TGZ->TGZ case, just copy it accordingly
 				GZipArchive tgz = new GZipArchive(file);
 				BaseFile rom = tgz.GetTorrentGZFileInfo();
 				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
@@ -3980,7 +3980,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				string machinename = null;
 
-				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
+				// If we have a very specific TGZ->TGZ case, just copy it accordingly
 				GZipArchive tgz = new GZipArchive(file);
 				BaseFile rom = tgz.GetTorrentGZFileInfo();
 				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
