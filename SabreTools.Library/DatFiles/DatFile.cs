@@ -1684,7 +1684,7 @@ namespace SabreTools.Library.DatFiles
 
 			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 			{
-				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+				string innerpost = " (" + j + " - " + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 				DatFile diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
@@ -1816,7 +1816,7 @@ namespace SabreTools.Library.DatFiles
 
 				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{
-					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+					string innerpost = " (" + j + " - " + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 					DatFile diffData = new DatFile(this);
 					diffData.FileName += innerpost;
 					diffData.Name += innerpost;
