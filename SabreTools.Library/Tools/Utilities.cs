@@ -2584,6 +2584,34 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get the proper filename (with subpath) from the file and parent combination
+		/// </summary>
+		/// <param name="path">Input combined path to use</param>
+		/// <param name="sanitize">True if path separators should be converted to '-', false otherwise</param>
+		/// <returns>Subpath for the file</returns>
+		public static string GetFilenameFromFileAndParent(string path, bool sanitize)
+		{
+			// Check that we have a combined path first
+			if (!path.Contains("¬"))
+			{
+				return Path.GetFileName(path).Replace('/', '-').Replace('\\', '-');
+			}
+
+			// First separate out the parts
+			string child = path.Split('¬')[0];
+			string parent = path.Split('¬')[1];
+
+			// If the parts are the same, return the filename from the first part
+			if (child == parent)
+			{
+				return Path.GetFileName(child).Replace('/', '-').Replace('\\', '-');
+			}
+
+			// Otherwise, remove the parent from the child and return the remainder
+			return child.Remove(0, parent.Length + 1).Replace('/', '-').Replace('\\', '-');
+		}
+
+		/// <summary>
 		/// Get the dictionary key that should be used for a given item and sorting type
 		/// </summary>
 		/// <param name="item">DatItem to get the key for</param>
