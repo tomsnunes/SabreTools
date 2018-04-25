@@ -1598,7 +1598,7 @@ namespace SabreTools.Library.DatFiles
 				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace);
 
 				// Once we're done, try writing out
-				intDat.Write(interOutDir);
+				intDat.Write(interOutDir, overwrite: inplace);
 
 				// Due to possible memory requirements, we force a garbage collection
 				GC.Collect();
@@ -1657,7 +1657,7 @@ namespace SabreTools.Library.DatFiles
 				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace);
 
 				// Once we're done, try writing out
-				intDat.Write(interOutDir);
+				intDat.Write(interOutDir, overwrite: inplace);
 
 				// Due to possible memory requirements, we force a garbage collection
 				GC.Collect();
@@ -1681,15 +1681,13 @@ namespace SabreTools.Library.DatFiles
 			InternalStopwatch watch = new InternalStopwatch("Initializing all output DATs");
 
 			DatFile[] outDatsArray = new DatFile[inputs.Count];
-
-			// TODO: Make this smarter when there are multiple input directories specified
 			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 			{
 				string innerpost = " (" + j + " - " + Utilities.GetFilenameFromFileAndParent(inputs[j], true) + " Only)";
 				DatFile diffData;
 
-				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace)
+				// If we're in inplace mode or the output directory is set, take the appropriate DatData object already stored
+				if (inplace || outDir != Environment.CurrentDirectory)
 				{
 					diffData = datHeaders[j];
 				}
@@ -1748,7 +1746,7 @@ namespace SabreTools.Library.DatFiles
 				string path = Utilities.GetOutputPath(outDir, inputs[j], inplace);
 
 				// Try to output the file
-				outDats[j].Write(path);
+				outDats[j].Write(path, overwrite: inplace);
 			});
 
 			watch.Stop();
@@ -1892,13 +1890,13 @@ namespace SabreTools.Library.DatFiles
 			// Output the difflist (a-b)+(b-a) diff
 			if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 			{
-				outerDiffData.Write(outDir);
+				outerDiffData.Write(outDir, overwrite: false);
 			}
 
 			// Output the (ab) diff
 			if ((diff & UpdateMode.DiffDupesOnly) != 0)
 			{
-				dupeData.Write(outDir);
+				dupeData.Write(outDir, overwrite: false);
 			}
 
 			// Output the individual (a-b) DATs
@@ -1909,7 +1907,7 @@ namespace SabreTools.Library.DatFiles
 					string path = Utilities.GetOutputPath(outDir, inputs[j], false /* inplace */);
 
 					// Try to output the file
-					outDats[j].Write(path);
+					outDats[j].Write(path, overwrite: false);
 				});
 			}
 
@@ -1953,7 +1951,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Try to output the file
-			Write(outDir);
+			Write(outDir, overwrite: false);
 		}
 
 		/// <summary>
@@ -1985,8 +1983,7 @@ namespace SabreTools.Library.DatFiles
 				string realOutDir = Utilities.GetOutputPath(outDir, file, inplace);
 
 				// Try to output the file, overwriting only if it's not in the current directory
-				// TODO: Figure out if overwriting should always happen of if there should be a user flag
-				innerDatdata.Write(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
+				innerDatdata.Write(realOutDir, overwrite: inplace);
 			}
 		}
 

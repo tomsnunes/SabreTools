@@ -2721,6 +2721,13 @@ namespace SabreTools.Library.Tools
 					outDir = Path.GetDirectoryName(split[1]);
 				}
 
+				// TODO: Should this be the default? Always create a subfolder if a folder is found?
+				// If we are processing a path that is coming from a directory and we are outputting to the current directory, we want to get the subfolder to write to
+				else if (split[0].Length != split[1].Length && outDir == Environment.CurrentDirectory)
+				{
+					outDir = Path.GetDirectoryName(Path.Combine(outDir, split[0].Remove(0, Path.GetDirectoryName(split[1]).Length + 1)));
+				}
+
 				// If we are processing a path that is coming from a directory, we want to get the subfolder to write to
 				else if (split[0].Length != split[1].Length)
 				{
