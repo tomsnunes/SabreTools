@@ -1682,13 +1682,14 @@ namespace SabreTools.Library.DatFiles
 
 			DatFile[] outDatsArray = new DatFile[inputs.Count];
 
+			// TODO: Make this smarter when there are multiple input directories specified
 			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 			{
 				string innerpost = " (" + j + " - " + Utilities.GetFilenameFromFileAndParent(inputs[j], true) + " Only)";
 				DatFile diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace || outDir != Environment.CurrentDirectory)
+				if (inplace)
 				{
 					diffData = datHeaders[j];
 				}
