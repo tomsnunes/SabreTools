@@ -135,7 +135,6 @@
     <Compile Include="External\Zlib\ZlibCodec.cs" />
     <Compile Include="External\Zlib\ZlibConstants.cs" />
     <Compile Include="External\Zlib\ZlibStream.cs" />
-    <Compile Include="External\xxHash\xxHash.cs" />
     <Compile Include="FileTypes\BaseArchive.cs" />
     <Compile Include="FileTypes\BaseFile.cs" />
     <Compile Include="FileTypes\CHDFile.cs" />

@@ -238,12 +238,11 @@ namespace SabreTools.Library.Data
 		SHA256 = SHA1 << 1,
 		SHA384 = SHA256 << 1,
 		SHA512 = SHA384 << 1,
-		xxHash = SHA512 << 1,
 
 		// Special combinations
 		Standard = CRC | MD5 | SHA1,
-		DeepHashes = SHA256 | SHA384 | SHA512 | xxHash,
-		SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512 | xxHash,
+		DeepHashes = SHA256 | SHA384 | SHA512,
+		SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512,
 	}
 
 	/// <summary>
