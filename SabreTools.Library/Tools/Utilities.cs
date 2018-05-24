@@ -2707,7 +2707,7 @@ namespace SabreTools.Library.Tools
 				// If we have an inplace output, use the directory name from the input path
 				if (inplace)
 				{
-					outDir = Path.GetDirectoryName(split[1]);
+					outDir = Path.GetDirectoryName(split[0]);
 				}
 
 				// TODO: Should this be the default? Always create a subfolder if a folder is found?
