@@ -72,6 +72,8 @@ An in-progress tool that will try to act as a C# port of the Go-based [Romba](ht
 
 In the most technical sense, the best way to get the newest version is to build it yourself. There's no guarantee that I will release intermediate builds based on incremental code updates. Combined with the fact that I don't know how to set up a continuous build system, we get an odd situation for those users who want the bleeding edge releases. For the time being, you can find all test and intermediate builds at [this link](https://mega.nz/#F!8JUhWZxT!h4DnCsgcBsMH3RRDKv27CA).
 
+For a limited time, I'm trying out AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/c3hsfpmqhg40al35/branch/master?svg=true)](https://ci.appveyor.com/project/mnadareski/sabretools/branch/master)
+
 ### Some Things to Note
 
 I have to say these because I know how some users are.
