@@ -29,7 +29,7 @@ build:
 
 # post-build step
 after_build:
-- ps: 7z a sabretools_$(configuration)-$(platform).zip C:\projects\Debug*\
+- ps: 7z a sabretools_%CONFIGURATION%-%PLATFORM %.zip C:\projects\Debug*\
 
 # artifact linking
 artifacts:
