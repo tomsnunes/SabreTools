@@ -13,11 +13,25 @@ before_build:
 - ps: nuget restore
 build:
   verbosity: minimal
-after_build:
-- ps: 7z a sabretools_debug-x64.zip C:\projects\Debug-x64\*
-- ps: 7z a sabretools_debug-mono-x64.zip C:\projects\Debug-mono-x64\*
-artifacts:
-- path: sabretools_debug-x64.zip
-  name: SabreTools (x64)
-- path: sabretools_debug-mono-x64.zip
-  name: SabreTooks (Mono x64)
+for:
+-
+  matrix:
+    only:
+      - platform: Mono
+    
+    after_build:
+    - ps: 7z a sabretools_debug-mono-x64.zip C:\projects\Debug-mono-x64\*
+    artifacts:
+    - path: sabretools_debug-mono-x64.zip
+      name: SabreTooks (Mono x64)
+for:
+-
+  matrix:
+    only:
+      - platform: x64
+    
+    after_build:
+    - ps: 7z a sabretools_debug-x64.zip C:\projects\Debug-x64\*
+    artifacts:
+    - path: sabretools_debug-x64.zip
+      name: SabreTools (x64)
