@@ -1,7 +1,14 @@
+# Version Format
 version: 0.9.9-test_{build}
+
+# VM Template
 image: Visual Studio 2017
+
+# Environment Variables
 environment:
   EnableNuGetPackageRestore: true
+
+
 platform:
 - x64
 - Mono
@@ -13,25 +20,8 @@ before_build:
 - ps: nuget restore
 build:
   verbosity: minimal
-for:
--
-  matrix:
-    only:
-      - platform: Mono
-    
-    after_build:
-    - ps: 7z a sabretools_debug-mono-x64.zip C:\projects\Debug-mono-x64\*
+after_build:
+    - ps: 7z a sabretools_$(configuration)-$(platform).zip C:\projects\Debug*\
     artifacts:
-    - path: sabretools_debug-mono-x64.zip
-      name: SabreTooks (Mono x64)
-for:
--
-  matrix:
-    only:
-      - platform: x64
-    
-    after_build:
-    - ps: 7z a sabretools_debug-x64.zip C:\projects\Debug-x64\*
-    artifacts:
-    - path: sabretools_debug-x64.zip
-      name: SabreTools (x64)
+    - path: sabretools_$(configuration)-$(platform).zip
+      name: SabreTools ($(platform))
