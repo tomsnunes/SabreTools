@@ -11,9 +11,9 @@ environment:
 # msbuild configuration
 platform:
 - x64
-- Mono
 configuration:
 - Debug
+- Mono
 
 # install dependencies
 install:
