@@ -21,7 +21,7 @@ install:
 
 # pre-build script
 before_build:
-- ps: nuget restore
+- nuget restore
 
 # build step
 build:
@@ -29,7 +29,7 @@ build:
 
 # post-build step
 after_build:
-- ps: 7z a sabretools_%CONFIGURATION%-%PLATFORM%.zip C:\projects\Debug*\
+- 7z a sabretools_%CONFIGURATION%-%PLATFORM%.zip C:\projects\Debug*\
 
 # artifact linking
 artifacts:
