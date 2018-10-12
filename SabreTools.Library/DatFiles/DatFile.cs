@@ -2217,7 +2217,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromDevices(false, false);
+			while (AddRomsFromDevices(false, false));
 			while (AddRomsFromDevices(true, false));
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
