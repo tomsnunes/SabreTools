@@ -1,5 +1,7 @@
 # ![](images/sabretools-rect.png)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/c3hsfpmqhg40al35/branch/master?svg=true)](https://ci.appveyor.com/project/mnadareski/sabretools/branch/master)
+
 ## Introduction
 
 The SabreTools project started as a desktop port of some core features of Wizard of DATz Redux, but it has since grown into a fully-featured DAT management tool. Below is a brief description of the features available in the suite. For more information about each feature, see the help text in each of the programs. For more information about the parent project, see [here](https://github.com/SabreTools/wizzardRedux).
@@ -70,21 +72,11 @@ An in-progress tool that will try to act as a C# port of the Go-based [Romba](ht
 
 ## Builds
 
-In the most technical sense, the best way to get the newest version is to build it yourself. There's no guarantee that I will release intermediate builds based on incremental code updates. Combined with the fact that I don't know how to set up a continuous build system, we get an odd situation for those users who want the bleeding edge releases. For the time being, you can find all test and intermediate builds at [this link](https://mega.nz/#F!8JUhWZxT!h4DnCsgcBsMH3RRDKv27CA).
+Last stable releases can be found on [the Releases tab](https://github.com/SabreTools/SabreTools/releases).
 
-For a limited time, I'm trying out AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/c3hsfpmqhg40al35/branch/master?svg=true)](https://ci.appveyor.com/project/mnadareski/sabretools/branch/master)
+Latest unstable builds can be found on [AppVeyor](https://ci.appveyor.com/project/mnadareski/sabretools/branch/master).
 
-### Some Things to Note
-
-I have to say these because I know how some users are.
-
-1. These builds have no guarantee of working for all features. For best experiences, please use the latest stable build.
-2. These builds may contain features that will be replaced or removed in the future. Do NOT take a dependency on any flags or naming conventions that you see.
-3. The names of the builds generally have to do with what each new change tests. Do NOT ask for names of these to be changed; they are named exactly how they will stay, no matter how odd or stupid it is.
-4. Not all versions will be built each time. This means that some test builds and prereleases will ONLY have a Mono x64 build or a Debug x64 build. Unless there is a specific need to test one of these and you have no way of building yourself, please do not request alternate versions of these.
-5. No, I won't be hosting them on another hoster. MEGA does its job here and that's all that is needed. Yes, I know that some multiple uploaders include MEGA. No, I don't care. Sorry.
-
-The day that a continuous build system is set up (read: never), these links will be archived, possibly on a third party host instead of relying on MEGA.
+For older test versions, please see the old [MEGA link](https://mega.nz/#F!8JUhWZxT!h4DnCsgcBsMH3RRDKv27CA). Note that older test versions had wonky naming, didn't always include all variants, and may be feature incomplete or not working at all.
 
 ## Licensing
 
