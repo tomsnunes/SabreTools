@@ -3576,9 +3576,17 @@ namespace SabreTools.Library.DatFiles
 					continue;
 				}
 
-				// Otherwise, we rebuild that file to all locations that we need to
-				RebuildIndividualFile(new Rom(fileinfo), foundpath, outDir, date, inverse, outputFormat, romba,
-					updateDat, false /* isZip */, headerToCheckAgainst);
+                // Otherwise, we rebuild that file to all locations that we need to
+                if (this[hash][0].Type == ItemType.Disk)
+                {
+                    RebuildIndividualFile(new Disk(fileinfo), foundpath, outDir, date, inverse, outputFormat, romba,
+                        updateDat, false /* isZip */, headerToCheckAgainst);
+                }
+                else
+                {
+                    RebuildIndividualFile(new Rom(fileinfo), foundpath, outDir, date, inverse, outputFormat, romba,
+                        updateDat, false /* isZip */, headerToCheckAgainst);
+                }
 			}
 
 			watch.Stop();
@@ -4268,7 +4276,8 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Now we want to remove all duplicates from the DAT
-				new Rom(fileinfo).GetDuplicates(this, remove: true);
+				new Rom(fileinfo).GetDuplicates(this, remove: true)
+                    .AddRange(new Disk(fileinfo).GetDuplicates(this, remove: true));
 			}
 
 			watch.Stop();
