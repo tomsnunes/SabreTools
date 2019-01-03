@@ -33,5 +33,5 @@ after_build:
 
 # artifact linking
 artifacts:
-- path: sabretools_$(configuration)-$(platform).zip
+- path: sabretools_$(version)_$(configuration)-$(platform).zip
   name: SabreTools ($(platform))
