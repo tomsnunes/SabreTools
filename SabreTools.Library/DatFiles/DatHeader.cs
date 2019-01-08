@@ -1,275 +1,105 @@
 ﻿using System;
-using System.Collections.Generic;
-
 using SabreTools.Library.Data;
 
 namespace SabreTools.Library.DatFiles
 {
-	/// <summary>
-	/// Represents all possible DAT header information
-	/// </summary>
-	public class DatHeader : ICloneable
-	{
-		#region Private instance variables
+    /// <summary>
+    /// Represents all possible DAT header information
+    /// </summary>
+    public class DatHeader : ICloneable
+    {
+        #region Publicly facing variables
 
-		// Data common to most DAT types
-		private string _fileName;
-		private string _name;
-		private string _description;
-		private string _rootDir;
-		private string _category;
-		private string _version;
-		private string _date;
-		private string _author;
-		private string _email;
-		private string _homepage;
-		private string _url;
-		private string _comment;
-		private string _header;
-		private string _type; // Generally only used for SuperDAT
-		private ForceMerging _forceMerging;
-		private ForceNodump _forceNodump;
-		private ForcePacking _forcePacking;
-		private DatFormat _datFormat;
-		private bool[] _excludeFields = new bool[Enum.GetNames(typeof(Field)).Length];
-		private bool _oneRom;
-		private bool _keepEmptyGames;
-		private bool _sceneDateStrip;
-		private DedupeType _dedupeRoms;
-		private Hash _stripHash;
+        // Data common to most DAT types
+        public string FileName { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string RootDir { get; set; }
+        public string Category { get; set; }
+        public string Version { get; set; }
+        public string Date { get; set; }
+        public string Author { get; set; }
+        public string Email { get; set; }
+        public string Homepage { get; set; }
+        public string Url { get; set; }
+        public string Comment { get; set; }
+        public string Header { get; set; }
+        public string Type { get; set; } // Generally only used for SuperDAT
+        public ForceMerging ForceMerging { get; set; }
+        public ForceNodump ForceNodump { get; set; }
+        public ForcePacking ForcePacking { get; set; }
+        public DatFormat DatFormat { get; set; }
+        public bool[] ExcludeFields { get; set; } = new bool[Enum.GetNames(typeof(Field)).Length];
+        public bool OneRom { get; set; }
+        public bool KeepEmptyGames { get; set; }
+        public bool SceneDateStrip { get; set; }
+        public DedupeType DedupeRoms { get; set; }
+        public Hash StripHash { get; private set; }
 
-		// Data (mostly) specific to the Miss DAT type
-		private bool _useRomName;
-		private string _prefix;
-		private string _postfix;
-		private bool _quotes;
-		private string _repExt;
-		private string _addExt;
-		private bool _remExt;
-		private bool _gameName;
-		private bool _romba;
+        // Data specific to the Miss DAT type
+        public bool UseRomName { get; set; }
+        public string Prefix { get; set; }
+        public string Postfix { get; set; }
+        public bool Quotes { get; set; }
+        public string ReplaceExtension { get; set; }
+        public string AddExtension { get; set; }
+        public bool RemoveExtension { get; set; }
+        public bool GameName { get; set; }
+        public bool Romba { get; set; }
 
-		#endregion
+        #endregion
 
-		#region Publicly facing variables
+        #region Instance Methods
 
-		// Data common to most DAT types
-		public string FileName
-		{
-			get { return _fileName; }
-			set { _fileName = value; }
-		}
-		public string Name
-		{
-			get { return _name; }
-			set { _name = value; }
-		}
-		public string Description
-		{
-			get { return _description; }
-			set { _description = value; }
-		}
-		public string RootDir
-		{
-			get { return _rootDir; }
-			set { _rootDir = value; }
-		}
-		public string Category
-		{
-			get { return _category; }
-			set { _category = value; }
-		}
-		public string Version
-		{
-			get { return _version; }
-			set { _version = value; }
-		}
-		public string Date
-		{
-			get { return _date; }
-			set { _date = value; }
-		}
-		public string Author
-		{
-			get { return _author; }
-			set { _author = value; }
-		}
-		public string Email
-		{
-			get { return _email; }
-			set { _email = value; }
-		}
-		public string Homepage
-		{
-			get { return _homepage; }
-			set { _homepage = value; }
-		}
-		public string Url
-		{
-			get { return _url; }
-			set { _url = value; }
-		}
-		public string Comment
-		{
-			get { return _comment; }
-			set { _comment = value; }
-		}
-		public string Header
-		{
-			get { return _header; }
-			set { _header = value; }
-		}
-		public string Type // Generally only used for SuperDAT
-		{
-			get { return _type; }
-			set { _type = value; }
-		}
-		public ForceMerging ForceMerging
-		{
-			get { return _forceMerging; }
-			set { _forceMerging = value; }
-		}
-		public ForceNodump ForceNodump
-		{
-			get { return _forceNodump; }
-			set { _forceNodump = value; }
-		}
-		public ForcePacking ForcePacking
-		{
-			get { return _forcePacking; }
-			set { _forcePacking = value; }
-		}
-		public DatFormat DatFormat
-		{
-			get { return _datFormat; }
-			set { _datFormat = value; }
-		}
-		public bool[] ExcludeFields
-		{
-			get { return _excludeFields; }
-			set { _excludeFields = value; }
-		}
-		public bool OneRom
-		{
-			get { return _oneRom; }
-			set { _oneRom = value; }
-		}
-		public bool KeepEmptyGames
-		{
-			get { return _keepEmptyGames; }
-			set { _keepEmptyGames = value; }
-		}
-		public bool SceneDateStrip
-		{
-			get { return _sceneDateStrip; }
-			set { _sceneDateStrip = value; }
-		}
-		public DedupeType DedupeRoms
-		{
-			get { return _dedupeRoms; }
-			set { _dedupeRoms = value; }
-		}
+        #region Cloning Methods
 
-		// Data specific to the Miss DAT type
-		public bool UseRomName
-		{
-			get { return _useRomName; }
-			set { _useRomName = value; }
-		}
-		public string Prefix
-		{
-			get { return _prefix; }
-			set { _prefix = value; }
-		}
-		public string Postfix
-		{
-			get { return _postfix; }
-			set { _postfix = value; }
-		}
-		public bool Quotes
-		{
-			get { return _quotes; }
-			set { _quotes = value; }
-		}
-		public string ReplaceExtension
-		{
-			get { return _repExt; }
-			set { _repExt = value; }
-		}
-		public string AddExtension
-		{
-			get { return _addExt; }
-			set { _addExt = value; }
-		}
-		public bool RemoveExtension
-		{
-			get { return _remExt; }
-			set { _remExt = value; }
-		}
-		public bool GameName
-		{
-			get { return _gameName; }
-			set { _gameName = value; }
-		}
-		public bool Romba
-		{
-			get { return _romba; }
-			set { _romba = value; }
-		}
+        /// <summary>
+        /// Clone the current header
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return new DatHeader()
+            {
+                FileName = this.FileName,
+                Name = this.Name,
+                Description = this.Description,
+                RootDir = this.RootDir,
+                Category = this.Category,
+                Version = this.Version,
+                Date = this.Date,
+                Author = this.Author,
+                Email = this.Email,
+                Homepage = this.Homepage,
+                Url = this.Url,
+                Comment = this.Comment,
+                Header = this.Header,
+                Type = this.Type,
+                ForceMerging = this.ForceMerging,
+                ForceNodump = this.ForceNodump,
+                ForcePacking = this.ForcePacking,
+                DatFormat = this.DatFormat,
+                ExcludeFields = this.ExcludeFields,
+                OneRom = this.OneRom,
+                KeepEmptyGames = this.KeepEmptyGames,
+                SceneDateStrip = this.SceneDateStrip,
+                DedupeRoms = this.DedupeRoms,
+                StripHash = this.StripHash,
 
-		#endregion
+                UseRomName = this.UseRomName,
+                Prefix = this.Prefix,
+                Postfix = this.Postfix,
+                Quotes = this.Quotes,
+                ReplaceExtension = this.ReplaceExtension,
+                AddExtension = this.AddExtension,
+                RemoveExtension = this.RemoveExtension,
+                GameName = this.GameName,
+                Romba = this.Romba,
+            };
+        }
 
-		#region Instance Methods
+        #endregion
 
-		#region Cloning Methods
-
-		/// <summary>
-		/// Clone the current header
-		/// </summary>
-		/// <returns></returns>
-		public object Clone()
-		{
-			return new DatHeader()
-			{
-				_fileName = this._fileName,
-				_name = this._name,
-				_description = this._description,
-				_rootDir = this._rootDir,
-				_category = this._category,
-				_version = this._version,
-				_date = this._date,
-				_author = this._author,
-				_email = this._email,
-				_homepage = this._homepage,
-				_url = this._url,
-				_comment = this._comment,
-				_header = this._header,
-				_type = this._type,
-				_forceMerging = this._forceMerging,
-				_forceNodump = this._forceNodump,
-				_forcePacking = this._forcePacking,
-				_datFormat = this._datFormat,
-				_excludeFields = this._excludeFields,
-				_oneRom = this._oneRom,
-				_keepEmptyGames = this._keepEmptyGames,
-				_sceneDateStrip = this._sceneDateStrip,
-				_dedupeRoms = this._dedupeRoms,
-				_stripHash = this._stripHash,
-
-				_useRomName = this._useRomName,
-				_prefix = this._prefix,
-				_postfix = this._postfix,
-				_quotes = this._quotes,
-				_repExt = this._repExt,
-				_addExt = this._addExt,
-				_remExt = this._remExt,
-				_gameName = this._gameName,
-				_romba = this._romba,
-			};
-		}
-
-		#endregion
-
-		#endregion // Instance Methods
-	}
+        #endregion // Instance Methods
+    }
 }

@@ -5,367 +5,253 @@ using SabreTools.Library.DatItems;
 
 namespace SabreTools.Library.DatFiles
 {
-	/// <summary>
-	/// Represents statistical data associated with a DAT
-	/// </summary>
-	public class DatStats
-	{
-		#region Private instance variables
+    /// <summary>
+    /// Represents statistical data associated with a DAT
+    /// </summary>
+    public class DatStats
+    {
+        #region Private instance variables
 
-		// Statistics report format
-		private StatReportFormat _reportFormat = StatReportFormat.None;
+        // Object used to lock stats updates
+        private object _lockObject = new object();
 
-		// Object used to lock stats updates
-		private object _lockObject = new object();
+        #endregion
 
-		// Overall item count
-		private long _count = 0;
+        #region Publicly facing variables
 
-		// Individual DatItem type counts
-		private long _archiveCount = 0;
-		private long _biosSetCount = 0;
-		private long _diskCount = 0;
-		private long _releaseCount = 0;
-		private long _romCount = 0;
-		private long _sampleCount = 0;
+        // Statistics report format
+        public StatReportFormat ReportFormat { get; set; } = StatReportFormat.None;
 
-		// Special count only used by statistics output
-		private long _gameCount = 0;
+        // Overall item count
+        public long Count { get; set; } = 0;
 
-		// Total reported size
-		private long _totalSize = 0;
+        // Individual DatItem type counts
+        public long ArchiveCount { get; set; } = 0;
+        public long BiosSetCount { get; set; } = 0;
+        public long DiskCount { get; set; } = 0;
+        public long ReleaseCount { get; set; } = 0;
+        public long RomCount { get; set; } = 0;
+        public long SampleCount { get; set; } = 0;
 
-		// Individual hash counts
-		private long _crcCount = 0;
-		private long _md5Count = 0;
-		private long _sha1Count = 0;
-		private long _sha256Count = 0;
-		private long _sha384Count = 0;
-		private long _sha512Count = 0;
+        // Special count only used by statistics output
+        public long GameCount { get; set; } = 0;
 
-		// Individual status counts
-		private long _baddumpCount = 0;
-		private long _goodCount = 0;
-		private long _nodumpCount = 0;
-		private long _verifiedCount = 0;
+        // Total reported size
+        public long TotalSize { get; set; } = 0;
 
-		#endregion
+        // Individual hash counts
+        public long CRCCount { get; set; } = 0;
+        public long MD5Count { get; set; } = 0;
+        public long SHA1Count { get; set; } = 0;
+        public long SHA256Count { get; set; } = 0;
+        public long SHA384Count { get; set; } = 0;
+        public long SHA512Count { get; set; } = 0;
 
-		#region Publicly facing variables
+        // Individual status counts
+        public long BaddumpCount { get; set; } = 0;
+        public long GoodCount { get; set; } = 0;
+        public long NodumpCount { get; set; } = 0;
+        public long VerifiedCount { get; set; } = 0;
 
-		// Statistics report format
-		public StatReportFormat ReportFormat
-		{
-			get { return _reportFormat; }
-			set { _reportFormat = value; }
-		}
+        #endregion
 
-		// Overall item count
-		public long Count
-		{
-			get { return _count; }
-			set { _count = value; }
-		}
+        #region Instance Methods
 
-		// Individual DatItem type counts
-		public long ArchiveCount
-		{
-			get { return _archiveCount; }
-			set { _archiveCount = value; }
-		}
-		public long BiosSetCount
-		{
-			get { return _biosSetCount; }
-			set { _biosSetCount = value; }
-		}
-		public long DiskCount
-		{
-			get { return _diskCount; }
-			set { _diskCount = value; }
-		}
-		public long ReleaseCount
-		{
-			get { return _releaseCount; }
-			set { _releaseCount = value; }
-		}
-		public long RomCount
-		{
-			get { return _romCount; }
-			set { _romCount = value; }
-		}
-		public long SampleCount
-		{
-			get { return _sampleCount; }
-			set { _sampleCount = value; }
-		}
+        /// <summary>
+        /// Add to the statistics given a DatItem
+        /// </summary>
+        /// <param name="item">Item to add info from</param>
+        public void AddItem(DatItem item)
+        {
+            // No matter what the item is, we increate the count
+            lock (_lockObject)
+            {
+                this.Count += 1;
 
-		// Special count only used by statistics output
-		public long GameCount
-		{
-			get { return _gameCount; }
-			set { _gameCount = value; }
-		}
+                // Now we do different things for each item type
 
-		// Total reported size
-		public long TotalSize
-		{
-			get { return _totalSize; }
-			set { _totalSize = value; }
-		}
+                switch (item.Type)
+                {
+                    case ItemType.Archive:
+                        this.ArchiveCount += 1;
+                        break;
+                    case ItemType.BiosSet:
+                        this.BiosSetCount += 1;
+                        break;
+                    case ItemType.Disk:
+                        this.DiskCount += 1;
+                        if (((Disk)item).ItemStatus != ItemStatus.Nodump)
+                        {
+                            this.MD5Count += (String.IsNullOrWhiteSpace(((Disk)item).MD5) ? 0 : 1);
+                            this.SHA1Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA1) ? 0 : 1);
+                            this.SHA256Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA256) ? 0 : 1);
+                            this.SHA384Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA384) ? 0 : 1);
+                            this.SHA512Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA512) ? 0 : 1);
+                        }
 
-		// Individual hash counts
-		public long CRCCount
-		{
-			get { return _crcCount; }
-			set { _crcCount = value; }
-		}
-		public long MD5Count
-		{
-			get { return _md5Count; }
-			set { _md5Count = value; }
-		}
-		public long SHA1Count
-		{
-			get { return _sha1Count; }
-			set { _sha1Count = value; }
-		}
-		public long SHA256Count
-		{
-			get { return _sha256Count; }
-			set { _sha256Count = value; }
-		}
-		public long SHA384Count
-		{
-			get { return _sha384Count; }
-			set { _sha384Count = value; }
-		}
-		public long SHA512Count
-		{
-			get { return _sha512Count; }
-			set { _sha512Count = value; }
-		}
+                        this.BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+                        this.GoodCount += (((Disk)item).ItemStatus == ItemStatus.Good ? 1 : 0);
+                        this.NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+                        this.VerifiedCount += (((Disk)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
+                        break;
+                    case ItemType.Release:
+                        this.ReleaseCount += 1;
+                        break;
+                    case ItemType.Rom:
+                        this.RomCount += 1;
+                        if (((Rom)item).ItemStatus != ItemStatus.Nodump)
+                        {
+                            this.TotalSize += ((Rom)item).Size;
+                            this.CRCCount += (String.IsNullOrWhiteSpace(((Rom)item).CRC) ? 0 : 1);
+                            this.MD5Count += (String.IsNullOrWhiteSpace(((Rom)item).MD5) ? 0 : 1);
+                            this.SHA1Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA1) ? 0 : 1);
+                            this.SHA256Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA256) ? 0 : 1);
+                            this.SHA384Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA384) ? 0 : 1);
+                            this.SHA512Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA512) ? 0 : 1);
+                        }
 
-		// Individual status counts
-		public long BaddumpCount
-		{
-			get { return _baddumpCount; }
-			set { _baddumpCount = value; }
-		}
-		public long GoodCount
-		{
-			get { return _goodCount; }
-			set { _goodCount = value; }
-		}
-		public long NodumpCount
-		{
-			get { return _nodumpCount; }
-			set { _nodumpCount = value; }
-		}
-		public long VerifiedCount
-		{
-			get { return _verifiedCount; }
-			set { _verifiedCount = value; }
-		}
+                        this.BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+                        this.GoodCount += (((Rom)item).ItemStatus == ItemStatus.Good ? 1 : 0);
+                        this.NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+                        this.VerifiedCount += (((Rom)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
+                        break;
+                    case ItemType.Sample:
+                        this.SampleCount += 1;
+                        break;
+                }
+            }
+        }
 
-		#endregion
+        /// <summary>
+        /// Add statistics from another DatStats object
+        /// </summary>
+        /// <param name="stats">DatStats object to add from</param>
+        public void AddStats(DatStats stats)
+        {
+            this.Count += stats.Count;
 
-		#region Instance Methods
+            this.ArchiveCount += stats.ArchiveCount;
+            this.BiosSetCount += stats.BiosSetCount;
+            this.DiskCount += stats.DiskCount;
+            this.ReleaseCount += stats.ReleaseCount;
+            this.RomCount += stats.RomCount;
+            this.SampleCount += stats.SampleCount;
 
-		/// <summary>
-		/// Add to the statistics given a DatItem
-		/// </summary>
-		/// <param name="item">Item to add info from</param>
-		public void AddItem(DatItem item)
-		{
-			// No matter what the item is, we increate the count
-			lock (_lockObject)
-			{
-				_count += 1;
+            this.GameCount += stats.GameCount;
 
-				// Now we do different things for each item type
+            this.TotalSize += stats.TotalSize;
 
-				switch (item.Type)
-				{
-					case ItemType.Archive:
-						_archiveCount += 1;
-						break;
-					case ItemType.BiosSet:
-						_biosSetCount += 1;
-						break;
-					case ItemType.Disk:
-						_diskCount += 1;
-						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
-						{
-							_md5Count += (String.IsNullOrWhiteSpace(((Disk)item).MD5) ? 0 : 1);
-							_sha1Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA1) ? 0 : 1);
-							_sha256Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA256) ? 0 : 1);
-							_sha384Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA384) ? 0 : 1);
-							_sha512Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA512) ? 0 : 1);
-						}
+            // Individual hash counts
+            this.CRCCount += stats.CRCCount;
+            this.MD5Count += stats.MD5Count;
+            this.SHA1Count += stats.SHA1Count;
+            this.SHA256Count += stats.SHA256Count;
+            this.SHA384Count += stats.SHA384Count;
+            this.SHA512Count += stats.SHA512Count;
 
-						_baddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-						_goodCount += (((Disk)item).ItemStatus == ItemStatus.Good ? 1 : 0);
-						_nodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-						_verifiedCount += (((Disk)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
-						break;
-					case ItemType.Release:
-						_releaseCount += 1;
-						break;
-					case ItemType.Rom:
-						_romCount += 1;
-						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
-						{
-							_totalSize += ((Rom)item).Size;
-							_crcCount += (String.IsNullOrWhiteSpace(((Rom)item).CRC) ? 0 : 1);
-							_md5Count += (String.IsNullOrWhiteSpace(((Rom)item).MD5) ? 0 : 1);
-							_sha1Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA1) ? 0 : 1);
-							_sha256Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA256) ? 0 : 1);
-							_sha384Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA384) ? 0 : 1);
-							_sha512Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA512) ? 0 : 1);
-						}
+            // Individual status counts
+            this.BaddumpCount += stats.BaddumpCount;
+            this.GoodCount += stats.GoodCount;
+            this.NodumpCount += stats.NodumpCount;
+            this.VerifiedCount += stats.VerifiedCount;
+    }
 
-						_baddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-						_goodCount += (((Rom)item).ItemStatus == ItemStatus.Good ? 1 : 0);
-						_nodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-						_verifiedCount += (((Rom)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
-						break;
-					case ItemType.Sample:
-						_sampleCount += 1;
-						break;
-				}
-			}
-		}
+        /// <summary>
+        /// Remove from the statistics given a DatItem
+        /// </summary>
+        /// <param name="item">Item to remove info for</param>
+        public void RemoveItem(DatItem item)
+        {
+            // No matter what the item is, we increate the count
+            lock (_lockObject)
+            {
+                this.Count -= 1;
 
-		/// <summary>
-		/// Add statistics from another DatStats object
-		/// </summary>
-		/// <param name="stats">DatStats object to add from</param>
-		public void AddStats(DatStats stats)
-		{
-			_count += stats.Count;
+                // Now we do different things for each item type
 
-			_archiveCount += stats.ArchiveCount;
-			_biosSetCount += stats.BiosSetCount;
-			_diskCount += stats.DiskCount;
-			_releaseCount += stats.ReleaseCount;
-			_romCount += stats.RomCount;
-			_sampleCount += stats.SampleCount;
+                switch (item.Type)
+                {
+                    case ItemType.Archive:
+                        this.ArchiveCount -= 1;
+                        break;
+                    case ItemType.BiosSet:
+                        this.BiosSetCount -= 1;
+                        break;
+                    case ItemType.Disk:
+                        this.DiskCount -= 1;
+                        if (((Disk)item).ItemStatus != ItemStatus.Nodump)
+                        {
+                            this.MD5Count -= (String.IsNullOrWhiteSpace(((Disk)item).MD5) ? 0 : 1);
+                            this.SHA1Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA1) ? 0 : 1);
+                            this.SHA256Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA256) ? 0 : 1);
+                            this.SHA384Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA384) ? 0 : 1);
+                            this.SHA512Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA512) ? 0 : 1);
+                        }
 
-			_gameCount += stats.GameCount;
+                        this.BaddumpCount -= (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+                        this.GoodCount -= (((Disk)item).ItemStatus == ItemStatus.Good ? 1 : 0);
+                        this.NodumpCount -= (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+                        this.VerifiedCount -= (((Disk)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
+                        break;
+                    case ItemType.Release:
+                        this.ReleaseCount -= 1;
+                        break;
+                    case ItemType.Rom:
+                        this.RomCount -= 1;
+                        if (((Rom)item).ItemStatus != ItemStatus.Nodump)
+                        {
+                            this.TotalSize -= ((Rom)item).Size;
+                            this.CRCCount -= (String.IsNullOrWhiteSpace(((Rom)item).CRC) ? 0 : 1);
+                            this.MD5Count -= (String.IsNullOrWhiteSpace(((Rom)item).MD5) ? 0 : 1);
+                            this.SHA1Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA1) ? 0 : 1);
+                            this.SHA256Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA256) ? 0 : 1);
+                            this.SHA384Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA384) ? 0 : 1);
+                            this.SHA512Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA512) ? 0 : 1);
+                        }
 
-			_totalSize += stats.TotalSize;
+                        this.BaddumpCount -= (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+                        this.GoodCount -= (((Rom)item).ItemStatus == ItemStatus.Good ? 1 : 0);
+                        this.NodumpCount -= (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+                        this.VerifiedCount -= (((Rom)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
+                        break;
+                    case ItemType.Sample:
+                        this.SampleCount -= 1;
+                        break;
+                }
+            }
+        }
 
-			// Individual hash counts
-			_crcCount += stats.CRCCount;
-			_md5Count += stats.MD5Count;
-			_sha1Count += stats.SHA1Count;
-			_sha256Count += stats.SHA256Count;
-			_sha384Count += stats.SHA384Count;
-			_sha512Count += stats.SHA512Count;
+        /// <summary>
+        /// Reset all statistics
+        /// </summary>
+        public void Reset()
+        {
+            this.Count = 0;
 
-			// Individual status counts
-			_baddumpCount += stats.BaddumpCount;
-			_goodCount += stats.GoodCount;
-			_nodumpCount += stats.NodumpCount;
-			_verifiedCount += stats.VerifiedCount;
-	}
+            this.ArchiveCount = 0;
+            this.BiosSetCount = 0;
+            this.DiskCount = 0;
+            this.ReleaseCount = 0;
+            this.RomCount = 0;
+            this.SampleCount = 0;
 
-		/// <summary>
-		/// Remove from the statistics given a DatItem
-		/// </summary>
-		/// <param name="item">Item to remove info for</param>
-		public void RemoveItem(DatItem item)
-		{
-			// No matter what the item is, we increate the count
-			lock (_lockObject)
-			{
-				_count -= 1;
+            this.GameCount = 0;
 
-				// Now we do different things for each item type
+            this.TotalSize = 0;
 
-				switch (item.Type)
-				{
-					case ItemType.Archive:
-						_archiveCount -= 1;
-						break;
-					case ItemType.BiosSet:
-						_biosSetCount -= 1;
-						break;
-					case ItemType.Disk:
-						_diskCount -= 1;
-						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
-						{
-							_md5Count -= (String.IsNullOrWhiteSpace(((Disk)item).MD5) ? 0 : 1);
-							_sha1Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA1) ? 0 : 1);
-							_sha256Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA256) ? 0 : 1);
-							_sha384Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA384) ? 0 : 1);
-							_sha512Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA512) ? 0 : 1);
-						}
+            this.CRCCount = 0;
+            this.MD5Count = 0;
+            this.SHA1Count = 0;
+            this.SHA256Count = 0;
+            this.SHA384Count = 0;
+            this.SHA512Count = 0;
 
-						_baddumpCount -= (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-						_goodCount -= (((Disk)item).ItemStatus == ItemStatus.Good ? 1 : 0);
-						_nodumpCount -= (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-						_verifiedCount -= (((Disk)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
-						break;
-					case ItemType.Release:
-						_releaseCount -= 1;
-						break;
-					case ItemType.Rom:
-						_romCount -= 1;
-						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
-						{
-							_totalSize -= ((Rom)item).Size;
-							_crcCount -= (String.IsNullOrWhiteSpace(((Rom)item).CRC) ? 0 : 1);
-							_md5Count -= (String.IsNullOrWhiteSpace(((Rom)item).MD5) ? 0 : 1);
-							_sha1Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA1) ? 0 : 1);
-							_sha256Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA256) ? 0 : 1);
-							_sha384Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA384) ? 0 : 1);
-							_sha512Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA512) ? 0 : 1);
-						}
+            this.BaddumpCount = 0;
+            this.GoodCount = 0;
+            this.NodumpCount = 0;
+            this.VerifiedCount = 0;
+        }
 
-						_baddumpCount -= (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-						_goodCount -= (((Rom)item).ItemStatus == ItemStatus.Good ? 1 : 0);
-						_nodumpCount -= (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-						_verifiedCount -= (((Rom)item).ItemStatus == ItemStatus.Verified ? 1 : 0);
-						break;
-					case ItemType.Sample:
-						_sampleCount -= 1;
-						break;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Reset all statistics
-		/// </summary>
-		public void Reset()
-		{
-			_count = 0;
-
-			_archiveCount = 0;
-			_biosSetCount = 0;
-			_diskCount = 0;
-			_releaseCount = 0;
-			_romCount = 0;
-			_sampleCount = 0;
-
-			_gameCount = 0;
-
-			_totalSize = 0;
-
-			_crcCount = 0;
-			_md5Count = 0;
-			_sha1Count = 0;
-			_sha256Count = 0;
-			_sha384Count = 0;
-			_sha512Count = 0;
-
-			_baddumpCount = 0;
-			_goodCount = 0;
-			_nodumpCount = 0;
-			_verifiedCount = 0;
-		}
-
-		#endregion // Instance Methods
-	}
+        #endregion // Instance Methods
+    }
 }
