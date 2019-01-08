@@ -1,5 +1,4 @@
 ﻿using System;
-
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 
@@ -12,45 +11,114 @@ namespace SabreTools.Library.DatFiles
     {
         #region Private instance variables
 
-        // Object used to lock stats updates
+        /// <summary>
+        /// Object used to lock stats updates
+        /// </summary>
         private object _lockObject = new object();
 
         #endregion
 
         #region Publicly facing variables
 
-        // Statistics report format
+        /// <summary>
+        /// Statistics writing format
+        /// </summary>
         public StatReportFormat ReportFormat { get; set; } = StatReportFormat.None;
 
-        // Overall item count
+        /// <summary>
+        /// Overall item count
+        /// </summary>
         public long Count { get; set; } = 0;
 
-        // Individual DatItem type counts
+        /// <summary>
+        /// Number of Archive items
+        /// </summary>
         public long ArchiveCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of BiosSet items
+        /// </summary>
         public long BiosSetCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of Disk items
+        /// </summary>
         public long DiskCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of Release items
+        /// </summary>
         public long ReleaseCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of Rom items
+        /// </summary>
         public long RomCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of Sample items
+        /// </summary>
         public long SampleCount { get; set; } = 0;
 
-        // Special count only used by statistics output
+        /// <summary>
+        /// Number of machines
+        /// </summary>
+        /// <remarks>Special count only used by statistics output</remarks>
         public long GameCount { get; set; } = 0;
 
-        // Total reported size
+        /// <summary>
+        /// Total uncompressed size
+        /// </summary>
         public long TotalSize { get; set; } = 0;
 
-        // Individual hash counts
+        /// <summary>
+        /// Number of items with a CRC hash
+        /// </summary>
         public long CRCCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with an MD5 hash
+        /// </summary>
         public long MD5Count { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with a SHA-1 hash
+        /// </summary>
         public long SHA1Count { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with a SHA-256 hash
+        /// </summary>
         public long SHA256Count { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with a SHA-384 hash
+        /// </summary>
         public long SHA384Count { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with a SHA-512 hash
+        /// </summary>
         public long SHA512Count { get; set; } = 0;
 
-        // Individual status counts
+        /// <summary>
+        /// Number of items with the baddump status
+        /// </summary>
         public long BaddumpCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with the good status
+        /// </summary>
         public long GoodCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with the nodump status
+        /// </summary>
         public long NodumpCount { get; set; } = 0;
+
+        /// <summary>
+        /// Number of items with the verified status
+        /// </summary>
         public long VerifiedCount { get; set; } = 0;
 
         #endregion
