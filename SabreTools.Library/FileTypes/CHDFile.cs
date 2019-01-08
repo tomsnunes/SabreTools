@@ -101,7 +101,7 @@ namespace SabreTools.Library.FileTypes
 		private ulong m_hunkcount;       // number of hunks represented
 		private uint m_unitbytes;        // size of each unit in bytes
 		private ulong m_unitcount;       // number of units represented
-		private CHDCodecType[] m_compression = new CHDCodecType[4];   // array of compression types used
+		private CHD_CODEC[] m_compression = new CHD_CODEC[4];   // array of compression types used
 
 		// map information
 		private uint m_mapentrybytes;    // length of each entry in a map
@@ -300,14 +300,14 @@ namespace SabreTools.Library.FileTypes
 			// Determine compression
 			switch (m_br.ReadUInt32())
 			{
-				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
-				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				case 0: m_compression[0] = CHD_CODEC.NONE; break;
+				case 1: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 2: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 3: m_compression[0] = CHD_CODEC.AVHUFF; break;
 				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
 			}
 
-			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+			m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC.NONE;
 
 			m_sectorsperhunk = m_br.ReadUInt32Reverse();
 			m_hunkcount = m_br.ReadUInt32Reverse();
@@ -343,14 +343,14 @@ namespace SabreTools.Library.FileTypes
 			// Determine compression
 			switch (m_br.ReadUInt32())
 			{
-				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
-				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				case 0: m_compression[0] = CHD_CODEC.NONE; break;
+				case 1: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 2: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 3: m_compression[0] = CHD_CODEC.AVHUFF; break;
 				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
 			}
 
-			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+			m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC.NONE;
 
 			m_sectorsperhunk = m_br.ReadUInt32Reverse();
 			m_hunkcount = m_br.ReadUInt32Reverse();
@@ -387,14 +387,14 @@ namespace SabreTools.Library.FileTypes
 			// Determine compression
 			switch (m_br.ReadUInt32())
 			{
-				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
-				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				case 0: m_compression[0] = CHD_CODEC.NONE; break;
+				case 1: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 2: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 3: m_compression[0] = CHD_CODEC.AVHUFF; break;
 				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
 			}
 
-			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+			m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC.NONE;
 
 			m_hunkcount = m_br.ReadUInt32Reverse();
 			m_logicalbytes = m_br.ReadUInt64Reverse();
@@ -435,14 +435,14 @@ namespace SabreTools.Library.FileTypes
 			// Determine compression
 			switch (m_br.ReadUInt32())
 			{
-				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
-				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				case 0: m_compression[0] = CHD_CODEC.NONE; break;
+				case 1: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 2: m_compression[0] = CHD_CODEC.ZLIB; break;
+				case 3: m_compression[0] = CHD_CODEC.AVHUFF; break;
 				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
 			}
 
-			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+			m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC.NONE;
 
 			m_hunkcount = m_br.ReadUInt32Reverse();
 			m_logicalbytes = m_br.ReadUInt64Reverse();
@@ -473,10 +473,10 @@ namespace SabreTools.Library.FileTypes
 			byte[] sha1 = new byte[20];
 
 			// Determine compression
-			m_compression[0] = (CHDCodecType)m_br.ReadUInt32Reverse();
-			m_compression[1] = (CHDCodecType)m_br.ReadUInt32Reverse();
-			m_compression[2] = (CHDCodecType)m_br.ReadUInt32Reverse();
-			m_compression[3] = (CHDCodecType)m_br.ReadUInt32Reverse();
+			m_compression[0] = (CHD_CODEC)m_br.ReadUInt32Reverse();
+			m_compression[1] = (CHD_CODEC)m_br.ReadUInt32Reverse();
+			m_compression[2] = (CHD_CODEC)m_br.ReadUInt32Reverse();
+			m_compression[3] = (CHD_CODEC)m_br.ReadUInt32Reverse();
 
 			m_logicalbytes = m_br.ReadUInt64Reverse();
 			m_mapoffset = m_br.ReadUInt64Reverse();
