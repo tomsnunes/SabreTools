@@ -417,7 +417,7 @@ namespace SabreTools.Library.DatFiles
 						{
 							int index = this[key].Count - 1;
 							DatItem lastrom = this[key][index];
-							if (lastrom.Type == ItemType.Rom)
+							if (lastrom.ItemType == ItemType.Rom)
 							{
 								((Rom)lastrom).Size += Utilities.GetSize(reader.GetAttribute("size"));
 							}
@@ -624,7 +624,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Type == ItemType.Rom
+						if (rom.ItemType == ItemType.Rom
 							&& ((Rom)rom).Size == -1
 							&& ((Rom)rom).CRC == "null")
 						{
@@ -773,7 +773,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
-				&& (rom.Type == ItemType.Rom
+				&& (rom.ItemType == ItemType.Rom
 				&& (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
 			{
 				return true;
@@ -797,7 +797,7 @@ namespace SabreTools.Library.DatFiles
 					}
 				}
 
-				switch (rom.Type)
+				switch (rom.ItemType)
 				{
 					case ItemType.Disk:
 						state += "\t\t\t<diskarea name=\"" + (!ExcludeFields[(int)Field.AreaName] ? (String.IsNullOrWhiteSpace(rom.AreaName) ? "cdrom" : rom.AreaName) : "") + "\""

@@ -806,7 +806,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Type == ItemType.Rom
+						if (rom.ItemType == ItemType.Rom
 							&& ((Rom)rom).Size == -1
 							&& ((Rom)rom).CRC == "null")
 						{
@@ -945,7 +945,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
-				&& (rom.Type == ItemType.Rom
+				&& (rom.ItemType == ItemType.Rom
 				&& (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
 			{
 				return true;
@@ -964,7 +964,7 @@ namespace SabreTools.Library.DatFiles
 							+ "\t\t\t<title>" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "</title>\n"
 							+ "\t\t\t<saveType>None</saveType>\n";
 
-				if (rom.Type == ItemType.Rom)
+				if (rom.ItemType == ItemType.Rom)
 				{
 					state += "\t\t\t<romSize>" + (!ExcludeFields[(int)Field.Size] ? ((Rom)rom).Size.ToString() : "") + "</romSize>\n";
 				}
@@ -974,7 +974,7 @@ namespace SabreTools.Library.DatFiles
 					+ "\t\t\t<sourceRom>None</sourceRom>\n"
 					+ "\t\t\t<language>0</language>\n";
 
-				if (rom.Type == ItemType.Disk)
+				if (rom.ItemType == ItemType.Disk)
 				{
 					state += "\t\t\t<files>\n"
 						+ (((Disk)rom).MD5 != null
@@ -982,7 +982,7 @@ namespace SabreTools.Library.DatFiles
 							: "\t\t\t\t<romSHA1 extension=\".chd\">" + (!ExcludeFields[(int)Field.SHA1] ? ((Disk)rom).SHA1.ToUpperInvariant() : "") + "</romSHA1>\n")
 						+ "\t\t\t</files>\n";
 				}
-				else if (rom.Type == ItemType.Rom)
+				else if (rom.ItemType == ItemType.Rom)
 				{
 					string tempext = "." + Utilities.GetExtension(((Rom)rom).Name);
 

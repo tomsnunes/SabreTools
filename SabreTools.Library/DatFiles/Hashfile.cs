@@ -154,7 +154,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Type == ItemType.Rom
+						if (rom.ItemType == ItemType.Rom
 							&& ((Rom)rom).Size == -1
 							&& ((Rom)rom).CRC == "null")
 						{
@@ -190,7 +190,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
-				&& (rom.Type == ItemType.Rom
+				&& (rom.ItemType == ItemType.Rom
 				&& (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
 			{
 				return true;
@@ -206,13 +206,13 @@ namespace SabreTools.Library.DatFiles
 				switch (_hash)
 				{
 					case Hash.MD5:
-						if (rom.Type == ItemType.Rom)
+						if (rom.ItemType == ItemType.Rom)
 						{
 							state += (!ExcludeFields[(int)Field.MD5] ? ((Rom)rom).MD5 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
 								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
-						else if (rom.Type == ItemType.Disk)
+						else if (rom.ItemType == ItemType.Disk)
 						{
 							state += (!ExcludeFields[(int)Field.MD5] ? ((Disk)rom).MD5 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
@@ -220,7 +220,7 @@ namespace SabreTools.Library.DatFiles
 						}
 						break;
 					case Hash.CRC:
-						if (rom.Type == ItemType.Rom)
+						if (rom.ItemType == ItemType.Rom)
 						{
 							state += (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
 								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "")
@@ -228,13 +228,13 @@ namespace SabreTools.Library.DatFiles
 						}
 						break;
 					case Hash.SHA1:
-						if (rom.Type == ItemType.Rom)
+						if (rom.ItemType == ItemType.Rom)
 						{
 							state += (!ExcludeFields[(int)Field.SHA1] ? ((Rom)rom).SHA1 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
 								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
-						else if (rom.Type == ItemType.Disk)
+						else if (rom.ItemType == ItemType.Disk)
 						{
 							state += (!ExcludeFields[(int)Field.SHA1] ? ((Disk)rom).SHA1 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
@@ -242,13 +242,13 @@ namespace SabreTools.Library.DatFiles
 						}
 						break;
 					case Hash.SHA256:
-						if (rom.Type == ItemType.Rom)
+						if (rom.ItemType == ItemType.Rom)
 						{
 							state += (!ExcludeFields[(int)Field.SHA256] ? ((Rom)rom).SHA256 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
 								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
-						else if (rom.Type == ItemType.Disk)
+						else if (rom.ItemType == ItemType.Disk)
 						{
 							state += (!ExcludeFields[(int)Field.SHA256] ? ((Disk)rom).SHA256 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
@@ -256,13 +256,13 @@ namespace SabreTools.Library.DatFiles
 						}
 						break;
 					case Hash.SHA384:
-						if (rom.Type == ItemType.Rom)
+						if (rom.ItemType == ItemType.Rom)
 						{
 							state += (!ExcludeFields[(int)Field.SHA384] ? ((Rom)rom).SHA384 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
 								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
-						else if (rom.Type == ItemType.Disk)
+						else if (rom.ItemType == ItemType.Disk)
 						{
 							state += (!ExcludeFields[(int)Field.SHA384] ? ((Disk)rom).SHA384 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
@@ -270,13 +270,13 @@ namespace SabreTools.Library.DatFiles
 						}
 						break;
 					case Hash.SHA512:
-						if (rom.Type == ItemType.Rom)
+						if (rom.ItemType == ItemType.Rom)
 						{
 							state += (!ExcludeFields[(int)Field.SHA512] ? ((Rom)rom).SHA512 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")
 								+ (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\n";
 						}
-						else if (rom.Type == ItemType.Disk)
+						else if (rom.ItemType == ItemType.Disk)
 						{
 							state += (!ExcludeFields[(int)Field.SHA512] ? ((Disk)rom).SHA512 : "")
 								+ " *" + (!ExcludeFields[(int)Field.MachineName] && GameName ? rom.MachineName + Path.DirectorySeparatorChar : "")

@@ -433,11 +433,11 @@ namespace SabreTools.Library.DatFiles
 							case "nodump":
 							case "verified":
 								ItemStatus tempStandaloneStatus = Utilities.GetItemStatus(quoteless);
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									((Rom)item).ItemStatus = tempStandaloneStatus;
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									((Disk)item).ItemStatus = tempStandaloneStatus;
 								}
@@ -449,7 +449,7 @@ namespace SabreTools.Library.DatFiles
 								item.Name = quoteless;
 								break;
 							case "size":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									if (Int64.TryParse(quoteless, out long size))
@@ -463,19 +463,19 @@ namespace SabreTools.Library.DatFiles
 								}
 								break;
 							case "crc":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Rom)item).CRC = Utilities.CleanHashData(quoteless, Constants.CRCLength);
 								}
 								break;
 							case "md5":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Rom)item).MD5 = Utilities.CleanHashData(quoteless, Constants.MD5Length);
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									i++;
 									quoteless = linegc[i].Replace("\"", "");
@@ -483,48 +483,48 @@ namespace SabreTools.Library.DatFiles
 								}
 								break;
 							case "sha1":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Rom)item).SHA1 = Utilities.CleanHashData(quoteless, Constants.SHA1Length);
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Disk)item).SHA1 = Utilities.CleanHashData(quoteless, Constants.SHA1Length);
 								}
 								break;
 							case "sha256":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Rom)item).SHA256 = Utilities.CleanHashData(quoteless, Constants.SHA256Length);
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Disk)item).SHA256 = Utilities.CleanHashData(quoteless, Constants.SHA256Length);
 								}
 								break;
 							case "sha384":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Rom)item).SHA384 = Utilities.CleanHashData(quoteless, Constants.SHA384Length);
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Disk)item).SHA384 = Utilities.CleanHashData(quoteless, Constants.SHA384Length);
 								}
 								break;
 							case "sha512":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Rom)item).SHA512 = Utilities.CleanHashData(quoteless, Constants.SHA512Length);
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Disk)item).SHA512 = Utilities.CleanHashData(quoteless, Constants.SHA512Length);
@@ -534,17 +534,17 @@ namespace SabreTools.Library.DatFiles
 							case "flags":
 								quoteless = linegc[++i].Replace("\"", "");
 								ItemStatus tempFlagStatus = Utilities.GetItemStatus(quoteless);
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									((Rom)item).ItemStatus = tempFlagStatus;
 								}
-								else if (item.Type == ItemType.Disk)
+								else if (item.ItemType == ItemType.Disk)
 								{
 									((Disk)item).ItemStatus = tempFlagStatus;
 								}
 								break;
 							case "date":
-								if (item.Type == ItemType.Rom)
+								if (item.ItemType == ItemType.Rom)
 								{
 									// If we have quotes in the next item, assume only one item
 									if (linegc[i + 1].Contains("\""))
@@ -558,7 +558,7 @@ namespace SabreTools.Library.DatFiles
 									}
 									((Rom)item).Date = quoteless;
 								}
-								else if (item.Type == ItemType.Release)
+								else if (item.ItemType == ItemType.Release)
 								{
 									// If we have quotes in the next item, assume only one item
 									if (linegc[i + 1].Contains("\""))
@@ -574,33 +574,33 @@ namespace SabreTools.Library.DatFiles
 								}
 								break;
 							case "default":
-								if (item.Type == ItemType.BiosSet)
+								if (item.ItemType == ItemType.BiosSet)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((BiosSet)item).Default = Utilities.GetYesNo(quoteless.ToLowerInvariant());
 								}
-								else if (item.Type == ItemType.Release)
+								else if (item.ItemType == ItemType.Release)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Release)item).Default = Utilities.GetYesNo(quoteless.ToLowerInvariant());
 								}
 								break;
 							case "description":
-								if (item.Type == ItemType.BiosSet)
+								if (item.ItemType == ItemType.BiosSet)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((BiosSet)item).Description = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "region":
-								if (item.Type == ItemType.Release)
+								if (item.ItemType == ItemType.Release)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Release)item).Region = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "language":
-								if (item.Type == ItemType.Release)
+								if (item.ItemType == ItemType.Release)
 								{
 									quoteless = linegc[++i].Replace("\"", "");
 									((Release)item).Language = quoteless.ToLowerInvariant();
@@ -728,7 +728,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Type == ItemType.Rom
+						if (rom.ItemType == ItemType.Rom
 							&& ((Rom)rom).Size == -1
 							&& ((Rom)rom).CRC == "null")
 						{
@@ -882,7 +882,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
-				&& (rom.Type == ItemType.Rom
+				&& (rom.ItemType == ItemType.Rom
 				&& (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
 			{
 				return true;
@@ -895,7 +895,7 @@ namespace SabreTools.Library.DatFiles
 				// Pre-process the item name
 				ProcessItemName(rom, true);
 
-				switch (rom.Type)
+				switch (rom.ItemType)
 				{
 					case ItemType.Archive:
 						state += "\tarchive ( name\"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""

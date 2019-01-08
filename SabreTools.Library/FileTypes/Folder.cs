@@ -283,7 +283,7 @@ namespace SabreTools.Library.FileTypes
 					}
 					outputStream.Dispose();
 
-					if (rom.Type == ItemType.Rom)
+					if (rom.ItemType == ItemType.Rom)
 					{
 						if (date && !String.IsNullOrWhiteSpace(((Rom)rom).Date))
 						{

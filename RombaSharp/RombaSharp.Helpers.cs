@@ -296,7 +296,7 @@ namespace RombaSharp
 					{
 						Globals.Logger.Verbose("Checking and adding file '{0}'", datItem.Name);
 
-						if (datItem.Type == ItemType.Rom)
+						if (datItem.ItemType == ItemType.Rom)
 						{
 							Rom rom = (Rom)datItem;
 
@@ -322,7 +322,7 @@ namespace RombaSharp
 								}
 							}
 						}
-						else if (datItem.Type == ItemType.Disk)
+						else if (datItem.ItemType == ItemType.Disk)
 						{
 							Disk disk = (Disk)datItem;
 

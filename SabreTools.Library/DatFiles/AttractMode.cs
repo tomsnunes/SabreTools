@@ -165,7 +165,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (item.Type == ItemType.Rom
+						if (item.ItemType == ItemType.Rom
 							&& ((Rom)item).Size == -1
 							&& ((Rom)item).CRC == "null")
 						{

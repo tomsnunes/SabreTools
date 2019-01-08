@@ -381,7 +381,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Type == ItemType.Rom
+						if (rom.ItemType == ItemType.Rom
 							&& ((Rom)rom).Size == -1
 							&& ((Rom)rom).CRC == "null")
 						{
@@ -442,7 +442,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
-				&& (rom.Type == ItemType.Rom
+				&& (rom.ItemType == ItemType.Rom
 				&& (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
 			{
 				return true;
@@ -467,12 +467,12 @@ namespace SabreTools.Library.DatFiles
 					status = "";
 
 				// Separated values should only output Rom and Disk
-				if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
+				if (rom.ItemType != ItemType.Disk && rom.ItemType != ItemType.Rom)
 				{
 					return true;
 				}
 
-				if (rom.Type == ItemType.Rom)
+				if (rom.ItemType == ItemType.Rom)
 				{
 					type = "rom";
 					romname = rom.Name;
@@ -485,7 +485,7 @@ namespace SabreTools.Library.DatFiles
 					sha512 = ((Rom)rom).SHA512;
 					status = (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
 				}
-				else if (rom.Type == ItemType.Disk)
+				else if (rom.ItemType == ItemType.Disk)
 				{
 					type = "disk";
 					diskname = rom.Name;

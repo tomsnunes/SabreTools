@@ -27,8 +27,8 @@ namespace SabreTools.Library.DatItems
 			return new Blank()
 			{
 				Name = this.Name,
-				Type = this.Type,
-				Dupe = this.Dupe,
+				ItemType = this.ItemType,
+				DupeType = this.DupeType,
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
@@ -68,7 +68,7 @@ namespace SabreTools.Library.DatItems
 		public override bool Equals(DatItem other)
 		{
 			// If we don't have a blank, return false
-			if (_itemType != other.Type)
+			if (_itemType != other.ItemType)
 			{
 				return false;
 			}

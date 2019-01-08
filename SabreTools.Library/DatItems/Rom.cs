@@ -196,8 +196,8 @@ namespace SabreTools.Library.DatItems
 			return new Rom()
 			{
 				Name = this.Name,
-				Type = this.Type,
-				Dupe = this.Dupe,
+				ItemType = this.ItemType,
+				DupeType = this.DupeType,
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
@@ -249,7 +249,7 @@ namespace SabreTools.Library.DatItems
 			bool dupefound = false;
 
 			// If we don't have a rom, return false
-			if (_itemType != other.Type)
+			if (_itemType != other.ItemType)
 			{
 				return dupefound;
 			}

@@ -389,7 +389,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Take care of Rom and Disk specific differences
-			if (item.Type == ItemType.Rom)
+			if (item.ItemType == ItemType.Rom)
 			{
 				Rom rom = (Rom)item;
 
@@ -528,7 +528,7 @@ namespace SabreTools.Library.DatFiles
 					}
 				}
 			}
-			else if (item.Type == ItemType.Disk)
+			else if (item.ItemType == ItemType.Disk)
 			{
 				Disk rom = (Disk)item;
 
@@ -710,14 +710,14 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Filter on rom type
-			if (_romTypes.Count == 0 && _notRomTypes.Count == 0 && item.Type != ItemType.Rom && item.Type != ItemType.Disk && item.Type != ItemType.Blank)
+			if (_romTypes.Count == 0 && _notRomTypes.Count == 0 && item.ItemType != ItemType.Rom && item.ItemType != ItemType.Disk && item.ItemType != ItemType.Blank)
 			{
 				return false;
 			}
 			if (_romTypes.Count > 0)
 			{
 				// If the rom type was not found in the list, return false
-				if (!FindValueInList(_romTypes, item.Type.ToString()))
+				if (!FindValueInList(_romTypes, item.ItemType.ToString()))
 				{
 					return false;
 				}
@@ -725,7 +725,7 @@ namespace SabreTools.Library.DatFiles
 			if (_notRomTypes.Count > 0)
 			{
 				// If the rom type was found in the list, return false
-				if (FindValueInList(_notRomTypes, item.Type.ToString()))
+				if (FindValueInList(_notRomTypes, item.ItemType.ToString()))
 				{
 					return false;
 				}

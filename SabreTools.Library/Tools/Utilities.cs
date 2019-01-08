@@ -2617,7 +2617,7 @@ namespace SabreTools.Library.Tools
 			switch (sortedBy)
 			{
 				case SortedBy.CRC:
-					key = (item.Type == ItemType.Rom ? ((Rom)item).CRC : Constants.CRCZero);
+					key = (item.ItemType == ItemType.Rom ? ((Rom)item).CRC : Constants.CRCZero);
 					break;
 				case SortedBy.Game:
 					key = (norename ? ""
@@ -2639,37 +2639,37 @@ namespace SabreTools.Library.Tools
 					key = HttpUtility.HtmlEncode(key);
 					break;
 				case SortedBy.MD5:
-					key = (item.Type == ItemType.Rom
+					key = (item.ItemType == ItemType.Rom
 						? ((Rom)item).MD5
-						: (item.Type == ItemType.Disk
+						: (item.ItemType == ItemType.Disk
 							? ((Disk)item).MD5
 							: Constants.MD5Zero));
 					break;
 				case SortedBy.SHA1:
-					key = (item.Type == ItemType.Rom
+					key = (item.ItemType == ItemType.Rom
 						? ((Rom)item).SHA1
-						: (item.Type == ItemType.Disk
+						: (item.ItemType == ItemType.Disk
 							? ((Disk)item).SHA1
 							: Constants.SHA1Zero));
 					break;
 				case SortedBy.SHA256:
-					key = (item.Type == ItemType.Rom
+					key = (item.ItemType == ItemType.Rom
 						? ((Rom)item).SHA256
-						: (item.Type == ItemType.Disk
+						: (item.ItemType == ItemType.Disk
 							? ((Disk)item).SHA256
 							: Constants.SHA256Zero));
 					break;
 				case SortedBy.SHA384:
-					key = (item.Type == ItemType.Rom
+					key = (item.ItemType == ItemType.Rom
 						? ((Rom)item).SHA384
-						: (item.Type == ItemType.Disk
+						: (item.ItemType == ItemType.Disk
 							? ((Disk)item).SHA384
 							: Constants.SHA384Zero));
 					break;
 				case SortedBy.SHA512:
-					key = (item.Type == ItemType.Rom
+					key = (item.ItemType == ItemType.Rom
 						? ((Rom)item).SHA512
-						: (item.Type == ItemType.Disk
+						: (item.ItemType == ItemType.Disk
 							? ((Disk)item).SHA512
 							: Constants.SHA512Zero));
 					break;

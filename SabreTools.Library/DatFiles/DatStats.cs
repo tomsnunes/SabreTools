@@ -138,7 +138,7 @@ namespace SabreTools.Library.DatFiles
 
                 // Now we do different things for each item type
 
-                switch (item.Type)
+                switch (item.ItemType)
                 {
                     case ItemType.Archive:
                         this.ArchiveCount += 1;
@@ -237,7 +237,7 @@ namespace SabreTools.Library.DatFiles
 
                 // Now we do different things for each item type
 
-                switch (item.Type)
+                switch (item.ItemType)
                 {
                     case ItemType.Archive:
                         this.ArchiveCount -= 1;
