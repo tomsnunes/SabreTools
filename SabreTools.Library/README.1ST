@@ -330,6 +330,165 @@ Options:
 		  compare against the input DATs. This flag forces all CHDs to be
 		  treated like regular files.
 
+	  -gn=, --game-name=		  Filter by game name
+		  Include only items with this game name in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -ngn=, --not-game-name=	 Filter by not game name
+		  Include only items without this game name in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -gd=, --game-description=   Filter by game description
+		  Include only items with this game description in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -ngd=, --not-game-description= Filter by not game description
+		  Include only items without this game description in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -ofg, --match-of-tags	   Allow cloneof and romof tags to match game name filters
+		  If filter or exclude by game name is used, this flag will allow those
+		  filters to be checked against the romof and cloneof tags as well.
+		  This can allow for more advanced set-building, especially in
+		  arcade-based sets.
+
+	  -rn=, --item-name=		  Filter by item name
+		  Include only items with this item name in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nrn=, --not-item-name=	 Filter by not item name
+		  Include only items without this item name in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -rt=, --item-type=		  Filter by item type
+		  Include only items with this item type in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nrt=, --not-item-type=	 Filter by not item type
+		  Include only items without this item type in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sgt=, --greater=		   Filter by size >=
+		  Only include items whose size is greater than or equal to this value
+		  in the output DAT. Users can specify either a regular integer number
+		  or a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192
+
+	  -slt=, --less=			  Filter by size =<
+		  Only include items whose size is less than or equal to this value in
+		  the output DAT. Users can specify either a regular integer number or
+		  a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192
+
+	  -seq=, --equal=			 Filter by size ==
+		  Only include items of this exact size in the output DAT. Users can
+		  specify either a regular integer number or a number with a standard
+		  postfix. e.g. 8kb => 8000 or 8kib => 8192
+
+	  -crc=, --crc=			   Filter by CRC hash
+		  Include only items with this CRC hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -ncrc=, --not-crc=		  Filter by not CRC hash
+		  Include only items without this CRC hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -md5=, --md5=			   Filter by MD5 hash
+		  Include only items with this MD5 hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nmd5=, --not-md5=		  Filter by not MD5 hash
+		  Include only items without this MD5 hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -sha1=, --sha1=			 Filter by SHA-1 hash
+		  Include only items with this SHA-1 hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nsha1=, --not-sha1=		Filter by not SHA-1 hash
+		  Include only items without this SHA-1 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sha256=, --sha256=		 Filter by SHA-256 hash
+		  Include only items with this SHA-256 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nsha256=, --not-sha256=	Filter by not SHA-256 hash
+		  Include only items without this SHA-256 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sha384=, --sha384=		 Filter by SHA-384 hash
+		  Include only items with this SHA-384 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nsha384=, --not-sha384=	Filter by not SHA-384 hash
+		  Include only items without this SHA-384 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sha512=, --sha512=		 Filter by SHA-512 hash
+		  Include only items with this SHA-512 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nsha512=, --not-sha512=	Filter by not SHA-512 hash
+		  Include only items without this SHA-512 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -is=, --status=			 Include only items with a given status
+		  Include only items with this item status in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Good, BadDump, Nodump, Verified
+
+	  -nis=, --not-status=		Exclude only items with a given status
+		  Include only items without this item status in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Good, BadDump, Nodump, Verified
+
+	  -gt=, --game-type=		  Include only games with a given type
+		  Include only items with this game type in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Bios, Device, Mechanical
+
+	  -ngt=, --not-game-type=	 Exclude only games with a given type
+		  Include only items without this game type in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Bios, Device, Mechanical
+
+	  -run, --runnable			Include only items that are marked runnable
+		  This allows users to include only verified runnable games.
+
+	  -nrun, --not-runnable	   Include only items that are not marked runnable
+		  This allows users to include only unrunnable games.
+
 	  -t=, --temp=				Set the temporary directory to use
 		  Optionally, a temp folder can be supplied in the case the default
 		  temp directory is not preferred.
@@ -1367,6 +1526,165 @@ Options:
 		  Preprocess the DAT to have child sets contain all items from the
 		  parent sets based on the cloneof and romof tags as well as device
 		  references. This is incompatible with the other --dat-X flags.
+
+	  -gn=, --game-name=		  Filter by game name
+		  Include only items with this game name in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -ngn=, --not-game-name=	 Filter by not game name
+		  Include only items without this game name in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -gd=, --game-description=   Filter by game description
+		  Include only items with this game description in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -ngd=, --not-game-description= Filter by not game description
+		  Include only items without this game description in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -ofg, --match-of-tags	   Allow cloneof and romof tags to match game name filters
+		  If filter or exclude by game name is used, this flag will allow those
+		  filters to be checked against the romof and cloneof tags as well.
+		  This can allow for more advanced set-building, especially in
+		  arcade-based sets.
+
+	  -rn=, --item-name=		  Filter by item name
+		  Include only items with this item name in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nrn=, --not-item-name=	 Filter by not item name
+		  Include only items without this item name in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -rt=, --item-type=		  Filter by item type
+		  Include only items with this item type in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nrt=, --not-item-type=	 Filter by not item type
+		  Include only items without this item type in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sgt=, --greater=		   Filter by size >=
+		  Only include items whose size is greater than or equal to this value
+		  in the output DAT. Users can specify either a regular integer number
+		  or a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192
+
+	  -slt=, --less=			  Filter by size =<
+		  Only include items whose size is less than or equal to this value in
+		  the output DAT. Users can specify either a regular integer number or
+		  a number with a standard postfix. e.g. 8kb => 8000 or 8kib => 8192
+
+	  -seq=, --equal=			 Filter by size ==
+		  Only include items of this exact size in the output DAT. Users can
+		  specify either a regular integer number or a number with a standard
+		  postfix. e.g. 8kb => 8000 or 8kib => 8192
+
+	  -crc=, --crc=			   Filter by CRC hash
+		  Include only items with this CRC hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -ncrc=, --not-crc=		  Filter by not CRC hash
+		  Include only items without this CRC hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -md5=, --md5=			   Filter by MD5 hash
+		  Include only items with this MD5 hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nmd5=, --not-md5=		  Filter by not MD5 hash
+		  Include only items without this MD5 hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -sha1=, --sha1=			 Filter by SHA-1 hash
+		  Include only items with this SHA-1 hash in the output. Additionally,
+		  the user can specify an exact match or full C#-style regex for
+		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -nsha1=, --not-sha1=		Filter by not SHA-1 hash
+		  Include only items without this SHA-1 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sha256=, --sha256=		 Filter by SHA-256 hash
+		  Include only items with this SHA-256 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nsha256=, --not-sha256=	Filter by not SHA-256 hash
+		  Include only items without this SHA-256 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sha384=, --sha384=		 Filter by SHA-384 hash
+		  Include only items with this SHA-384 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nsha384=, --not-sha384=	Filter by not SHA-384 hash
+		  Include only items without this SHA-384 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -sha512=, --sha512=		 Filter by SHA-512 hash
+		  Include only items with this SHA-512 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nsha512=, --not-sha512=	Filter by not SHA-512 hash
+		  Include only items without this SHA-512 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -is=, --status=			 Include only items with a given status
+		  Include only items with this item status in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Good, BadDump, Nodump, Verified
+
+	  -nis=, --not-status=		Exclude only items with a given status
+		  Include only items without this item status in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Good, BadDump, Nodump, Verified
+
+	  -gt=, --game-type=		  Include only games with a given type
+		  Include only items with this game type in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Bios, Device, Mechanical
+
+	  -ngt=, --not-game-type=	 Exclude only games with a given type
+		  Include only items without this game type in the output. Multiple
+		  instances of this flag are allowed.
+		  Possible values are: None, Bios, Device, Mechanical
+
+	  -run, --runnable			Include only items that are marked runnable
+		  This allows users to include only verified runnable games.
+
+	  -nrun, --not-runnable	   Include only items that are not marked runnable
+		  This allows users to include only unrunnable games.
 
 ** Section 3.0 - Examples
 

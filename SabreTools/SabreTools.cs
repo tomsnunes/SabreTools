@@ -862,7 +862,7 @@ namespace SabreTools
 				case "DATFromDir":
 					VerifyInputs(inputs, feature);
 					InitDatFromDir(inputs, datHeader, omitFromScan, noAutomaticDate, archivesAsFiles, chdsAsFiles,
-						skipFileType, addBlankFiles, addFileDates, tempDir, outDir, copyFiles);
+						skipFileType, addBlankFiles, addFileDates, tempDir, outDir, copyFiles, filter);
 					break;
 				// If we're in header extract and remove mode
 				case "Extract":
@@ -902,7 +902,7 @@ namespace SabreTools
 				// If we're using the verifier
 				case "Verify":
 					VerifyInputs(inputs, feature);
-					InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles, individual);
+					InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles, individual, filter);
 					break;
 				// If nothing is set, show the help
 				default:

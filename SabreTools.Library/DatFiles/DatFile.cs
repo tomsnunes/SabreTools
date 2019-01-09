@@ -3277,8 +3277,9 @@ namespace SabreTools.Library.DatFiles
         /// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
         /// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
         /// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
+        /// <param name="filter">Filter object to be passed to the DatItem level</param>
         public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles, SkipFileType skipFileType,
-            bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
+            bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles, Filter filter)
         {
             // If the description is defined but not the name, set the name from the description
             if (String.IsNullOrWhiteSpace(Name) && !String.IsNullOrWhiteSpace(Description))
@@ -3377,6 +3378,12 @@ namespace SabreTools.Library.DatFiles
             if (tempDir != Path.GetTempPath())
             {
                 Utilities.TryDeleteDirectory(tempDir);
+            }
+
+            // If we have a valid filter, perform the filtering now
+            if (filter != null && filter != default(Filter))
+            {
+                filter.FilterDatFile(this);
             }
 
             return true;
@@ -4523,8 +4530,9 @@ namespace SabreTools.Library.DatFiles
         /// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
         /// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
         /// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
+        /// <param name="filter">Filter object to be passed to the DatItem level</param>
         /// <returns>True if verification was a success, false otherwise</returns>
-        public bool VerifyGeneric(List<string> inputs, bool hashOnly, bool quickScan, string headerToCheckAgainst, bool chdsAsFiles)
+        public bool VerifyGeneric(List<string> inputs, bool hashOnly, bool quickScan, string headerToCheckAgainst, bool chdsAsFiles, Filter filter)
         {
             // TODO: We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
             bool success = true;
@@ -4535,7 +4543,7 @@ namespace SabreTools.Library.DatFiles
             {
                 // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
                 PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-                    SkipFileType.None, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, headerToCheckAgainst, chdsAsFiles);
+                    SkipFileType.None, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, headerToCheckAgainst, chdsAsFiles, filter);
             }
 
             // Setup the fixdat
