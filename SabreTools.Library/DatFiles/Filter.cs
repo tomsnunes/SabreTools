@@ -14,7 +14,7 @@ namespace SabreTools.Library.DatFiles
     /// <summary>
     /// Represents the filtering operations that need to be performed on a set of items, usually a DAT
     /// </summary>
-    public partial class Filter
+    public class Filter
     {
         #region Pubically facing variables
 
