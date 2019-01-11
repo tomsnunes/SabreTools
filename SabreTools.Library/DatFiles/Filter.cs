@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 
@@ -15,56 +14,100 @@ namespace SabreTools.Library.DatFiles
     /// <summary>
     /// Represents the filtering operations that need to be performed on a set of items, usually a DAT
     /// </summary>
-    public class Filter
+    public partial class Filter
     {
         #region Pubically facing variables
 
-        #region Positive
+        /// <summary>
+        /// Include or exclude machine names
+        /// </summary>
+        public FilterItem<string> MachineName { get; set; } = new FilterItem<string>();
 
-        public List<string> MachineNames { get; set; } = new List<string>();
-        public List<string> MachineDescriptions { get; set; } = new List<string>();
-        public List<string> ItemNames { get; set; } = new List<string>();
-        public List<string> ItemTypes { get; set; } = new List<string>();
-        public List<string> CRCs { get; set; } = new List<string>();
-        public List<string> MD5s { get; set; } = new List<string>();
-        public List<string> SHA1s { get; set; } = new List<string>();
-        public List<string> SHA256s { get; set; } = new List<string>();
-        public List<string> SHA384s { get; set; } = new List<string>();
-        public List<string> SHA512s { get; set; } = new List<string>();
-        public ItemStatus ItemStatuses { get; set; } = ItemStatus.NULL;
-        public MachineType MachineTypes { get; set; } = MachineType.NULL;
+        /// <summary>
+        /// Include or exclude machine descriptions
+        /// </summary>
+        public FilterItem<string> MachineDescription { get; set; } = new FilterItem<string>();
 
-        #endregion
+        /// <summary>
+        /// Include or exclude item names
+        /// </summary>
+        public FilterItem<string> ItemName { get; set; } = new FilterItem<string>();
 
-        #region Negative
+        /// <summary>
+        /// Include or exclude item types
+        /// </summary>
+        public FilterItem<string> ItemTypes { get; set; } = new FilterItem<string>();
 
-        public List<string> NotMachineNames { get; set; } = new List<string>();
-        public List<string> NotMachineDescriptions { get; set; } = new List<string>();
-        public List<string> NotItemNames { get; set; } = new List<string>();
-        public List<string> NotItemTypes { get; set; } = new List<string>();
-        public List<string> NotCRCs { get; set; } = new List<string>();
-        public List<string> NotMD5s { get; set; } = new List<string>();
-        public List<string> NotSHA1s { get; set; } = new List<string>();
-        public List<string> NotSHA256s { get; set; } = new List<string>();
-        public List<string> NotSHA384s { get; set; } = new List<string>();
-        public List<string> NotSHA512s { get; set; } = new List<string>();
-        public ItemStatus NotItemStatuses { get; set; } = ItemStatus.NULL;
-        public MachineType NotMachineTypes { get; set; } = MachineType.NULL;
+        /// <summary>
+        /// Include or exclude CRC32 hashes
+        /// </summary>
+        public FilterItem<string> CRC { get; set; } = new FilterItem<string>();
 
-        #endregion
+        /// <summary>
+        /// Include or exclude MD5 hashes
+        /// </summary>
+        public FilterItem<string> MD5 { get; set; } = new FilterItem<string>();
 
-        #region Neutral
+        /// <summary>
+        /// Include or exclude SHA-1 hashes
+        /// </summary>
+        public FilterItem<string> SHA1 { get; set; } = new FilterItem<string>();
 
-        public long SizeGreaterThanOrEqual { get; set; } = -1;
-        public long SizeLessThanOrEqual { get; set; } = -1;
-        public long SizeEqualTo { get; set; } = -1;
-        public bool IncludeOfInGame { get; set; } = false;
-        public bool? Runnable { get; set; } = null;
-        public bool Single { get; set; } = false;
-        public bool Trim { get; set; } = false;
-        public string Root { get; set; } = null;
+        /// <summary>
+        /// Include or exclude SHA-256 hashes
+        /// </summary>
+        public FilterItem<string> SHA256 { get; set; } = new FilterItem<string>();
 
-        #endregion
+        /// <summary>
+        /// Include or exclude SHA-384 hashes
+        /// </summary>
+        public FilterItem<string> SHA384 { get; set; } = new FilterItem<string>();
+
+        /// <summary>
+        /// Include or exclude SHA-512 hashes
+        /// </summary>
+        public FilterItem<string> SHA512 { get; set; } = new FilterItem<string>();
+
+        /// <summary>
+        /// Include or exclude item statuses
+        /// </summary>
+        public FilterItem<ItemStatus> ItemStatuses { get; set; } = new FilterItem<ItemStatus>() { Positive = ItemStatus.NULL, Negative = ItemStatus.NULL };
+
+        /// <summary>
+        /// Include or exclude machine types
+        /// </summary>
+        public FilterItem<MachineType> MachineTypes { get; set; } = new FilterItem<MachineType>() { Positive = MachineType.NULL, Negative = MachineType.NULL };
+
+        /// <summary>
+        /// Include or exclude item sizes
+        /// </summary>
+        /// <remarks>Positive means "Greater than or equal", Negative means "Less than or equal", Neutral means "Equal"</remarks>
+        public FilterItem<long> Size { get; set; } = new FilterItem<long>() { Positive = -1, Negative = -1, Neutral = -1 };
+
+        /// <summary>
+        /// Include romof and cloneof when filtering machine names
+        /// </summary>
+        public FilterItem<bool> IncludeOfInGame { get; set; } = new FilterItem<bool>() { Neutral = false };
+
+        /// <summary>
+        /// Include or exclude items with the "Runnable" tag
+        /// </summary>
+        public FilterItem<bool?> Runnable { get; set; } = new FilterItem<bool?>() { Neutral = null };
+
+        /// <summary>
+        /// Change all machine names to "!"
+        /// </summary>
+        public FilterItem<bool> Single { get; set; } = new FilterItem<bool>() { Neutral = false };
+
+        /// <summary>
+        /// Trim total machine and item name to not exceed NTFS limits
+        /// </summary>
+        public FilterItem<bool> Trim { get; set; } = new FilterItem<bool>() { Neutral = false };
+
+        /// <summary>
+        /// Include root directory when determing trim sizes
+        /// </summary>
+        public FilterItem<string> Root { get; set; } = new FilterItem<string>() { Neutral = null };
 
         #endregion // Pubically facing variables
 
@@ -92,16 +135,14 @@ namespace SabreTools.Library.DatFiles
                         if (ItemPasses(item))
                         {
                             // If we are in single game mode, rename all games
-                            if (this.Single)
-                            {
+                            if (this.Single.Neutral)
                                 item.MachineName = "!";
-                            }
 
                             // If we are in NTFS trim mode, trim the game name
-                            if (this.Trim)
+                            if (this.Trim.Neutral)
                             {
                                 // Windows max name length is 260
-                                int usableLength = 260 - item.MachineName.Length - this.Root.Length;
+                                int usableLength = 260 - item.MachineName.Length - this.Root.Neutral.Length;
                                 if (item.Name.Length > usableLength)
                                 {
                                     string ext = Path.GetExtension(item.Name);
@@ -140,25 +181,17 @@ namespace SabreTools.Library.DatFiles
         {
             // If the item is null, we automatically fail it
             if (item == null)
-            {
                 return false;
-            }
 
             // Filter on machine type
-            if (this.MachineTypes != MachineType.NULL && (item.MachineType & this.MachineTypes) == 0)
-            {
+            if (!this.MachineTypes.MatchesPositive(MachineType.NULL, item.MachineType))
                 return false;
-            }
-            if (this.NotMachineTypes != MachineType.NULL && (item.MachineType & this.NotMachineTypes) != 0)
-            {
+            if (this.MachineTypes.MatchesNegative(MachineType.NULL, item.MachineType))
                 return false;
-            }
 
             // Filter on machine runability
-            if (this.Runnable != null && item.Runnable != this.Runnable)
-            {
+            if (!this.Runnable.MatchesNeutral(null, item.Runnable))
                 return false;
-            }
 
             // Take care of Rom and Disk specific differences
             if (item.ItemType == ItemType.Rom)
@@ -166,373 +199,137 @@ namespace SabreTools.Library.DatFiles
                 Rom rom = (Rom)item;
 
                 // Filter on status
-                if (this.ItemStatuses != ItemStatus.NULL && (rom.ItemStatus & this.ItemStatuses) == 0)
-                {
+                if (!this.ItemStatuses.MatchesPositive(ItemStatus.NULL, rom.ItemStatus))
                     return false;
-                }
-                if (this.NotItemStatuses != ItemStatus.NULL && (rom.ItemStatus & this.NotItemStatuses) != 0)
-                {
+                if (this.ItemStatuses.MatchesNegative(ItemStatus.NULL, rom.ItemStatus))
                     return false;
-                }
 
                 // Filter on rom size
-                if (this.SizeEqualTo != -1 && rom.Size != this.SizeEqualTo)
-                {
+                if (!this.Size.MatchesNeutral(-1, rom.Size))
                     return false;
-                }
-                else
-                {
-                    if (this.SizeGreaterThanOrEqual != -1 && rom.Size < this.SizeGreaterThanOrEqual)
-                    {
-                        return false;
-                    }
-                    if (this.SizeLessThanOrEqual != -1 && rom.Size > this.SizeLessThanOrEqual)
-                    {
-                        return false;
-                    }
-                }
+                else if (!this.Size.MatchesPositive(-1, rom.Size))
+                    return false;
+                else if (!this.Size.MatchesNegative(-1, rom.Size))
+                    return false;
 
                 // Filter on CRC
-                if (this.CRCs.Count > 0)
-                {
-                    // If the CRC isn't in the list, return false
-                    if (!FindValueInList(this.CRCs, rom.CRC))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotCRCs.Count > 0)
-                {
-                    // If the CRC is in the list, return false
-                    if (FindValueInList(this.NotCRCs, rom.CRC))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.CRC.MatchesPositiveSet(rom.CRC))
+                    return false;
+                if (this.CRC.MatchesNegativeSet(rom.CRC))
+                    return false;
 
                 // Filter on MD5
-                if (this.MD5s.Count > 0)
-                {
-                    // If the MD5 isn't in the list, return false
-                    if (!FindValueInList(this.MD5s, rom.MD5))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotMD5s.Count > 0)
-                {
-                    // If the MD5 is in the list, return false
-                    if (FindValueInList(this.NotMD5s, rom.MD5))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.MD5.MatchesPositiveSet(rom.MD5))
+                    return false;
+                if (this.MD5.MatchesNegativeSet(rom.MD5))
+                    return false;
 
                 // Filter on SHA-1
-                if (this.SHA1s.Count > 0)
-                {
-                    // If the SHA-1 isn't in the list, return false
-                    if (!FindValueInList(this.SHA1s, rom.SHA1))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA1s.Count > 0)
-                {
-                    // If the SHA-1 is in the list, return false
-                    if (FindValueInList(this.NotSHA1s, rom.SHA1))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA1.MatchesPositiveSet(rom.SHA1))
+                    return false;
+                if (this.SHA1.MatchesNegativeSet(rom.SHA1))
+                    return false;
 
                 // Filter on SHA-256
-                if (this.SHA256s.Count > 0)
-                {
-                    // If the SHA-256 isn't in the list, return false
-                    if (!FindValueInList(this.SHA256s, rom.SHA256))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA256s.Count > 0)
-                {
-                    // If the SHA-256 is in the list, return false
-                    if (FindValueInList(this.NotSHA256s, rom.SHA256))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA256.MatchesPositiveSet(rom.SHA256))
+                    return false;
+                if (this.SHA256.MatchesNegativeSet(rom.SHA256))
+                    return false;
 
                 // Filter on SHA-384
-                if (this.SHA384s.Count > 0)
-                {
-                    // If the SHA-384 isn't in the list, return false
-                    if (!FindValueInList(this.SHA384s, rom.SHA384))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA384s.Count > 0)
-                {
-                    // If the SHA-384 is in the list, return false
-                    if (FindValueInList(this.NotSHA384s, rom.SHA384))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA384.MatchesPositiveSet(rom.SHA384))
+                    return false;
+                if (this.SHA384.MatchesNegativeSet(rom.SHA384))
+                    return false;
 
                 // Filter on SHA-512
-                if (this.SHA512s.Count > 0)
-                {
-                    // If the SHA-512 isn't in the list, return false
-                    if (!FindValueInList(this.SHA512s, rom.SHA512))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA512s.Count > 0)
-                {
-                    // If the SHA-512 is in the list, return false
-                    if (FindValueInList(this.NotSHA512s, rom.SHA512))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA512.MatchesPositiveSet(rom.SHA512))
+                    return false;
+                if (this.SHA512.MatchesNegativeSet(rom.SHA512))
+                    return false;
             }
             else if (item.ItemType == ItemType.Disk)
             {
                 Disk rom = (Disk)item;
 
                 // Filter on status
-                if (this.ItemStatuses != ItemStatus.NULL && (rom.ItemStatus & this.ItemStatuses) == 0)
-                {
+                if (!this.ItemStatuses.MatchesPositive(ItemStatus.NULL, rom.ItemStatus))
                     return false;
-                }
-                if (this.NotItemStatuses != ItemStatus.NULL && (rom.ItemStatus & this.NotItemStatuses) != 0)
-                {
+                if (this.ItemStatuses.MatchesNegative(ItemStatus.NULL, rom.ItemStatus))
                     return false;
-                }
 
                 // Filter on MD5
-                if (this.MD5s.Count > 0)
-                {
-                    // If the MD5 isn't in the list, return false
-                    if (!FindValueInList(this.MD5s, rom.MD5))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotMD5s.Count > 0)
-                {
-                    // If the MD5 is in the list, return false
-                    if (FindValueInList(this.NotMD5s, rom.MD5))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.MD5.MatchesPositiveSet(rom.MD5))
+                    return false;
+                if (this.MD5.MatchesNegativeSet(rom.MD5))
+                    return false;
 
                 // Filter on SHA-1
-                if (this.SHA1s.Count > 0)
-                {
-                    // If the SHA-1 isn't in the list, return false
-                    if (!FindValueInList(this.SHA1s, rom.SHA1))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA1s.Count > 0)
-                {
-                    // If the SHA-1 is in the list, return false
-                    if (FindValueInList(this.NotSHA1s, rom.SHA1))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA1.MatchesPositiveSet(rom.SHA1))
+                    return false;
+                if (this.SHA1.MatchesNegativeSet(rom.SHA1))
+                    return false;
 
                 // Filter on SHA-256
-                if (this.SHA256s.Count > 0)
-                {
-                    // If the SHA-256 isn't in the list, return false
-                    if (!FindValueInList(this.SHA256s, rom.SHA256))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA256s.Count > 0)
-                {
-                    // If the SHA-256 is in the list, return false
-                    if (FindValueInList(this.NotSHA256s, rom.SHA256))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA256.MatchesPositiveSet(rom.SHA256))
+                    return false;
+                if (this.SHA256.MatchesNegativeSet(rom.SHA256))
+                    return false;
 
                 // Filter on SHA-384
-                if (this.SHA384s.Count > 0)
-                {
-                    // If the SHA-384 isn't in the list, return false
-                    if (!FindValueInList(this.SHA384s, rom.SHA384))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA384s.Count > 0)
-                {
-                    // If the SHA-384 is in the list, return false
-                    if (FindValueInList(this.NotSHA384s, rom.SHA384))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA384.MatchesPositiveSet(rom.SHA384))
+                    return false;
+                if (this.SHA384.MatchesNegativeSet(rom.SHA384))
+                    return false;
 
                 // Filter on SHA-512
-                if (this.SHA512s.Count > 0)
-                {
-                    // If the SHA-512 isn't in the list, return false
-                    if (!FindValueInList(this.SHA512s, rom.SHA512))
-                    {
-                        return false;
-                    }
-                }
-                if (this.NotSHA512s.Count > 0)
-                {
-                    // If the SHA-512 is in the list, return false
-                    if (FindValueInList(this.NotSHA512s, rom.SHA512))
-                    {
-                        return false;
-                    }
-                }
+                if (!this.SHA512.MatchesPositiveSet(rom.SHA512))
+                    return false;
+                if (this.SHA512.MatchesNegativeSet(rom.SHA512))
+                    return false;
             }
 
             // Filter on machine name
-            if (this.MachineNames.Count > 0)
+            bool machineNameFound = this.MachineName.MatchesPositiveSet(item.MachineName);
+            if (this.IncludeOfInGame.Neutral)
             {
-                bool found = FindValueInList(this.MachineNames, item.MachineName);
-
-                // If we are checking CloneOf and RomOf, add them in as well
-                if (this.IncludeOfInGame)
-                {
-                    found |= FindValueInList(this.MachineNames, item.CloneOf);
-                    found |= FindValueInList(this.MachineNames, item.RomOf);
-                }
-
-                // If the game name was not found in the list, return false
-                if (!found)
-                {
-                    return false;
-                }
+                machineNameFound |= this.MachineName.MatchesPositiveSet(item.CloneOf);
+                machineNameFound |= this.MachineName.MatchesPositiveSet(item.RomOf);
             }
-            if (this.NotMachineNames.Count > 0)
+            if (!machineNameFound)
+                return false;
+
+            machineNameFound = this.MachineName.MatchesNegativeSet(item.MachineName);
+            if (this.IncludeOfInGame.Neutral)
             {
-                bool found = FindValueInList(this.NotMachineNames, item.MachineName);
-
-                // If we are checking CloneOf and RomOf, add them in as well
-                if (this.IncludeOfInGame)
-                {
-                    found |= FindValueInList(this.NotMachineNames, item.CloneOf);
-                    found |= FindValueInList(this.NotMachineNames, item.RomOf);
-                }
-
-                // If the machine name was found in the list, return false
-                if (found)
-                {
-                    return false;
-                }
+                machineNameFound |= this.MachineName.MatchesNegativeSet(item.CloneOf);
+                machineNameFound |= this.MachineName.MatchesNegativeSet(item.RomOf);
             }
+            if (machineNameFound)
+                return false;
 
             // Filter on machine description
-            if (this.MachineDescriptions.Count > 0)
-            {
-                bool found = FindValueInList(this.MachineDescriptions, item.MachineDescription);
-
-                // If the machine description was not found in the list, return false
-                if (!found)
-                {
-                    return false;
-                }
-            }
-            if (this.NotMachineDescriptions.Count > 0)
-            {
-                bool found = FindValueInList(this.NotMachineDescriptions, item.MachineDescription);
-
-                // If the machine description was found in the list, return false
-                if (found)
-                {
-                    return false;
-                }
-            }
+            if (!this.MachineDescription.MatchesPositiveSet(item.MachineDescription))
+                return false;
+            if (this.MachineDescription.MatchesNegativeSet(item.MachineDescription))
+                return false;
 
             // Filter on item name
-            if (this.ItemNames.Count > 0)
-            {
-                // If the item name was not found in the list, return false
-                if (!FindValueInList(this.ItemNames, item.Name))
-                {
-                    return false;
-                }
-            }
-            if (this.NotItemNames.Count > 0)
-            {
-                // If the item name was found in the list, return false
-                if (FindValueInList(this.NotItemNames, item.Name))
-                {
-                    return false;
-                }
-            }
+            if (!this.ItemName.MatchesPositiveSet(item.Name))
+                return false;
+            if (this.ItemName.MatchesNegativeSet(item.Name))
+                return false;
 
             // Filter on item type
-            if (this.ItemTypes.Count == 0 && this.NotItemTypes.Count == 0 && item.ItemType != ItemType.Rom && item.ItemType != ItemType.Disk && item.ItemType != ItemType.Blank)
-            {
+            if (this.ItemTypes.PositiveSet.Count == 0 && this.ItemTypes.NegativeSet.Count == 0
+                && item.ItemType != ItemType.Rom && item.ItemType != ItemType.Disk && item.ItemType != ItemType.Blank)
                 return false;
-            }
-            if (this.ItemTypes.Count > 0)
-            {
-                // If the item type was not found in the list, return false
-                if (!FindValueInList(this.ItemTypes, item.ItemType.ToString()))
-                {
-                    return false;
-                }
-            }
-            if (this.NotItemTypes.Count > 0)
-            {
-                // If the item type was found in the list, return false
-                if (FindValueInList(this.NotItemTypes, item.ItemType.ToString()))
-                {
-                    return false;
-                }
-            }
+            if (!this.ItemTypes.MatchesPositiveSet(item.ItemType.ToString()))
+                return false;
+            if (this.ItemTypes.MatchesNegativeSet(item.ItemType.ToString()))
+                return false;
 
             return true;
-        }
-
-        /// <summary>
-        /// Generic code to check if a specific value is in the list given
-        /// </summary>
-        /// <param name="haystack">List to search for the value in</param>
-        /// <param name="needle">Value to search the list for</param>
-        /// <returns>True if the value could be found, false otherwise</returns>
-        private bool FindValueInList(List<string> haystack, string needle)
-        {
-            bool found = false;
-            foreach (string straw in haystack)
-            {
-                if (!String.IsNullOrWhiteSpace(straw))
-                {
-                    string regexStraw = straw;
-
-                    // If the straw has no special characters at all, treat it as an exact match
-                    if (regexStraw == Regex.Escape(regexStraw))
-                    {
-                        regexStraw = "^" + regexStraw + "$";
-                    }
-
-                    // Check if a match is found with the regex
-                    found |= Regex.IsMatch(needle, regexStraw, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-                }
-            }
-
-            return found;
         }
 
         #endregion

@@ -93,6 +93,7 @@
     <Compile Include="DatFiles\DatStats.cs" />
     <Compile Include="DatFiles\DosCenter.cs" />
     <Compile Include="DatFiles\Filter.cs" />
+    <Compile Include="DatFiles\FilterItem.cs" />
     <Compile Include="DatFiles\Hashfile.cs" />
     <Compile Include="DatFiles\Listrom.cs" />
     <Compile Include="DatFiles\Listxml.cs" />
