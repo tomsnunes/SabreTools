@@ -45,8 +45,8 @@ namespace SabreTools.Library.DatFiles
         /// </summary>
         /// <param name="def">Default value to check filter value</param>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in the positive filter, false otherwise</returns>
-        public bool MatchesPositive(T def, T value)
+        /// <returns>True if the value was found in the positive filter, null on default value, false otherwise</returns>
+        public bool? MatchesPositive(T def, T value)
         {
             return Matches(this.Positive, def, value);
         }
@@ -56,8 +56,8 @@ namespace SabreTools.Library.DatFiles
         /// </summary>
         /// <param name="def">Default value to check filter value</param>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in the negative filter, false otherwise</returns>
-        public bool MatchesNegative(T def, T value)
+        /// <returns>True if the value was found in the negative filter, null on default value, false otherwise</returns>
+        public bool? MatchesNegative(T def, T value)
         {
             return Matches(this.Negative, def, value);
         }
@@ -67,8 +67,8 @@ namespace SabreTools.Library.DatFiles
         /// </summary>
         /// <param name="def">Default value to check filter value</param>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in the neutral filter, false otherwise</returns>
-        public bool MatchesNeutral(T def, T value)
+        /// <returns>True if the value was found in the neutral filter, null on default value, false otherwise</returns>
+        public bool? MatchesNeutral(T def, T value)
         {
             return Matches(this.Neutral, def, value);
         }
@@ -77,8 +77,8 @@ namespace SabreTools.Library.DatFiles
         /// Check if the given value matches any of the positive filters
         /// </summary>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in a positive filter, false otherwise</returns>
-        public bool MatchesPositiveSet(T value)
+        /// <returns>True if the value was found in a positive filter, null on an empty set, false otherwise</returns>
+        public bool? MatchesPositiveSet(T value)
         {
             return MatchesSet(this.PositiveSet, value);
         }
@@ -87,8 +87,8 @@ namespace SabreTools.Library.DatFiles
         /// Check if the given value matches any of the negative filters
         /// </summary>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in a negative filter, false otherwise</returns>
-        public bool MatchesNegativeSet(T value)
+        /// <returns>True if the value was found in a negative filter, null on an empty set, false otherwise</returns>
+        public bool? MatchesNegativeSet(T value)
         {
             return MatchesSet(this.NegativeSet, value);
         }
@@ -97,8 +97,8 @@ namespace SabreTools.Library.DatFiles
         /// Check if the given value matches any of the neutral filters
         /// </summary>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in a neutral filter, false otherwise</returns>
-        public bool MatchesNeutralSet(T value)
+        /// <returns>True if the value was found in a neutral filter, null on an empty set, false otherwise</returns>
+        public bool? MatchesNeutralSet(T value)
         {
             return MatchesSet(this.NeutralSet, value);
         }
@@ -109,12 +109,12 @@ namespace SabreTools.Library.DatFiles
         /// <param name="single">Value to check against</param>
         /// <param name="def">Default value to check filter value</param>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in the supplied filter, false otherwise</returns>
-        private bool Matches(T single, T def, T value)
+        /// <returns>True if the value was found in the supplied filter, null on default value, false otherwise</returns>
+        private bool? Matches(T single, T def, T value)
         {
             // If the filter is default, we ignore
             if (single.Equals(def))
-                return true;
+                return null;
 
             // If we have a flag
             if (typeof(T).IsEnum && (single as Enum).HasFlag(value as Enum))
@@ -128,14 +128,14 @@ namespace SabreTools.Library.DatFiles
         /// </summary>
         /// <param name="set">Set to check against</param>
         /// <param name="value">Value to check</param>
-        /// <returns>True if the value was found in the supplied filter, false otherwise</returns>
-        private bool MatchesSet(List<T> set, T value)
+        /// <returns>True if the value was found in the supplied filter, null on an empty set, false otherwise</returns>
+        private bool? MatchesSet(List<T> set, T value)
         {
-            if (set.Count > 0)
-            {
-                if (this.FindValueInList(set, value))
-                    return true;
-            }
+            if (set.Count == 0)
+                return null;
+
+            if (this.FindValueInList(set, value))
+                return true;
 
             return false;
         }

@@ -184,13 +184,13 @@ namespace SabreTools.Library.DatFiles
                 return false;
 
             // Filter on machine type
-            if (!this.MachineTypes.MatchesPositive(MachineType.NULL, item.MachineType))
+            if (this.MachineTypes.MatchesPositive(MachineType.NULL, item.MachineType) == false)
                 return false;
-            if (this.MachineTypes.MatchesNegative(MachineType.NULL, item.MachineType))
+            if (this.MachineTypes.MatchesNegative(MachineType.NULL, item.MachineType) == true)
                 return false;
 
             // Filter on machine runability
-            if (!this.Runnable.MatchesNeutral(null, item.Runnable))
+            if (this.Runnable.MatchesNeutral(null, item.Runnable) == false)
                 return false;
 
             // Take care of Rom and Disk specific differences
@@ -199,53 +199,53 @@ namespace SabreTools.Library.DatFiles
                 Rom rom = (Rom)item;
 
                 // Filter on status
-                if (!this.ItemStatuses.MatchesPositive(ItemStatus.NULL, rom.ItemStatus))
+                if (this.ItemStatuses.MatchesPositive(ItemStatus.NULL, rom.ItemStatus) == false)
                     return false;
-                if (this.ItemStatuses.MatchesNegative(ItemStatus.NULL, rom.ItemStatus))
+                if (this.ItemStatuses.MatchesNegative(ItemStatus.NULL, rom.ItemStatus) == true)
                     return false;
 
                 // Filter on rom size
-                if (!this.Size.MatchesNeutral(-1, rom.Size))
+                if (this.Size.MatchesNeutral(-1, rom.Size) == false)
                     return false;
-                else if (!this.Size.MatchesPositive(-1, rom.Size))
+                else if (this.Size.MatchesPositive(-1, rom.Size) == false)
                     return false;
-                else if (!this.Size.MatchesNegative(-1, rom.Size))
+                else if (this.Size.MatchesNegative(-1, rom.Size) == false)
                     return false;
 
                 // Filter on CRC
-                if (!this.CRC.MatchesPositiveSet(rom.CRC))
+                if (this.CRC.MatchesPositiveSet(rom.CRC) == false)
                     return false;
-                if (this.CRC.MatchesNegativeSet(rom.CRC))
+                if (this.CRC.MatchesNegativeSet(rom.CRC) == true)
                     return false;
 
                 // Filter on MD5
-                if (!this.MD5.MatchesPositiveSet(rom.MD5))
+                if (this.MD5.MatchesPositiveSet(rom.MD5) == false)
                     return false;
-                if (this.MD5.MatchesNegativeSet(rom.MD5))
+                if (this.MD5.MatchesNegativeSet(rom.MD5) == true)
                     return false;
 
                 // Filter on SHA-1
-                if (!this.SHA1.MatchesPositiveSet(rom.SHA1))
+                if (this.SHA1.MatchesPositiveSet(rom.SHA1) == false)
                     return false;
-                if (this.SHA1.MatchesNegativeSet(rom.SHA1))
+                if (this.SHA1.MatchesNegativeSet(rom.SHA1) == true)
                     return false;
 
                 // Filter on SHA-256
-                if (!this.SHA256.MatchesPositiveSet(rom.SHA256))
+                if (this.SHA256.MatchesPositiveSet(rom.SHA256) == false)
                     return false;
-                if (this.SHA256.MatchesNegativeSet(rom.SHA256))
+                if (this.SHA256.MatchesNegativeSet(rom.SHA256) == true)
                     return false;
 
                 // Filter on SHA-384
-                if (!this.SHA384.MatchesPositiveSet(rom.SHA384))
+                if (this.SHA384.MatchesPositiveSet(rom.SHA384) == false)
                     return false;
-                if (this.SHA384.MatchesNegativeSet(rom.SHA384))
+                if (this.SHA384.MatchesNegativeSet(rom.SHA384) == true)
                     return false;
 
                 // Filter on SHA-512
-                if (!this.SHA512.MatchesPositiveSet(rom.SHA512))
+                if (this.SHA512.MatchesPositiveSet(rom.SHA512) == false)
                     return false;
-                if (this.SHA512.MatchesNegativeSet(rom.SHA512))
+                if (this.SHA512.MatchesNegativeSet(rom.SHA512) == true)
                     return false;
             }
             else if (item.ItemType == ItemType.Disk)
@@ -253,80 +253,80 @@ namespace SabreTools.Library.DatFiles
                 Disk rom = (Disk)item;
 
                 // Filter on status
-                if (!this.ItemStatuses.MatchesPositive(ItemStatus.NULL, rom.ItemStatus))
+                if (this.ItemStatuses.MatchesPositive(ItemStatus.NULL, rom.ItemStatus) == false)
                     return false;
-                if (this.ItemStatuses.MatchesNegative(ItemStatus.NULL, rom.ItemStatus))
+                if (this.ItemStatuses.MatchesNegative(ItemStatus.NULL, rom.ItemStatus) == true)
                     return false;
 
                 // Filter on MD5
-                if (!this.MD5.MatchesPositiveSet(rom.MD5))
+                if (this.MD5.MatchesPositiveSet(rom.MD5) == false)
                     return false;
-                if (this.MD5.MatchesNegativeSet(rom.MD5))
+                if (this.MD5.MatchesNegativeSet(rom.MD5) == true)
                     return false;
 
                 // Filter on SHA-1
-                if (!this.SHA1.MatchesPositiveSet(rom.SHA1))
+                if (this.SHA1.MatchesPositiveSet(rom.SHA1) == false)
                     return false;
-                if (this.SHA1.MatchesNegativeSet(rom.SHA1))
+                if (this.SHA1.MatchesNegativeSet(rom.SHA1) == true)
                     return false;
 
                 // Filter on SHA-256
-                if (!this.SHA256.MatchesPositiveSet(rom.SHA256))
+                if (this.SHA256.MatchesPositiveSet(rom.SHA256) == false)
                     return false;
-                if (this.SHA256.MatchesNegativeSet(rom.SHA256))
+                if (this.SHA256.MatchesNegativeSet(rom.SHA256) == true)
                     return false;
 
                 // Filter on SHA-384
-                if (!this.SHA384.MatchesPositiveSet(rom.SHA384))
+                if (this.SHA384.MatchesPositiveSet(rom.SHA384) == false)
                     return false;
-                if (this.SHA384.MatchesNegativeSet(rom.SHA384))
+                if (this.SHA384.MatchesNegativeSet(rom.SHA384) == true)
                     return false;
 
                 // Filter on SHA-512
-                if (!this.SHA512.MatchesPositiveSet(rom.SHA512))
+                if (this.SHA512.MatchesPositiveSet(rom.SHA512) == false)
                     return false;
-                if (this.SHA512.MatchesNegativeSet(rom.SHA512))
+                if (this.SHA512.MatchesNegativeSet(rom.SHA512) == true)
                     return false;
             }
 
             // Filter on machine name
-            bool machineNameFound = this.MachineName.MatchesPositiveSet(item.MachineName);
+            bool? machineNameFound = this.MachineName.MatchesPositiveSet(item.MachineName);
             if (this.IncludeOfInGame.Neutral)
             {
-                machineNameFound |= this.MachineName.MatchesPositiveSet(item.CloneOf);
-                machineNameFound |= this.MachineName.MatchesPositiveSet(item.RomOf);
+                machineNameFound |= (this.MachineName.MatchesPositiveSet(item.CloneOf) == true);
+                machineNameFound |= (this.MachineName.MatchesPositiveSet(item.RomOf) == true);
             }
-            if (!machineNameFound)
+            if (machineNameFound == false)
                 return false;
 
             machineNameFound = this.MachineName.MatchesNegativeSet(item.MachineName);
             if (this.IncludeOfInGame.Neutral)
             {
-                machineNameFound |= this.MachineName.MatchesNegativeSet(item.CloneOf);
-                machineNameFound |= this.MachineName.MatchesNegativeSet(item.RomOf);
+                machineNameFound |= (this.MachineName.MatchesNegativeSet(item.CloneOf) == true);
+                machineNameFound |= (this.MachineName.MatchesNegativeSet(item.RomOf) == true);
             }
-            if (machineNameFound)
+            if (machineNameFound == false)
                 return false;
 
             // Filter on machine description
-            if (!this.MachineDescription.MatchesPositiveSet(item.MachineDescription))
+            if (this.MachineDescription.MatchesPositiveSet(item.MachineDescription) == false)
                 return false;
-            if (this.MachineDescription.MatchesNegativeSet(item.MachineDescription))
+            if (this.MachineDescription.MatchesNegativeSet(item.MachineDescription) == true)
                 return false;
 
             // Filter on item name
-            if (!this.ItemName.MatchesPositiveSet(item.Name))
+            if (this.ItemName.MatchesPositiveSet(item.Name) == false)
                 return false;
-            if (this.ItemName.MatchesNegativeSet(item.Name))
+            if (this.ItemName.MatchesNegativeSet(item.Name) == true)
                 return false;
 
             // Filter on item type
             if (this.ItemTypes.PositiveSet.Count == 0 && this.ItemTypes.NegativeSet.Count == 0
                 && item.ItemType != ItemType.Rom && item.ItemType != ItemType.Disk && item.ItemType != ItemType.Blank)
                 return false;
-            if (!this.ItemTypes.MatchesPositiveSet(item.ItemType.ToString()))
+            if (this.ItemTypes.MatchesPositiveSet(item.ItemType.ToString()) == false)
                 return false;
-            if (this.ItemTypes.MatchesNegativeSet(item.ItemType.ToString()))
+            if (this.ItemTypes.MatchesNegativeSet(item.ItemType.ToString()) == true)
                 return false;
 
             return true;
