@@ -112,8 +112,9 @@ namespace SabreTools.Library.DatFiles
         /// Create and open an output file for writing direct from a dictionary
         /// </summary>
         /// <param name="outfile">Name of the file to write to</param>
+        /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the DAT was written correctly, false otherwise</returns>
-        public bool WriteToFile(string outfile)
+        public override bool WriteToFile(string outfile, bool ignoreblanks = false)
         {
             try
             {
@@ -160,7 +161,7 @@ namespace SabreTools.Library.DatFiles
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != item.MachineName.ToLowerInvariant())
                         {
-                            WriteStartGame(sw, item);
+                            WriteDatItem(sw, item, ignoreblanks);
                         }
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -221,9 +222,18 @@ namespace SabreTools.Library.DatFiles
         /// </summary>
         /// <param name="sw">StreamWriter to output to</param>
         /// <param name="rom">DatItem object to be output</param>
+        /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteStartGame(StreamWriter sw, DatItem rom)
+        private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
         {
+            // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
+            if (ignoreblanks
+                && (rom.ItemType == ItemType.Rom
+                && (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
+            {
+                return true;
+            }
+
             try
             {
                 // No game should start with a path separator
