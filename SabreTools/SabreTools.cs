@@ -205,10 +205,6 @@ namespace SabreTools
                     case "add-date":
                         addFileDates = true;
                         break;
-                    case "all-stats":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
-                        statDatFormat = StatReportFormat.All;
-                        break;
                     case "archives-as-files":
                         archivesAsFiles = true;
                         break;
@@ -229,10 +225,6 @@ namespace SabreTools
                         break;
                     case "clean":
                         cleanGameNames = true;
-                        break;
-                    case "csv":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
-                        statDatFormat |= StatReportFormat.CSV;
                         break;
                     case "dat-device-non-merged":
                         splitType = SplitType.DeviceNonMerged;
@@ -313,10 +305,6 @@ namespace SabreTools
                     case "hash-only":
                         hashOnly = true;
                         break;
-                    case "html":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
-                        statDatFormat |= StatReportFormat.HTML;
-                        break;
                     case "individual":
                         individual = true;
                         break;
@@ -355,99 +343,6 @@ namespace SabreTools
                         break;
                     case "only-same":
                         onlySame = true;
-                        break;
-                    // TODO: Remove all "output-*" variant flags
-                    case "output-all":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.ALL;
-                        break;
-                    case "output-attractmode":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.AttractMode;
-                        break;
-                    case "output-cmp":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.ClrMamePro;
-                        break;
-                    case "output-csv":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.CSV;
-                        break;
-                    case "output-doscenter":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.DOSCenter;
-                        break;
-                    case "output-listrom":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.Listrom;
-                        break;
-                    case "output-listxml": // TODO: Not added to readme yet
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        datHeader.DatFormat |= DatFormat.Listxml;
-                        break;
-                    case "output-miss":
-                        datHeader.DatFormat |= DatFormat.MissFile;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-md5":
-                        datHeader.DatFormat |= DatFormat.RedumpMD5;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-offlinelist":
-                        datHeader.DatFormat |= DatFormat.OfflineList;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-romcenter":
-                        datHeader.DatFormat |= DatFormat.RomCenter;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-sabredat":
-                        datHeader.DatFormat |= DatFormat.SabreDat;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-sfv":
-                        datHeader.DatFormat |= DatFormat.RedumpSFV;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-sha1":
-                        datHeader.DatFormat |= DatFormat.RedumpSHA1;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-sha256":
-                        datHeader.DatFormat |= DatFormat.RedumpSHA256;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-sha384":
-                        datHeader.DatFormat |= DatFormat.RedumpSHA384;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-sha512":
-                        datHeader.DatFormat |= DatFormat.RedumpSHA512;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-smdb":
-                        datHeader.DatFormat |= DatFormat.EverdriveSMDB;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-softwarelist":
-                        datHeader.DatFormat |= DatFormat.SoftwareList;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-ssv":
-                        datHeader.DatFormat |= DatFormat.SSV;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-tsv":
-                        datHeader.DatFormat |= DatFormat.TSV;
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        break;
-                    case "output-xml":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
-                        // Only set this flag if the depreciated flag is not already
-                        if ((datHeader.DatFormat & DatFormat.LogiqxDepreciated) == 0)
-                        {
-                            datHeader.DatFormat |= DatFormat.Logiqx;
-                        }
                         break;
                     case "quick":
                         quickScan = true;
@@ -541,10 +436,6 @@ namespace SabreTools
                     case "tar":
                         outputFormat = OutputFormat.TapeArchive;
                         break;
-                    case "text":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
-                        statDatFormat |= StatReportFormat.Textfile;
-                        break;
                     case "torrent-7zip":
                         outputFormat = OutputFormat.Torrent7Zip;
                         break;
@@ -574,10 +465,6 @@ namespace SabreTools
                         break;
                     case "trim":
                         filter.Trim.Neutral = true;
-                        break;
-                    case "tsv":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _reportTypeListInput.Flags));
-                        statDatFormat |= StatReportFormat.TSV;
                         break;
                     case "type":
                         splittingMode |= SplittingMode.Type;

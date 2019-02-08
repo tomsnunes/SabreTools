@@ -33,18 +33,6 @@ namespace SabreTools
                     longDescription: "If this flag is set, then the Date will be appended to each file information in the output DAT. The output format is standardized as \"yyyy/MM/dd HH:mm:ss\".");
             }
         }
-        private static Feature _allStatsFlag
-        {
-            get
-            {
-                return new Feature(
-                    "all-stats",
-                    new List<string>() { "-as", "--all-stats" },
-                    "Write all statistics to all available formats [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output all statistical information to all available formats. [DEPRECIATED]");
-            }
-        } // TODO: Remove
         private static Feature _archivesAsFilesFlag
         {
             get
@@ -129,18 +117,6 @@ namespace SabreTools
                     longDescription: "If this flag is set, then all files that are going to be parsed are moved to the temporary directory before being hashed. This can be helpful in cases where the temp folder is located on an SSD and the user wants to take advantage of this.");
             }
         }
-        private static Feature _csvFlag
-        {
-            get
-            {
-                return new Feature(
-                    "csv",
-                    new List<string>() { "-csv", "--csv" },
-                    "Output in Comma-Separated Value format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output all statistical information in standardized CSV format. [DEPRECIATED]");
-            }
-        } // TODO: Remove
         private static Feature _datDeviceNonMergedFlag
         {
             get
@@ -417,18 +393,6 @@ namespace SabreTools
                     longDescription: "This sets a mode where files are not checked based on name but rather hash alone. This allows verification of (possibly) incorrectly named folders and sets to be verified without worrying about the proper set structure to be there.");
             }
         }
-        private static Feature _htmlFlag
-        {
-            get
-            {
-                return new Feature(
-                    "html",
-                    new List<string>() { "-html", "--html" },
-                    "Output in HTML format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output all statistical information in standardized HTML format. [DEPRECIATED]");
-            }
-        } // TODO: Remove
         private static Feature _individualFlag
         {
             get
@@ -585,270 +549,6 @@ namespace SabreTools
                     longDescription: "Normally, updating the description will always overwrite if the machine names are the same. With this flag, descriptions will only be overwritten if they are the same as the machine names.");
             }
         }
-        private static Feature _outputAllFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-all",
-                    new List<string>() { "-oa", "--output-all" },
-                    "Output in all formats [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in all formats [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputAttractmodeFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-attractmode",
-                    new List<string>() { "-oam", "--output-attractmode" },
-                    "Output in AttractMode format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in AttractMode format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputCmpFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-cmp",
-                    new List<string>() { "-oc", "--output-cmp" },
-                    "Output in CMP format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in ClrMamePro format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputCsvFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-csv",
-                    new List<string>() { "-ocsv", "--output-csv" },
-                    "Output in CSV format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in CSV format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputDoscenterFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-doscenter",
-                    new List<string>() { "-od", "--output-doscenter" },
-                    "Output in DOSCenter format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in DOSCenter format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputListromFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-listrom",
-                    new List<string>() { "-olr", "--output-listrom" },
-                    "Output in MAME Listrom format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in MAME Listrom format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputListxmlFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-listxml",
-                    new List<string>() { "-olx", "--output-listxml" },
-                    "Output in MAME Listxml format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in MAME Listxml format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputMd5Flag
-        {
-            get
-            {
-                return new Feature(
-                    "output-md5",
-                    new List<string>() { "-omd5", "--output-md5" },
-                    "Output in MD5 format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in MD5 format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputMissFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-miss",
-                    new List<string>() { "-om", "--output-miss" },
-                    "Output in Missfile format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in Missfile format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputOfflinelistFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-offlinelist",
-                    new List<string>() { "-ool", "--output-offlinelist" },
-                    "Output in OfflineList format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in OfflineList format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputRomcenterFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-romcenter",
-                    new List<string>() { "-or", "--output-romcenter" },
-                    "Output in RomCenter format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in RomCenter format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSabredatFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-sabredat",
-                    new List<string>() { "-os", "--output-sabredat" },
-                    "Output in SabreDat format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SabreDat format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSfvFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-sfv",
-                    new List<string>() { "-osfv", "--output-sfv" },
-                    "Output in SFV format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SFV format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSha1Flag
-        {
-            get
-            {
-                return new Feature(
-                    "output-sha1",
-                    new List<string>() { "-osha1", "--output-sha1" },
-                    "Output in SHA-1 format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SHA-1 format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSha256Flag
-        {
-            get
-            {
-                return new Feature(
-                    "output-sha256",
-                    new List<string>() { "-osha256", "--output-sha256" },
-                    "Output in SHA-256 format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SHA-256 format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSha384Flag
-        {
-            get
-            {
-                return new Feature(
-                    "output-sha384",
-                    new List<string>() { "-osha384", "--output-sha384" },
-                    "Output in SHA-256 format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SHA-256 format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSha512Flag
-        {
-            get
-            {
-                return new Feature(
-                    "output-sha512",
-                    new List<string>() { "-osha512", "--output-sha512" },
-                    "Output in SHA-256 format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SHA-256 format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSmdbFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-smdb",
-                    new List<string>() { "-osmdb", "--output-smdb" },
-                    "Output in Everdrive SMDB format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in Everdrive SMDB format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSoftwarelistFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-softwarelist",
-                    new List<string>() { "-osl", "--output-softwarelist" },
-                    "Output in Softwarelist format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in Softwarelist format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputSsvFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-ssv",
-                    new List<string>() { "-ossv", "--output-ssv" },
-                    "Output in SSV format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in SSV format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputTsvFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-tsv",
-                    new List<string>() { "-otsv", "--output-tsv" },
-                    "Output in TSV format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in TSV format [DEPRECIATED]");
-            }
-        } // TODO: Remove
-        private static Feature _outputXmlFlag
-        {
-            get
-            {
-                return new Feature(
-                    "output-xml",
-                    new List<string>() { "-ox", "--output-xml" },
-                    "Output in Logiqx XML format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output in Logiqx XML format [DEPRECIATED]");
-            }
-        } // TODO: Remove
         private static Feature _quickFlag
         {
             get
@@ -1185,18 +885,6 @@ namespace SabreTools
                     longDescription: "Instead of outputting the files to folder, files will be rebuilt to Tape ARchive (TAR) files. This format is a standardized storage archive without any compression, usually used with other compression formats around it. It is widely used in backup applications and source code archives.");
             }
         }
-        private static Feature _textFlag
-        {
-            get
-            {
-                return new Feature(
-                    "text",
-                    new List<string>() { "-txt", "--text" },
-                    "Output in generic text format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output all statistical information in generic text format. If no other format flags are enabled, this is the default output. [DEPRECIATED]");
-            }
-        } // TODO: Remove
         private static Feature _torrent7zipFlag
         {
             get
@@ -1317,18 +1005,6 @@ namespace SabreTools
                     longDescription: "In the cases where files will have too long a name, this allows for trimming the name of the files to the NTFS maximum length at most.");
             }
         }
-        private static Feature _tsvFlag
-        {
-            get
-            {
-                return new Feature(
-                    "tsv",
-                    new List<string>() { "-tsv", "--tsv" },
-                    "Output in Tab-Separated Value format [DEPRECIATED]",
-                    FeatureType.Flag,
-                    longDescription: "Output all statistical information in standardized TSV format. [DEPRECIATED]");
-            }
-        } // TODO: Remove
         private static Feature _typeFlag
         {
             get
@@ -2369,32 +2045,8 @@ Some special strings that can be used:
             datFromDir.AddFeature(_noAutomaticDateFlag);
             datFromDir.AddFeature(_forcepackingStringInput);
             datFromDir.AddFeature(_archivesAsFilesFlag);
-            // NEW
             datFromDir.AddFeature(_outputTypeListInput);
                 datFromDir[_outputTypeListInput.Name].AddFeature(_depreciatedFlag);
-            // OLD
-            datFromDir.AddFeature(_outputAllFlag);
-            datFromDir.AddFeature(_outputAttractmodeFlag);
-            datFromDir.AddFeature(_outputCmpFlag);
-            datFromDir.AddFeature(_outputCsvFlag);
-            datFromDir.AddFeature(_outputDoscenterFlag);
-            datFromDir.AddFeature(_outputListromFlag);
-            datFromDir.AddFeature(_outputListxmlFlag);
-            datFromDir.AddFeature(_outputMissFlag);
-            datFromDir.AddFeature(_outputMd5Flag);
-            datFromDir.AddFeature(_outputOfflinelistFlag);
-            datFromDir.AddFeature(_outputRomcenterFlag);
-            datFromDir.AddFeature(_outputSabredatFlag);
-            datFromDir.AddFeature(_outputSfvFlag);
-            datFromDir.AddFeature(_outputSha1Flag);
-            datFromDir.AddFeature(_outputSha256Flag);
-            datFromDir.AddFeature(_outputSha384Flag);
-            datFromDir.AddFeature(_outputSha512Flag);
-            datFromDir.AddFeature(_outputSoftwarelistFlag);
-            datFromDir.AddFeature(_outputSsvFlag);
-            datFromDir.AddFeature(_outputTsvFlag);
-            datFromDir.AddFeature(_outputXmlFlag);
-                datFromDir[_outputXmlFlag].AddFeature(_depreciatedFlag);
             datFromDir.AddFeature(_rombaFlag);
             datFromDir.AddFeature(_skipArchivesFlag);
             datFromDir.AddFeature(_skipFilesFlag);
@@ -2551,32 +2203,8 @@ The following systems have headers that this program can work with:
                 "Split input DATs by a given criteria",
                 FeatureType.Flag,
                 longDescription: "This feature allows the user to split input DATs by a number of different possible criteria. See the individual input information for details. More than one split type is allowed at a time.");
-            // NEW
             split.AddFeature(_outputTypeListInput);
                 split[_outputTypeListInput.Name].AddFeature(_depreciatedFlag);
-            // OLD
-            split.AddFeature(_outputAllFlag);
-            split.AddFeature(_outputAttractmodeFlag);
-            split.AddFeature(_outputCmpFlag);
-            split.AddFeature(_outputCsvFlag);
-            split.AddFeature(_outputDoscenterFlag);
-            split.AddFeature(_outputListromFlag);
-            split.AddFeature(_outputListxmlFlag);
-            split.AddFeature(_outputMissFlag);
-            split.AddFeature(_outputMd5Flag);
-            split.AddFeature(_outputOfflinelistFlag);
-            split.AddFeature(_outputRomcenterFlag);
-            split.AddFeature(_outputSabredatFlag);
-            split.AddFeature(_outputSfvFlag);
-            split.AddFeature(_outputSha1Flag);
-            split.AddFeature(_outputSha256Flag);
-            split.AddFeature(_outputSha384Flag);
-            split.AddFeature(_outputSha512Flag);
-            split.AddFeature(_outputSoftwarelistFlag);
-            split.AddFeature(_outputSsvFlag);
-            split.AddFeature(_outputTsvFlag);
-            split.AddFeature(_outputXmlFlag);
-                split[_outputXmlFlag].AddFeature(_depreciatedFlag);
             split.AddFeature(_outputDirStringInput);
             split.AddFeature(_inplaceFlag);
             split.AddFeature(_extensionFlag);
@@ -2613,14 +2241,7 @@ The stats that are outputted are as follows:
 - Items that include a SHA-384
 - Items that include a SHA-512
 - Items with Nodump status");
-            // NEW
             stats.AddFeature(_reportTypeListInput);
-            // OLD
-            stats.AddFeature(_allStatsFlag);
-            stats.AddFeature(_csvFlag);
-            stats.AddFeature(_htmlFlag);
-            stats.AddFeature(_tsvFlag);
-            stats.AddFeature(_textFlag);
             stats.AddFeature(_filenameStringInput);
             stats.AddFeature(_outputDirStringInput);
             stats.AddFeature(_baddumpColumnFlag);
@@ -2637,7 +2258,6 @@ The stats that are outputted are as follows:
                 "Update and manipulate DAT(s)",
                 FeatureType.Flag,
                 longDescription: "This is the multitool part of the program, allowing for almost every manipulation to a DAT, or set of DATs. This is also a combination of many different programs that performed DAT manipulation that work better together.");
-            // NEW
             update.AddFeature(_outputTypeListInput);
                 update[_outputTypeListInput].AddFeature(_prefixStringInput);
                 update[_outputTypeListInput].AddFeature(_postfixStringInput);
@@ -2649,54 +2269,6 @@ The stats that are outputted are as follows:
                 update[_outputTypeListInput].AddFeature(_removeExtensionsFlag);
                 update[_outputTypeListInput].AddFeature(_rombaFlag);
                 update[_outputTypeListInput].AddFeature(_depreciatedFlag);
-            // OLD
-            update.AddFeature(_outputAllFlag);
-            update.AddFeature(_outputAttractmodeFlag);
-            update.AddFeature(_outputCmpFlag);
-            update.AddFeature(_outputCsvFlag);
-                update[_outputCsvFlag].AddFeature(_prefixStringInput);
-                update[_outputCsvFlag].AddFeature(_postfixStringInput);
-                update[_outputCsvFlag].AddFeature(_quotesFlag);
-            update.AddFeature(_outputDoscenterFlag);
-            update.AddFeature(_outputListromFlag);
-            update.AddFeature(_outputListxmlFlag);
-            update.AddFeature(_outputMissFlag);
-                update[_outputMissFlag].AddFeature(_romsFlag);
-                update[_outputMissFlag].AddFeature(_gamePrefixFlag);
-                update[_outputMissFlag].AddFeature(_prefixStringInput);
-                update[_outputMissFlag].AddFeature(_postfixStringInput);
-                update[_outputMissFlag].AddFeature(_quotesFlag);
-                update[_outputMissFlag].AddFeature(_addExtensionStringInput);
-                update[_outputMissFlag].AddFeature(_replaceExtensionStringInput);
-                update[_outputMissFlag].AddFeature(_removeExtensionsFlag);
-                update[_outputMissFlag].AddFeature(_rombaFlag);
-            update.AddFeature(_outputMd5Flag);
-                update[_outputMd5Flag].AddFeature(_gamePrefixFlag);
-            update.AddFeature(_outputOfflinelistFlag);
-            update.AddFeature(_outputRomcenterFlag);
-            update.AddFeature(_outputSabredatFlag);
-            update.AddFeature(_outputSfvFlag);
-                update[_outputSfvFlag].AddFeature(_gamePrefixFlag);
-            update.AddFeature(_outputSha1Flag);
-                update[_outputSha1Flag].AddFeature(_gamePrefixFlag);
-            update.AddFeature(_outputSha256Flag);
-                update[_outputSha256Flag].AddFeature(_gamePrefixFlag);
-            update.AddFeature(_outputSha384Flag);
-                update[_outputSha384Flag].AddFeature(_gamePrefixFlag);
-            update.AddFeature(_outputSha512Flag);
-                update[_outputSha512Flag].AddFeature(_gamePrefixFlag);
-            update.AddFeature(_outputSoftwarelistFlag);
-            update.AddFeature(_outputSsvFlag);
-                update[_outputSsvFlag].AddFeature(_prefixStringInput);
-                update[_outputSsvFlag].AddFeature(_postfixStringInput);
-                update[_outputSsvFlag].AddFeature(_quotesFlag);
-            update.AddFeature(_outputTsvFlag);
-                update[_outputTsvFlag].AddFeature(_prefixStringInput);
-                update[_outputTsvFlag].AddFeature(_postfixStringInput);
-                update[_outputTsvFlag].AddFeature(_quotesFlag);
-            update.AddFeature(_outputXmlFlag);
-                update[_outputXmlFlag].AddFeature(_depreciatedFlag);
-            // End OLD
             update.AddFeature(_filenameStringInput);
             update.AddFeature(_nameStringInput);
             update.AddFeature(_descriptionStringInput);
