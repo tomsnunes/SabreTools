@@ -343,6 +343,11 @@ namespace SabreTools.Library.Data
         /// </summary>
         Listrom =               1 << 15,
 
+        /// <summary>
+        /// Everdrive Packs SMDB
+        /// </summary>
+        EverdriveSMDB =         1 << 16,
+
         #endregion
 
         #region SFV-similar Formats
@@ -350,32 +355,32 @@ namespace SabreTools.Library.Data
         /// <summary>
         /// CRC32 hash list
         /// </summary>
-        RedumpSFV =             1 << 16,
+        RedumpSFV =             1 << 17,
 
         /// <summary>
         /// MD5 hash list
         /// </summary>
-        RedumpMD5 =             1 << 17,
+        RedumpMD5 =             1 << 18,
 
         /// <summary>
         /// SHA-1 hash list
         /// </summary>
-        RedumpSHA1 =            1 << 18,
+        RedumpSHA1 =            1 << 19,
 
         /// <summary>
         /// SHA-256 hash list
         /// </summary>
-        RedumpSHA256 =          1 << 19,
+        RedumpSHA256 =          1 << 20,
 
         /// <summary>
         /// SHA-384 hash list
         /// </summary>
-        RedumpSHA384 =          1 << 20,
+        RedumpSHA384 =          1 << 21,
 
         /// <summary>
         /// SHA-512 hash list
         /// </summary>
-        RedumpSHA512 =          1 << 21,
+        RedumpSHA512 =          1 << 22,
 
         #endregion
 

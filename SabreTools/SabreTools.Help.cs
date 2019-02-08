@@ -789,6 +789,18 @@ namespace SabreTools
                     longDescription: "Output in SHA-256 format [DEPRECIATED]");
             }
         } // TODO: Remove
+        private static Feature _outputSmdbFlag
+        {
+            get
+            {
+                return new Feature(
+                    "output-smdb",
+                    new List<string>() { "-osmdb", "--output-smdb" },
+                    "Output in Everdrive SMDB format [DEPRECIATED]",
+                    FeatureType.Flag,
+                    longDescription: "Output in Everdrive SMDB format [DEPRECIATED]");
+            }
+        } // TODO: Remove
         private static Feature _outputSoftwarelistFlag
         {
             get
@@ -1845,6 +1857,7 @@ Possible values are:
     sha256           - SHA256
     sha384           - SHA384
     sha512           - SHA512
+    smdb, everdrive  - Everdrive SMDB
     sl, softwarelist - MAME Software List XML
     ssv              - Standardized Semicolon-Separated Value
     tsv              - Standardized Tab-Separated Value

@@ -5717,6 +5717,20 @@ namespace SabreTools.Library.DatFiles
                 outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", overwrite));
             };
 
+            // Everdrive SMDB
+            if ((DatFormat & DatFormat.EverdriveSMDB) != 0
+                && (DatFormat & DatFormat.AttractMode) == 0
+                && (DatFormat & DatFormat.MissFile) == 0)
+            {
+                outfileNames.Add(DatFormat.EverdriveSMDB, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
+            }
+            if ((DatFormat & DatFormat.EverdriveSMDB) != 0
+                && ((DatFormat & DatFormat.AttractMode) != 0
+                    || (DatFormat & DatFormat.MissFile) != 0))
+            {
+                outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".smdb.txt", overwrite));
+            }
+
             // Software List
             if ((DatFormat & DatFormat.SoftwareList) != 0
                 && (DatFormat & DatFormat.Logiqx) == 0

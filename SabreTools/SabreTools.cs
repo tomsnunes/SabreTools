@@ -425,6 +425,10 @@ namespace SabreTools
                         datHeader.DatFormat |= DatFormat.RedumpSHA512;
                         Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
                         break;
+                    case "output-smdb":
+                        datHeader.DatFormat |= DatFormat.EverdriveSMDB;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));
+                        break;
                     case "output-softwarelist":
                         datHeader.DatFormat |= DatFormat.SoftwareList;
                         Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _outputTypeListInput.Flags));

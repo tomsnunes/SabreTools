@@ -228,6 +228,7 @@ Options:
 		  sha256			- SHA256
 		  sha384			- SHA384
 		  sha512			- SHA512
+		  smdb, everdrive	- Everdrive SMDB
 		  sl, softwarelist	- MAME Software List XML
 		  ssv				- Standardized Semicolon-Separated Value
 		  tsv				- Standardized Tab-Separated Value
@@ -756,6 +757,7 @@ Options:
 		  sha256			- SHA256
 		  sha384			- SHA384
 		  sha512			- SHA512
+		  smdb, everdrive	- Everdrive SMDB
 		  sl, softwarelist	- MAME Software List XML
 		  ssv				- Standardized Semicolon-Separated Value
 		  tsv				- Standardized Tab-Separated Value
@@ -928,6 +930,7 @@ Options:
 		  sha256			- SHA256
 		  sha384			- SHA384
 		  sha512			- SHA512
+		  smdb, everdrive	- Everdrive SMDB
 		  sl, softwarelist	- MAME Software List XML
 		  ssv				- Standardized Semicolon-Separated Value
 		  tsv				- Standardized Tab-Separated Value
@@ -1832,6 +1835,7 @@ This section contains remappings from old flag names to new ones for the purpose
 -osha256, --output-sha256 -> -ot=sha256, --output-type=sha256
 -osha384, --output-sha384 -> -ot=sha384, --output-type=sha384
 -osha512, --output-sha512 -> -ot=sha512, --output-type=sha512
+-osmdb, --output-everdrive -> -ot=smdb, --output-type=everdrive
 -osl, --output-sl -> -ot=sl, --output-type=softwarelist
 -osl, --output-softwarelist -> -ot=sl, --output-type=softwarelist
 -ossv, --output-ssv -> -ot=ssv, --output-type=ssv
