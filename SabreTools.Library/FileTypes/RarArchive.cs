@@ -37,7 +37,7 @@ namespace SabreTools.Library.FileTypes
 		public RarArchive()
 			: base()
 		{
-			_fileType = FileType.RarArchive;
+			this.Type = FileType.RarArchive;
 		}
 
 		/// <summary>
@@ -49,7 +49,7 @@ namespace SabreTools.Library.FileTypes
 		public RarArchive(string filename, bool getHashes = false)
 			: base(filename, getHashes)
 		{
-			_fileType = FileType.RarArchive;
+			this.Type = FileType.RarArchive;
 		}
 
 		#endregion
@@ -71,7 +71,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(outDir);
 
 				// Extract all files to the temp directory
-				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(_filename);
+				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(this.Filename);
 				foreach (RarArchiveEntry entry in ra.Entries)
 				{
 					entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
@@ -155,7 +155,7 @@ namespace SabreTools.Library.FileTypes
 
 			try
 			{
-				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false, });
+				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(this.Filename, new ReaderOptions { LeaveStreamOpen = false, });
 				foreach (RarArchiveEntry entry in ra.Entries)
 				{
 					if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
@@ -191,11 +191,11 @@ namespace SabreTools.Library.FileTypes
 		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
 			List<BaseFile> found = new List<BaseFile>();
-			string gamename = Path.GetFileNameWithoutExtension(_filename);
+			string gamename = Path.GetFileNameWithoutExtension(this.Filename);
 
 			try
 			{
-				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(Utilities.TryOpenRead(_filename));
+				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(Utilities.TryOpenRead(this.Filename));
 				foreach (RarArchiveEntry entry in ra.Entries.Where(e => e != null && !e.IsDirectory))
 				{
 					// If secure hashes are disabled, do a quickscan
@@ -242,12 +242,12 @@ namespace SabreTools.Library.FileTypes
 		/// TODO: Write the rest of this RAR file handling
 		public void GetRarFileInfo()
 		{
-			if (!File.Exists(_filename))
+			if (!File.Exists(this.Filename))
 			{
 				return;
 			}
 
-			BinaryReader br = new BinaryReader(Utilities.TryOpenRead(_filename));
+			BinaryReader br = new BinaryReader(Utilities.TryOpenRead(this.Filename));
 
 			// Check for the signature first (Skipping the SFX Module)
 			byte[] signature = br.ReadBytes(8);
@@ -464,7 +464,7 @@ namespace SabreTools.Library.FileTypes
 
 			try
 			{
-				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false });
+				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(this.Filename, new ReaderOptions { LeaveStreamOpen = false });
 				List<RarArchiveEntry> rarEntries = ra.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
 				string lastRarEntry = null;
 				foreach (RarArchiveEntry entry in rarEntries)

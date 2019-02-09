@@ -117,223 +117,223 @@ using SabreTools.Library.DatItems;
 /// </remarks>
 namespace SabreTools.Library.FileTypes
 {
-	public class CoreRarArchive : BaseArchive
-	{
-		// SFX Module Information
-		public byte[] SFX;
+    public class CoreRarArchive : BaseArchive
+    {
+        // SFX Module Information
+        public byte[] SFX;
 
-		// Standard Header Information
-		public uint HeaderCRC32;
-		public uint HeaderSize; // vint
-		public RarHeaderFlags HeaderFlags; // vint
-		public uint ExtraAreaSize; // vint
-		public RarArchiveFlags ArchiveFlags; // vint
-		public uint VolumeNumber; // vint
-		public byte[] ExtraArea;
+        // Standard Header Information
+        public uint HeaderCRC32;
+        public uint HeaderSize; // vint
+        public RarHeaderFlags HeaderFlags; // vint
+        public uint ExtraAreaSize; // vint
+        public RarArchiveFlags ArchiveFlags; // vint
+        public uint VolumeNumber; // vint
+        public byte[] ExtraArea;
 
-		// Encryption Header Information
-		public uint EncryptionHeaderCRC32;
-		public uint EncryptionHeaderSize; // vint
-		public RarHeaderFlags EncryptionHeaderFlags; // vint
-		public uint EncryptionVersion; // vint
-		public uint EncryptionFlags; // vint
-		public byte KDFCount;
-		public byte[] Salt = new byte[16];
-		public byte[] CheckValue = new byte[12];
+        // Encryption Header Information
+        public uint EncryptionHeaderCRC32;
+        public uint EncryptionHeaderSize; // vint
+        public RarHeaderFlags EncryptionHeaderFlags; // vint
+        public uint EncryptionVersion; // vint
+        public uint EncryptionFlags; // vint
+        public byte KDFCount;
+        public byte[] Salt = new byte[16];
+        public byte[] CheckValue = new byte[12];
 
-		// Locator Information
-		public uint LocatorSize; // vint
-		public uint LocatorFlags; // vint
-		public uint QuickOpenOffset; // vint
-		public uint RecoveryRecordOffset; // vint
+        // Locator Information
+        public uint LocatorSize; // vint
+        public uint LocatorFlags; // vint
+        public uint QuickOpenOffset; // vint
+        public uint RecoveryRecordOffset; // vint
 
-		// Entry Information
-		public List<CoreRarArchiveEntry> Entries = new List<CoreRarArchiveEntry>();
+        // Entry Information
+        public List<CoreRarArchiveEntry> Entries = new List<CoreRarArchiveEntry>();
 
-		#region Unimplemented methods
+        #region Unimplemented methods
 
-		public override bool CopyAll(string outDir)
-		{
-			throw new NotImplementedException();
-		}
+        public override bool CopyAll(string outDir)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override string CopyToFile(string entryName, string outDir)
-		{
-			throw new NotImplementedException();
-		}
+        public override string CopyToFile(string entryName, string outDir)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override (MemoryStream, string) CopyToStream(string entryName)
-		{
-			throw new NotImplementedException();
-		}
+        public override (MemoryStream, string) CopyToStream(string entryName)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
-		{
-			throw new NotImplementedException();
-		}
+        public override List<BaseFile> GetChildren(Hash omitFromScan = Hash.DeepHashes, bool date = false)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override List<string> GetEmptyFolders()
-		{
-			throw new NotImplementedException();
-		}
+        public override List<string> GetEmptyFolders()
+        {
+            throw new NotImplementedException();
+        }
 
-		public override bool IsTorrent()
-		{
-			throw new NotImplementedException();
-		}
+        public override bool IsTorrent()
+        {
+            throw new NotImplementedException();
+        }
 
-		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
-		{
-			throw new NotImplementedException();
-		}
+        public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
-		{
-			throw new NotImplementedException();
-		}
+        public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
-		{
-			throw new NotImplementedException();
-		}
+        public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
+        {
+            throw new NotImplementedException();
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 
-	public class CoreRarArchiveEntry
-	{
-		// Standard Entry Information
-		public uint HeaderCRC32;
-		public uint HeaderSize; // vint
-		public RarHeaderType HeaderType; // vint
-		public RarHeaderFlags HeaderFlags; // vint
-		public uint ExtraAreaSize; // vint
-		public uint DataAreaSize; // vint
-		public RarFileFlags FileFlags; // vint
-		public uint UnpackedSize; // vint
-		public uint Attributes; // vint
-		public uint mtime;
-		public uint DataCRC32;
-		public uint CompressionInformation; // vint
-		public uint HostOS; // vint
-		public uint NameLength; // vint
-		public byte[] Name;
-		public byte[] DataArea;
+    public class CoreRarArchiveEntry
+    {
+        // Standard Entry Information
+        public uint HeaderCRC32;
+        public uint HeaderSize; // vint
+        public RarHeaderType HeaderType; // vint
+        public RarHeaderFlags HeaderFlags; // vint
+        public uint ExtraAreaSize; // vint
+        public uint DataAreaSize; // vint
+        public RarFileFlags FileFlags; // vint
+        public uint UnpackedSize; // vint
+        public uint Attributes; // vint
+        public uint mtime;
+        public uint DataCRC32;
+        public uint CompressionInformation; // vint
+        public uint HostOS; // vint
+        public uint NameLength; // vint
+        public byte[] Name;
+        public byte[] DataArea;
 
-		// File Encryption Information
-		public uint EncryptionSize; // vint
-		public RarEncryptionFlags EncryptionFlags; // vint
-		public byte KDFCount;
-		public byte[] Salt = new byte[16];
-		public byte[] IV = new byte[16];
-		public byte[] CheckValue = new byte[12];
+        // File Encryption Information
+        public uint EncryptionSize; // vint
+        public RarEncryptionFlags EncryptionFlags; // vint
+        public byte KDFCount;
+        public byte[] Salt = new byte[16];
+        public byte[] IV = new byte[16];
+        public byte[] CheckValue = new byte[12];
 
-		// File Hash Information
-		public uint HashSize; // vint
-		public uint HashType; // vint
-		public byte[] HashData = new byte[32];
+        // File Hash Information
+        public uint HashSize; // vint
+        public uint HashType; // vint
+        public byte[] HashData = new byte[32];
 
-		// File Time Information
-		public uint TimeSize; // vint
-		public RarTimeFlags TimeFlags; // vint
-		public uint TimeMtime;
-		public ulong TimeMtime64;
-		public uint TimeCtime;
-		public ulong TimeCtime64;
-		public uint TimeLtime;
-		public ulong TimeLtime64;
+        // File Time Information
+        public uint TimeSize; // vint
+        public RarTimeFlags TimeFlags; // vint
+        public uint TimeMtime;
+        public ulong TimeMtime64;
+        public uint TimeCtime;
+        public ulong TimeCtime64;
+        public uint TimeLtime;
+        public ulong TimeLtime64;
 
-		// File Version Information
-		public uint VersionSize; // vint
-		public const uint VersionFlags = 0; // vint
-		public uint VersionNumber; // vint
+        // File Version Information
+        public uint VersionSize; // vint
+        public const uint VersionFlags = 0; // vint
+        public uint VersionNumber; // vint
 
-		// File System Redirection Record
-		public uint RedirectionSize; // vint
-		public RarRedirectionType RedirectionType; // vint
-		public uint RedirectionFlags; // vint
-		public uint RedirectionNameLength; // vint
-		public byte[] RedirectionName;
+        // File System Redirection Record
+        public uint RedirectionSize; // vint
+        public RarRedirectionType RedirectionType; // vint
+        public uint RedirectionFlags; // vint
+        public uint RedirectionNameLength; // vint
+        public byte[] RedirectionName;
 
-		// Unix Owner Record
-		public uint UnixOwnerSize; // vint
-		public RarUnixOwnerRecordFlags UnixOwnerFlags; // vint
-		public uint UnixOwnerUserNameLength; // vint
-		public byte[] UnixOwnerUserName;
-		public uint UnixOwnerGroupNameLength; // vint
-		public byte[] UnixOwnerGroupName;
-		public uint UnixOwnerUserId; // vint
-		public uint UnixOwnerGroupId; // vint
+        // Unix Owner Record
+        public uint UnixOwnerSize; // vint
+        public RarUnixOwnerRecordFlags UnixOwnerFlags; // vint
+        public uint UnixOwnerUserNameLength; // vint
+        public byte[] UnixOwnerUserName;
+        public uint UnixOwnerGroupNameLength; // vint
+        public byte[] UnixOwnerGroupName;
+        public uint UnixOwnerUserId; // vint
+        public uint UnixOwnerGroupId; // vint
 
-		// Service Data Information
-		public uint ServiceSize; // vint
-		public byte[] ServiceData;
-	}
+        // Service Data Information
+        public uint ServiceSize; // vint
+        public byte[] ServiceData;
+    }
 
-	// BELOW ARE CONCRETE IMPLEMENTATIONS OF HEADER DETAILS
+    // BELOW ARE CONCRETE IMPLEMENTATIONS OF HEADER DETAILS
 
-	/// <summary>
-	/// General archive block format used by all RAR block types
-	/// </summary>
-	public class GeneralArchiveBlockFormat
-	{
-		public uint HeaderCRC32;
-		public uint HeaderSize; // vint
-		public HeaderType HeaderType;
-		public HeaderFlags HeaderFlags;
-		public ulong ExtraAreaSize; // vint
-		public ulong DataAreaSize; // vint
-		public byte[] ExtraArea;
-		public byte[] DataArea;
-	}
+    /// <summary>
+    /// General archive block format used by all RAR block types
+    /// </summary>
+    public class GeneralArchiveBlockFormat
+    {
+        public uint HeaderCRC32;
+        public uint HeaderSize; // vint
+        public HeaderType HeaderType;
+        public HeaderFlags HeaderFlags;
+        public ulong ExtraAreaSize; // vint
+        public ulong DataAreaSize; // vint
+        public byte[] ExtraArea;
+        public byte[] DataArea;
+    }
 
-	/// <summary>
-	/// General extra area format used by all RAR extra area records
-	/// </summary>
-	public class GeneralExtraAreaFormat
-	{
-		public ulong Size; // vint
-		public ulong Type; // vint
-		public byte[] Data;
-	}
+    /// <summary>
+    /// General extra area format used by all RAR extra area records
+    /// </summary>
+    public class GeneralExtraAreaFormat
+    {
+        public ulong Size; // vint
+        public ulong Type; // vint
+        public byte[] Data;
+    }
 
-	/// <summary>
-	/// Encryption header only present in encrypted archives
-	/// 
-	/// Every proceeding header is started from 16 byte AES-256
-	/// initialization vectors followed by encrypted header data
-	/// </summary>
-	public class ArchiveEncryptionHeader : GeneralArchiveBlockFormat
-	{
-		public new HeaderType HeaderType = HeaderType.ArchiveEncryptionHeader;
-		public ulong EncryptionVersion; // vint
-		public ulong EncryptionFlags; // vint
-	}
+    /// <summary>
+    /// Encryption header only present in encrypted archives
+    /// 
+    /// Every proceeding header is started from 16 byte AES-256
+    /// initialization vectors followed by encrypted header data
+    /// </summary>
+    public class ArchiveEncryptionHeader : GeneralArchiveBlockFormat
+    {
+        public new HeaderType HeaderType = HeaderType.ArchiveEncryptionHeader;
+        public ulong EncryptionVersion; // vint
+        public ulong EncryptionFlags; // vint
+    }
 
-	/// <summary>
-	/// Types of archive header
-	/// </summary>
-	public enum HeaderType : ulong // vint
-	{
-		MainArchiveHeader = 1,
-		FileHeader = 2,
-		ServiceHeader = 3,
-		ArchiveEncryptionHeader = 4,
-		EndOfArchiveHeader = 5,
-	}
+    /// <summary>
+    /// Types of archive header
+    /// </summary>
+    public enum HeaderType : ulong // vint
+    {
+        MainArchiveHeader = 1,
+        FileHeader = 2,
+        ServiceHeader = 3,
+        ArchiveEncryptionHeader = 4,
+        EndOfArchiveHeader = 5,
+    }
 
-	/// <summary>
-	/// Flags common for all headers
-	/// </summary>
-	[Flags]
-	public enum HeaderFlags : ulong // vint
-	{
-		ExtraAreaIsPresentInEndOfHeader = 0x0001,
-		DataAreaIsPresentInEndOfHeader = 0x0002,
-		BlocksWithUnknownType = 0x0004, // this flag must be skipped when updating an archive
-		DataAreaIsContinuingFromPreviousVolume = 0x0008,
-		DataAreaIsContinuingInNextVolume = 0x0010,
-		BlockDependsOnPrecedingFileBlock = 0x0020,
-		PreserveChildBlockIfHostBlockIsModified = 0x0040,
-	}
+    /// <summary>
+    /// Flags common for all headers
+    /// </summary>
+    [Flags]
+    public enum HeaderFlags : ulong // vint
+    {
+        ExtraAreaIsPresentInEndOfHeader = 0x0001,
+        DataAreaIsPresentInEndOfHeader = 0x0002,
+        BlocksWithUnknownType = 0x0004, // this flag must be skipped when updating an archive
+        DataAreaIsContinuingFromPreviousVolume = 0x0008,
+        DataAreaIsContinuingInNextVolume = 0x0010,
+        BlockDependsOnPrecedingFileBlock = 0x0020,
+        PreserveChildBlockIfHostBlockIsModified = 0x0040,
+    }
 }
