@@ -16,10 +16,10 @@ namespace SabreTools.Library.Data
 	/// </summary>
 	public static class Constants
 	{
-        /// <summary>
-        /// The current toolset version to be used by all child applications
-        /// </summary>
-        public readonly static string Version = "v1.0.0"; // -" + Assembly.GetExecutingAssembly().GetLinkerTime().ToString("yyyy-MM-dd HH:mm:ss");
+		/// <summary>
+		/// The current toolset version to be used by all child applications
+		/// </summary>
+		public readonly static string Version = "v1.0.0-" + Assembly.GetExecutingAssembly().GetLinkerTime().ToString("yyyy-MM-dd HH:mm:ss");
 		public const int HeaderHeight = 3;
 
 		#region 0-byte file constants
