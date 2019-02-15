@@ -74,12 +74,12 @@ namespace SabreTools.Library.DatFiles
 
                 Rom rom = new Rom
                 {
-                    Name = gameinfo[1].Substring(fullname.Length + 1),
-                    Size = Constants.SizeZero,
-                    CRC = gameinfo[4].PadLeft(8, '0'),
-                    MD5 = gameinfo[3].PadLeft(32, '0'),
-                    SHA1 = gameinfo[2].PadLeft(40, '0'),
-                    SHA256 = gameinfo[0].PadLeft(64, '0'),
+                    Name = gameinfo[1].Substring(fullname[0].Length + 1),
+                    Size = -1, // No size provided, but we don't want the size being 0
+                    CRC = Utilities.CleanHashData(gameinfo[4], 8),
+                    MD5 = Utilities.CleanHashData(gameinfo[3], 32),
+                    SHA1 = Utilities.CleanHashData(gameinfo[2], 40),
+                    SHA256 = Utilities.CleanHashData(gameinfo[0], 64),
                     ItemStatus = ItemStatus.None,
 
                     MachineName = fullname[0],
