@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
-using System.Web;
 using System.Xml;
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
@@ -856,7 +856,7 @@ namespace SabreTools.Library.DatFiles
                 string header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                             + "<dat xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"datas.xsd\">\n"
                             + "\t<configuration>\n"
-                            + "\t\t<datName>" + HttpUtility.HtmlEncode(Name) + "</datName>\n"
+                            + "\t\t<datName>" + WebUtility.HtmlEncode(Name) + "</datName>\n"
                             + "\t\t<datVersion>" + Count + "</datVersion>\n"
                             + "\t\t<system>none</system>\n"
                             + "\t\t<screenshotsWidth>240</screenshotsWidth>\n"
@@ -880,9 +880,9 @@ namespace SabreTools.Library.DatFiles
                             + "\t\t\t<extension>.bin</extension>\n"
                             + "\t\t</canOpen>\n"
                             + "\t\t<newDat>\n"
-                            + "\t\t\t<datVersionURL>" + HttpUtility.HtmlEncode(Url) + "</datVersionURL>\n"
-                            + "\t\t\t<datURL fileName=\"" + HttpUtility.HtmlEncode(FileName) + ".zip\">" + HttpUtility.HtmlEncode(Url) + "</datURL>\n"
-                            + "\t\t\t<imURL>" + HttpUtility.HtmlEncode(Url) + "</imURL>\n"
+                            + "\t\t\t<datVersionURL>" + WebUtility.HtmlEncode(Url) + "</datVersionURL>\n"
+                            + "\t\t\t<datURL fileName=\"" + WebUtility.HtmlEncode(FileName) + ".zip\">" + WebUtility.HtmlEncode(Url) + "</datURL>\n"
+                            + "\t\t\t<imURL>" + WebUtility.HtmlEncode(Url) + "</imURL>\n"
                             + "\t\t</newDat>\n"
                             + "\t\t<search>\n"
                             + "\t\t\t<to value=\"location\" default=\"true\" auto=\"true\"/>\n"
@@ -959,7 +959,7 @@ namespace SabreTools.Library.DatFiles
                 state += "\t\t<game>\n"
                             + "\t\t\t<imageNumber>1</imageNumber>\n"
                             + "\t\t\t<releaseNumber>1</releaseNumber>\n"
-                            + "\t\t\t<title>" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "</title>\n"
+                            + "\t\t\t<title>" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "</title>\n"
                             + "\t\t\t<saveType>None</saveType>\n";
 
                 if (rom.ItemType == ItemType.Rom)

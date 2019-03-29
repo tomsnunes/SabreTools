@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using SabreTools.Library.Data;
 using SabreTools.Library.FileTypes;
 using SabreTools.Library.DatItems;
@@ -5095,7 +5095,7 @@ namespace SabreTools.Library.DatFiles
             string expName = name.Replace("/", " - ").Replace("\\", " - ");
 
             // Now set the new output values
-            datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
+            datFile.FileName = WebUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
                 ? FileName
                 : (shortname
                     ? Path.GetFileName(name)
@@ -6039,7 +6039,7 @@ namespace SabreTools.Library.DatFiles
 
                     DatFile lastdirdat = new DatFile
                     {
-                        FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir),
+                        FileName = "DIR: " + WebUtility.HtmlEncode(lastdir),
                         _datStats = dirStats,
                     };
 
@@ -6091,7 +6091,7 @@ namespace SabreTools.Library.DatFiles
             {
                 DatFile dirdat = new DatFile
                 {
-                    FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir),
+                    FileName = "DIR: " + WebUtility.HtmlEncode(lastdir),
                     _datStats = dirStats,
                 };
 

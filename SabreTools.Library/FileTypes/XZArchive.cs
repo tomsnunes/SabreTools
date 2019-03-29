@@ -77,7 +77,7 @@ namespace SabreTools.Library.FileTypes
                 SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(Utilities.TryOpenRead(this.Filename));
                 foreach (SevenZipArchiveEntry entry in sza.Entries)
                 {
-                    entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+                    entry.WriteToDirectory(outDir, new SharpCompress.Common.ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
                 }
                 encounteredErrors = false;
                 sza.Dispose();

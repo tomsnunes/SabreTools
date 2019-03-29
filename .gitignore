@@ -1,9 +1,12 @@
 /.vs
 /build.bat
 /packages/
-/RombaSharp/obj/**
+/RombaSharp/bin/
+/RombaSharp/obj/
 /RombaSharp/RombaSharp.csproj.user
-/SabreTools/obj/**
+/SabreTools/bin/
+/SabreTools/obj/
 /SabreTools/SabreTools.csproj.user
-/SabreTools.Library/obj/**
+/SabreTools.Library/bin/
+/SabreTools.Library/obj/
 /SabreTools.userprefs

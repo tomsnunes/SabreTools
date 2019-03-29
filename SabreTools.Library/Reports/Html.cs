@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Web;
+using System.Net;
 
 using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
@@ -52,8 +52,8 @@ namespace SabreTools.Library.Reports
         public override void Write(long game = -1)
         {
             string line = "\t\t\t<tr" + (_datFile.FileName.StartsWith("DIR: ")
-                            ? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(_datFile.FileName.Remove(0, 5))
-                            : "><td>" + HttpUtility.HtmlEncode(_datFile.FileName)) + "</td>"
+                            ? " class=\"dir\"><td>" + WebUtility.HtmlEncode(_datFile.FileName.Remove(0, 5))
+                            : "><td>" + WebUtility.HtmlEncode(_datFile.FileName)) + "</td>"
                         + "<td align=\"right\">" + Utilities.GetBytesReadable(_datFile.TotalSize) + "</td>"
                         + "<td align=\"right\">" + (game == -1 ? _datFile.Keys.Count() : game) + "</td>"
                         + "<td align=\"right\">" + _datFile.RomCount + "</td>"

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
-using System.Web;
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
@@ -344,21 +344,21 @@ namespace SabreTools.Library.DatFiles
 
                 if (rom.ItemType == ItemType.Rom)
                 {
-                    state += "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(rom.MachineName) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.Description] ? HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") +
+                    state += "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? WebUtility.HtmlEncode(rom.CloneOf) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? WebUtility.HtmlEncode(rom.CloneOf) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.MachineName] ? WebUtility.HtmlEncode(rom.MachineName) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.Description] ? WebUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") +
                     "¬" + (!ExcludeFields[(int)Field.CRC] ? ((Rom)rom).CRC.ToLowerInvariant() : "") +
                     "¬" + (!ExcludeFields[(int)Field.Size] && ((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
                 }
                 else if (rom.ItemType == ItemType.Disk)
                 {
-                    state += "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? HttpUtility.HtmlEncode(rom.CloneOf) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(rom.MachineName) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.Description] ? HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) : "") +
-                    "¬" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") +
+                    state += "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? WebUtility.HtmlEncode(rom.CloneOf) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? WebUtility.HtmlEncode(rom.CloneOf) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.MachineName] ? WebUtility.HtmlEncode(rom.MachineName) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.Description] ? WebUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) : "") +
+                    "¬" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") +
                     "¬¬¬¬¬\n";
                 }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
-using System.Web;
 using System.Xml;
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
@@ -661,7 +661,7 @@ Generation MSXIDs by www.generation-msx.nl
                 }
 
                 string state = "<software>\n"
-                            + "\t<title>" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(rom.MachineName) : "") + "</title>\n"
+                            + "\t<title>" + (!ExcludeFields[(int)Field.MachineName] ? WebUtility.HtmlEncode(rom.MachineName) : "") + "</title>\n"
                             // + "\t<genmsxid>" + msxid + "</genmsxid>\n"
                             // + "\t<system>" + system + "</system>\n"
                             + "\t<company>" + (!ExcludeFields[(int)Field.Manufacturer] ? rom.Manufacturer : "") + "</company>\n"

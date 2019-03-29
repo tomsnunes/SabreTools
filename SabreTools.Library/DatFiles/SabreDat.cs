@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
-using System.Web;
 using System.Xml;
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
@@ -660,17 +660,17 @@ namespace SabreTools.Library.DatFiles
                             "<!DOCTYPE sabredat SYSTEM \"newdat.xsd\">\n\n" +
                             "<datafile>\n" +
                             "\t<header>\n" +
-                            "\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
-                            "\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
-                            (!String.IsNullOrWhiteSpace(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
-                            (!String.IsNullOrWhiteSpace(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
-                            "\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
-                            (!String.IsNullOrWhiteSpace(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
-                            "\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
-                            (!String.IsNullOrWhiteSpace(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
+                            "\t\t<name>" + WebUtility.HtmlEncode(Name) + "</name>\n" +
+                            "\t\t<description>" + WebUtility.HtmlEncode(Description) + "</description>\n" +
+                            (!String.IsNullOrWhiteSpace(RootDir) ? "\t\t<rootdir>" + WebUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
+                            (!String.IsNullOrWhiteSpace(Category) ? "\t\t<category>" + WebUtility.HtmlEncode(Category) + "</category>\n" : "") +
+                            "\t\t<version>" + WebUtility.HtmlEncode(Version) + "</version>\n" +
+                            (!String.IsNullOrWhiteSpace(Date) ? "\t\t<date>" + WebUtility.HtmlEncode(Date) + "</date>\n" : "") +
+                            "\t\t<author>" + WebUtility.HtmlEncode(Author) + "</author>\n" +
+                            (!String.IsNullOrWhiteSpace(Comment) ? "\t\t<comment>" + WebUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
                             (!String.IsNullOrWhiteSpace(Type) || ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
                                 "\t\t<flags>\n" +
-                                    (!String.IsNullOrWhiteSpace(Type) ? "\t\t\t<flag name=\"type\" value=\"" + HttpUtility.HtmlEncode(Type) + "\"/>\n" : "") +
+                                    (!String.IsNullOrWhiteSpace(Type) ? "\t\t\t<flag name=\"type\" value=\"" + WebUtility.HtmlEncode(Type) + "\"/>\n" : "") +
                                     (ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
                                     (ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : "") +
                                     (ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : "") +
@@ -725,8 +725,8 @@ namespace SabreTools.Library.DatFiles
                     {
                         state += "\t";
                     }
-                    state += "<directory name=\"" + (!ExcludeFields[(int)Field.MachineName] ? HttpUtility.HtmlEncode(newsplit[i]) : "") + "\" description=\"" +
-                    HttpUtility.HtmlEncode(newsplit[i]) + "\">\n";
+                    state += "<directory name=\"" + (!ExcludeFields[(int)Field.MachineName] ? WebUtility.HtmlEncode(newsplit[i]) : "") + "\" description=\"" +
+                    WebUtility.HtmlEncode(newsplit[i]) + "\">\n";
                 }
                 depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 
@@ -833,19 +833,19 @@ namespace SabreTools.Library.DatFiles
                 switch (rom.ItemType)
                 {
                     case ItemType.Archive:
-                        state += "<file type=\"archive\" name=\"" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "\""
+                        state += "<file type=\"archive\" name=\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
                             + "/>\n";
                         break;
                     case ItemType.BiosSet:
-                        state += "<file type=\"biosset\" name\"" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "\""
-                            + (!ExcludeFields[(int)Field.Description] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
+                        state += "<file type=\"biosset\" name\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
+                            + (!ExcludeFields[(int)Field.Description] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + WebUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
                             + (!ExcludeFields[(int)Field.Default] && ((BiosSet)rom).Default != null
                                 ? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
                                 : "")
                             + "/>\n";
                         break;
                     case ItemType.Disk:
-                        state += "<file type=\"disk\" name=\"" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "\""
+                        state += "<file type=\"disk\" name=\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
                             + (!ExcludeFields[(int)Field.MD5] && !String.IsNullOrWhiteSpace(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
                             + (!ExcludeFields[(int)Field.SHA1] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
                             + (!ExcludeFields[(int)Field.SHA256] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
@@ -857,17 +857,17 @@ namespace SabreTools.Library.DatFiles
                                 prefix + "</file>\n" : "/>\n");
                         break;
                     case ItemType.Release:
-                        state += "<file type=\"release\" name\"" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "\""
-                            + (!ExcludeFields[(int)Field.Region] && !String.IsNullOrWhiteSpace(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Language] && !String.IsNullOrWhiteSpace(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Date] && !String.IsNullOrWhiteSpace(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
+                        state += "<file type=\"release\" name\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
+                            + (!ExcludeFields[(int)Field.Region] && !String.IsNullOrWhiteSpace(((Release)rom).Region) ? " region=\"" + WebUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+                            + (!ExcludeFields[(int)Field.Language] && !String.IsNullOrWhiteSpace(((Release)rom).Language) ? " language=\"" + WebUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+                            + (!ExcludeFields[(int)Field.Date] && !String.IsNullOrWhiteSpace(((Release)rom).Date) ? " date=\"" + WebUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
                             + (!ExcludeFields[(int)Field.Default] && ((Release)rom).Default != null
                                 ? ((Release)rom).Default.ToString().ToLowerInvariant()
                                 : "")
                             + "/>\n";
                         break;
                     case ItemType.Rom:
-                        state += "<file type=\"rom\" name=\"" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "\""
+                        state += "<file type=\"rom\" name=\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
                             + (!ExcludeFields[(int)Field.Size] && ((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
                             + (!ExcludeFields[(int)Field.CRC] && !String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
                             + (!ExcludeFields[(int)Field.MD5] && !String.IsNullOrWhiteSpace(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
@@ -882,7 +882,7 @@ namespace SabreTools.Library.DatFiles
                                 prefix + "</file>\n" : "/>\n");
                         break;
                     case ItemType.Sample:
-                        state += "<file type=\"sample\" name=\"" + (!ExcludeFields[(int)Field.Name] ? HttpUtility.HtmlEncode(rom.Name) : "") + "\""
+                        state += "<file type=\"sample\" name=\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
                             + "/>\n";
                         break;
                 }

@@ -74,7 +74,7 @@ namespace SabreTools.Library.FileTypes
 				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(this.Filename);
 				foreach (RarArchiveEntry entry in ra.Entries)
 				{
-					entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+					entry.WriteToDirectory(outDir, new SharpCompress.Common.ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 				}
 				encounteredErrors = false;
 				ra.Dispose();

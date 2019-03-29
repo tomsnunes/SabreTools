@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -2472,7 +2472,7 @@ namespace SabreTools.Library.Tools
                     || (c >= 0xE000 && c <= 0xFFFD)
                     || (c >= 0x10000 && c <= 0x10FFFF)
                         ? c
-                        : HttpUtility.HtmlEncode(c)[0]))
+                        : WebUtility.HtmlEncode(c.ToString())[0]))
                 .ToArray());
         }
 
@@ -2623,7 +2623,7 @@ namespace SabreTools.Library.Tools
                         key = "null";
                     }
 
-                    key = HttpUtility.HtmlEncode(key);
+                    key = WebUtility.HtmlEncode(key);
                     break;
                 case SortedBy.MD5:
                     key = (item.ItemType == ItemType.Rom
