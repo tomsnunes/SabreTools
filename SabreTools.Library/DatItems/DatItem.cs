@@ -178,8 +178,24 @@ namespace SabreTools.Library.DatItems
         /// </summary>
         public string Publisher
         {
-            get { return _machine.Publisher; }
-            set { _machine.Publisher = value; }
+            get
+            {
+                if (_machine == null)
+                {
+                    _machine = new Machine();
+                }
+
+                return _machine.Publisher;
+            }
+            set
+            {
+                if (_machine == null)
+                {
+                    _machine = new Machine();
+                }
+
+                _machine.Publisher = value;
+            }
         }
 
         /// <summary>
@@ -263,8 +279,24 @@ namespace SabreTools.Library.DatItems
         /// <remarks>yes = true, partial = null, no = false</remarks>
         public bool? Supported
         {
-            get { return _machine.Supported; }
-            set { _machine.Supported = value; }
+            get
+            {
+                if (_machine == null)
+                {
+                    _machine = new Machine();
+                }
+
+                return _machine.Supported;
+            }
+            set
+            {
+                if (_machine == null)
+                {
+                    _machine = new Machine();
+                }
+
+                _machine.Supported = value;
+            }
         }
 
         /// <summary>
@@ -1065,7 +1097,7 @@ namespace SabreTools.Library.DatItems
                     return 0;
                 }
             });
-            
+
             return true;
         }
 
