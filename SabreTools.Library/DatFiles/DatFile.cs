@@ -3486,7 +3486,7 @@ namespace SabreTools.Library.DatFiles
                     {
                         empties = archive.GetEmptyFolders();
                     }
-                    
+
                     // Add add all of the found empties to the DAT
                     Parallel.ForEach(empties, Globals.ParallelOptions, empty =>
                     {
@@ -3537,7 +3537,7 @@ namespace SabreTools.Library.DatFiles
             if (datItem.ItemType != ItemType.Rom && datItem.ItemType != ItemType.Disk)
             {
                 return;
-            }			
+            }
 
             try
             {
@@ -4103,19 +4103,15 @@ namespace SabreTools.Library.DatFiles
                 outputFormat = OutputFormat.Folder;
             }
 
-            // Prepopluate a few key strings based on DatItem type
-            string crc = null;
-            string sha1 = null;
-            if (datItem.ItemType == ItemType.Rom)
+            // If we have a disk, change it into a Rom for later use
+            if (datItem.ItemType == ItemType.Disk)
             {
-                crc = ((Rom)datItem).CRC;
-                sha1 = ((Rom)datItem).SHA1;
+                datItem = ((Disk)datItem).ConvertToRom();
             }
-            else if (datItem.ItemType == ItemType.Disk)
-            {
-                crc = "";
-                sha1 = ((Disk)datItem).SHA1;
-            }
+
+            // Prepopluate a few key strings
+            string crc = ((Rom)datItem).CRC ?? string.Empty;
+            string sha1 = ((Rom)datItem).SHA1 ?? string.Empty;
 
             // Find if the file has duplicates in the DAT
             bool hasDuplicates = datItem.HasDuplicates(this);
@@ -5503,7 +5499,7 @@ namespace SabreTools.Library.DatFiles
                     {
                         Globals.Logger.Error("Datfile {0} could not be written out: {1}", outfile, ex.ToString());
                     }
-                    
+
                 });
             }
             catch (Exception ex)

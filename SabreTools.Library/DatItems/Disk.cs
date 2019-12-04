@@ -180,6 +180,65 @@ namespace SabreTools.Library.DatItems
             };
         }
 
+        /// <summary>
+        /// Convert a disk to the closest Rom approximation
+        /// </summary>
+        /// <returns></returns>
+        public Rom ConvertToRom()
+        {
+            var rom = new Rom()
+            {
+                Name = this.Name,
+                ItemType = ItemType.Rom,
+                DupeType = this.DupeType,
+
+                CRC = null,
+                MD5 = this.MD5,
+                SHA1 = this.SHA1,
+                SHA256 = this.SHA256,
+                SHA384 = this.SHA384,
+                SHA512 = this.SHA512,
+
+                MergeTag = this.MergeTag,
+                Region = this.Region,
+                ItemStatus = this.ItemStatus,
+                Optional = this.Optional,
+
+                MachineName = this.MachineName,
+                Comment = this.Comment,
+                MachineDescription = this.MachineDescription,
+                Year = this.Year,
+                Manufacturer = this.Manufacturer,
+                Publisher = this.Publisher,
+                RomOf = this.RomOf,
+                CloneOf = this.CloneOf,
+                SampleOf = this.SampleOf,
+                Supported = this.Supported,
+                SourceFile = this.SourceFile,
+                Runnable = this.Runnable,
+                Board = this.Board,
+                RebuildTo = this.RebuildTo,
+                Devices = this.Devices,
+                SlotOptions = this.SlotOptions,
+                Infos = this.Infos,
+                MachineType = this.MachineType,
+
+                PartName = this.PartName,
+                PartInterface = this.PartInterface,
+                Features = this.Features,
+                AreaName = this.AreaName,
+                AreaSize = this.AreaSize,
+
+                SystemID = this.SystemID,
+                System = this.System,
+                SourceID = this.SourceID,
+                Source = this.Source,
+                Remove = this.Remove,
+            };
+
+            return rom;
+        }
+
         #endregion
 
         #region Comparision Methods
