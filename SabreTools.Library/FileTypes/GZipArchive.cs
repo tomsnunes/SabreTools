@@ -20,7 +20,9 @@ using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
-using Ionic.Zlib;
+using Compress;
+using Compress.gZip;
+using Compress.ZipFile.ZLib;
 
 namespace SabreTools.Library.FileTypes
 {
@@ -72,12 +74,15 @@ namespace SabreTools.Library.FileTypes
 
                 // Decompress the _filename stream
                 FileStream outstream = Utilities.TryCreate(Path.Combine(outDir, Path.GetFileNameWithoutExtension(this.Filename)));
-                GZipStream gzstream = new GZipStream(Utilities.TryOpenRead(this.Filename), Ionic.Zlib.CompressionMode.Decompress);
+                var gz = new gZip();
+                ZipReturn ret = gz.ZipFileOpen(this.Filename);
+                ret = gz.ZipFileOpenReadStream(0, out Stream gzstream, out ulong streamSize);
                 gzstream.CopyTo(outstream);
 
                 // Dispose of the streams
                 outstream.Dispose();
-                gzstream.Dispose();
+                ret = gz.ZipFileCloseReadStream();
+                gz.ZipFileClose();
 
                 encounteredErrors = false;
             }
@@ -159,7 +164,9 @@ namespace SabreTools.Library.FileTypes
             {
                 // Decompress the _filename stream
                 realEntry = Path.GetFileNameWithoutExtension(this.Filename);
-                GZipStream gzstream = new GZipStream(Utilities.TryOpenRead(this.Filename), Ionic.Zlib.CompressionMode.Decompress);
+                var gz = new gZip();
+                ZipReturn ret = gz.ZipFileOpen(this.Filename);
+                ret = gz.ZipFileOpenReadStream(0, out Stream gzstream, out ulong streamSize);
 
                 // Write the file out
                 byte[] gbuffer = new byte[_bufferSize];
@@ -233,11 +240,13 @@ namespace SabreTools.Library.FileTypes
                         // Otherwise, use the stream directly
                         else
                         {
-                            GZipStream gzstream = new GZipStream(Utilities.TryOpenRead(this.Filename), Ionic.Zlib.CompressionMode.Decompress);
+                            var gz = new gZip();
+                            ZipReturn ret = gz.ZipFileOpen(this.Filename);
+                            ret = gz.ZipFileOpenReadStream(0, out Stream gzstream, out ulong streamSize);
                             BaseFile gzipEntryRom = Utilities.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
-                            gzipEntryRom.Filename = gzstream.FileName;
+                            gzipEntryRom.Filename = gz.Filename(0);
                             gzipEntryRom.Parent = gamename;
-                            gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
+                            gzipEntryRom.Date = (date && gz.TimeStamp > 0 ? gz.TimeStamp.ToString() : null);
                             _children.Add(gzipEntryRom);
                             gzstream.Dispose();
                         }
@@ -507,7 +516,7 @@ namespace SabreTools.Library.FileTypes
                 sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
 
                 // Now create a deflatestream from the input file
-                DeflateStream ds = new DeflateStream(outputStream, Ionic.Zlib.CompressionMode.Compress, Ionic.Zlib.CompressionLevel.BestCompression, true);
+                ZlibBaseStream ds = new ZlibBaseStream(outputStream, CompressionMode.Compress, CompressionLevel.BestCompression, ZlibStreamFlavor.DEFLATE, true);
 
                 // Copy the input stream to the output
                 byte[] ibuffer = new byte[_bufferSize];

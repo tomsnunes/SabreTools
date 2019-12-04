@@ -225,50 +225,6 @@
         kDummy =                    0x19,
     }
 
-    /// <summary>
-    /// Zip open type
-    /// </summary>
-    /// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
-    public enum ZipOpenType
-    {
-        Closed,
-        OpenRead,
-        OpenWrite
-    }
-
-    /// <summary>
-    /// Zip testing type
-    /// </summary>
-    /// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
-    public enum ZipReturn
-    {
-        ZipGood,
-        ZipFileLocked,
-        ZipFileCountError,
-        ZipSignatureError,
-        ZipExtraDataOnEndOfZip,
-        ZipUnsupportedCompression,
-        ZipLocalFileHeaderError,
-        ZipCentralDirError,
-        ZipEndOfCentralDirectoryError,
-        Zip64EndOfCentralDirError,
-        Zip64EndOfCentralDirectoryLocatorError,
-        ZipReadingFromOutputFile,
-        ZipWritingToInputFile,
-        ZipErrorGettingDataStream,
-        ZipCRCDecodeError,
-        ZipDecodeError,
-        ZipFileNameToLong,
-        ZipFileAlreadyOpen,
-        ZipCannotFastOpen,
-        ZipErrorOpeningFile,
-        ZipErrorFileNotFound,
-        ZipErrorReadingFile,
-        ZipErrorTimeStamp,
-        ZipErrorRollBackFile,
-        ZipUntested
-    }
-
     #endregion
 
     #region DatFile related

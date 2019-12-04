@@ -17,7 +17,7 @@ using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
-using ROMVault2.SupportedFiles.Zip;
+using Compress.ZipFile;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
@@ -395,7 +395,7 @@ namespace SabreTools.Library.FileTypes
 
                     // Get the order for the entries with the new file
                     List<string> keys = inputIndexMap.Keys.ToList();
-                    keys.Sort(ZipFile.TorrentZipStringCompare);
+                    keys.Sort(ZipFile.TrrntZipStringCompare);
 
                     // Copy over all files to the new archive
                     foreach (string key in keys)
@@ -521,7 +521,7 @@ namespace SabreTools.Library.FileTypes
 
                     // Sort the keys in TZIP order
                     List<string> keys = inputIndexMap.Keys.ToList();
-                    keys.Sort(ZipFile.TorrentZipStringCompare);
+                    keys.Sort(ZipFile.TrrntZipStringCompare);
 
                     // Now add all of the files in order
                     foreach (string key in keys)
@@ -578,7 +578,7 @@ namespace SabreTools.Library.FileTypes
 
                     // Get the order for the entries with the new file
                     List<string> keys = inputIndexMap.Keys.ToList();
-                    keys.Sort(ZipFile.TorrentZipStringCompare);
+                    keys.Sort(ZipFile.TrrntZipStringCompare);
 
                     // Copy over all files to the new archive
                     foreach (string key in keys)

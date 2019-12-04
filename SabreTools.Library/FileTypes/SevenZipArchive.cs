@@ -18,7 +18,7 @@ using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
-using ROMVault2.SupportedFiles.Zip;
+using Compress.ZipFile;
 using SevenZip; // TODO: Remove this when 7zip write is implemented in SharpCompress
 using SharpCompress.Archives;
 using SharpCompress.Archives.SevenZip;
@@ -447,7 +447,7 @@ namespace SabreTools.Library.FileTypes
 
                         // Get the order for the entries with the new file
                         List<string> keys = inputIndexMap.Keys.ToList();
-                        keys.Sort(ZipFile.TorrentZipStringCompare);
+                        keys.Sort(ZipFile.TrrntZipStringCompare);
 
                         // Copy over all files to the new archive
                         foreach (string key in keys)
@@ -606,7 +606,7 @@ namespace SabreTools.Library.FileTypes
 
                     // Sort the keys in TZIP order
                     List<string> keys = inputIndexMap.Keys.ToList();
-                    keys.Sort(ZipFile.TorrentZipStringCompare);
+                    keys.Sort(ZipFile.TrrntZipStringCompare);
 
                     // Create the temp directory
                     string tempPath = Path.Combine(outDir, Guid.NewGuid().ToString());
@@ -673,7 +673,7 @@ namespace SabreTools.Library.FileTypes
 
                         // Get the order for the entries with the new file
                         List<string> keys = inputIndexMap.Keys.ToList();
-                        keys.Sort(ZipFile.TorrentZipStringCompare);
+                        keys.Sort(ZipFile.TrrntZipStringCompare);
 
                         // Copy over all files to the new archive
                         foreach (string key in keys)
