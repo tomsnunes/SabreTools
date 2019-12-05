@@ -2102,27 +2102,23 @@ namespace SabreTools.Library.Tools
         /// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
         /// <returns>Populated BaseFile object if success, empty one on error</returns>
         public static BaseFile GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
-            long offset = 0, bool keepReadOpen = false, bool chdsAsFiles = true)
+            long? offset = null, bool keepReadOpen = false, bool chdsAsFiles = true)
         {
             // We first check to see if it's a CHD
             if (chdsAsFiles == false && GetCHDInfo(input) != null)
             {
                 // Seek to the starting position, if one is set
-                if (input.CanSeek)
+                if (input.CanSeek && offset.HasValue)
                 {
                     try
                     {
                         if (offset < 0)
                         {
-                            input.Seek(offset, SeekOrigin.End);
+                            input.Seek(offset.Value, SeekOrigin.End);
                         }
-                        else if (offset > 0)
+                        else if (offset >= 0)
                         {
-                            input.Seek(offset, SeekOrigin.Begin);
-                        }
-                        else
-                        {
-                            input.Seek(0, SeekOrigin.Begin);
+                            input.Seek(offset.Value, SeekOrigin.Begin);
                         }
                     }
                     catch (NotSupportedException)
@@ -2176,21 +2172,17 @@ namespace SabreTools.Library.Tools
                 SHA512 sha512 = SHA512.Create();
 
                 // Seek to the starting position, if one is set
-                if (input.CanSeek)
+                if (input.CanSeek && offset.HasValue)
                 {
                     try
                     {
                         if (offset < 0)
                         {
-                            input.Seek(offset, SeekOrigin.End);
+                            input.Seek(offset.Value, SeekOrigin.End);
                         }
-                        else if (offset > 0)
+                        else if (offset >= 0)
                         {
-                            input.Seek(offset, SeekOrigin.Begin);
-                        }
-                        else
-                        {
-                            input.Seek(0, SeekOrigin.Begin);
+                            input.Seek(offset.Value, SeekOrigin.Begin);
                         }
                     }
                     catch (NotSupportedException)
@@ -2205,8 +2197,10 @@ namespace SabreTools.Library.Tools
 
                 byte[] buffer = new byte[32 * 1024 * 1024];
                 int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                while ((read = input.Read(buffer, 0, (int)Math.Min(size, buffer.Length))) > 0)
                 {
+                    size -= read;
+
                     crc.Update(buffer, 0, read);
                     if ((omitFromScan & Hash.MD5) == 0)
                     {
@@ -2228,6 +2222,9 @@ namespace SabreTools.Library.Tools
                     {
                         sha512.TransformBlock(buffer, 0, read, buffer, 0);
                     }
+
+                    if (size <= 0)
+                        break;
                 }
 
                 crc.Update(buffer, 0, 0);
