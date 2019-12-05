@@ -71,7 +71,7 @@ namespace SabreTools.Library.FileTypes
 
                 // Extract all files to the temp directory
                 ZipFile zf = new ZipFile();
-                ZipReturn zr = zf.ZipFileOpen(this.Filename, new FileInfo(this.Filename).LastWriteTime.Ticks, true);
+                ZipReturn zr = zf.ZipFileOpen(this.Filename, -1, true);
                 if (zr != ZipReturn.ZipGood)
                 {
                     throw new Exception(ZipFile.ZipErrorMessageText(zr));
@@ -203,7 +203,7 @@ namespace SabreTools.Library.FileTypes
             try
             {
                 ZipFile zf = new ZipFile();
-                ZipReturn zr = zf.ZipFileOpen(this.Filename, new FileInfo(this.Filename).LastWriteTime.Ticks, true);
+                ZipReturn zr = zf.ZipFileOpen(this.Filename, -1, true);
                 if (zr != ZipReturn.ZipGood)
                 {
                     throw new Exception(ZipFile.ZipErrorMessageText(zr));
@@ -278,7 +278,7 @@ namespace SabreTools.Library.FileTypes
             try
             {
                 ZipFile zf = new ZipFile();
-                ZipReturn zr = zf.ZipFileOpen(this.Filename, new FileInfo(this.Filename).LastWriteTime.Ticks, true);
+                ZipReturn zr = zf.ZipFileOpen(this.Filename, -1, true);
                 if (zr != ZipReturn.ZipGood)
                 {
                     throw new Exception(ZipFile.ZipErrorMessageText(zr));
@@ -293,6 +293,7 @@ namespace SabreTools.Library.FileTypes
                     if (zr != ZipReturn.ZipGood)
                     {
                         Globals.Logger.Warning("An error occurred while reading archive {0}: Zip Error - {1}", this.Filename, zr);
+                        zr = zf.ZipFileCloseReadStream();
                         continue;
                     }
 
@@ -301,6 +302,7 @@ namespace SabreTools.Library.FileTypes
                         || zf.Filename(i).EndsWith(Path.AltDirectorySeparatorChar.ToString())
                         || zf.Filename(i).EndsWith(Path.PathSeparator.ToString()))
                     {
+                        zr = zf.ZipFileCloseReadStream();
                         continue;
                     }
 

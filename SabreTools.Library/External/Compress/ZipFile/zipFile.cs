@@ -528,7 +528,7 @@ namespace Compress.ZipFile
 
 
 
-
+        // TODO: Figure out the timestamp instead of using ticks like we were before
         public ZipReturn ZipFileOpen(string newFilename, long timestamp, bool readHeaders)
         {
             ZipFileClose();
