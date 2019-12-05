@@ -4188,7 +4188,8 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Seek to the beginning of the stream
-                fileStream.Seek(0, SeekOrigin.Begin);
+                if (fileStream.CanSeek)
+                    fileStream.Seek(0, SeekOrigin.Begin);
 
                 Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
                 rebuilt = true;

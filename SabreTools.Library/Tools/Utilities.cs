@@ -2108,30 +2108,33 @@ namespace SabreTools.Library.Tools
             if (chdsAsFiles == false && GetCHDInfo(input) != null)
             {
                 // Seek to the starting position, if one is set
-                try
+                if (input.CanSeek)
                 {
-                    if (offset < 0)
+                    try
                     {
-                        input.Seek(offset, SeekOrigin.End);
+                        if (offset < 0)
+                        {
+                            input.Seek(offset, SeekOrigin.End);
+                        }
+                        else if (offset > 0)
+                        {
+                            input.Seek(offset, SeekOrigin.Begin);
+                        }
+                        else
+                        {
+                            input.Seek(0, SeekOrigin.Begin);
+                        }
                     }
-                    else if (offset > 0)
+                    catch (NotSupportedException)
                     {
-                        input.Seek(offset, SeekOrigin.Begin);
+                        Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
                     }
-                    else
+                    catch (NotImplementedException)
                     {
-                        input.Seek(0, SeekOrigin.Begin);
+                        Globals.Logger.Warning("Stream does not support seeking to starting offset. Stream position not changed");
                     }
                 }
-                catch (NotSupportedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
-                }
-                catch (NotImplementedException)
-                {
-                    Globals.Logger.Warning("Stream does not support seeking to starting offset. Stream position not changed");
-                }
-
+                    
                 // Get the BaseFile from the information
                 BaseFile chd = GetCHDInfo(input);
 
@@ -2173,31 +2176,34 @@ namespace SabreTools.Library.Tools
                 SHA512 sha512 = SHA512.Create();
 
                 // Seek to the starting position, if one is set
-                try
+                if (input.CanSeek)
                 {
-                    if (offset < 0)
+                    try
                     {
-                        input.Seek(offset, SeekOrigin.End);
+                        if (offset < 0)
+                        {
+                            input.Seek(offset, SeekOrigin.End);
+                        }
+                        else if (offset > 0)
+                        {
+                            input.Seek(offset, SeekOrigin.Begin);
+                        }
+                        else
+                        {
+                            input.Seek(0, SeekOrigin.Begin);
+                        }
                     }
-                    else if (offset > 0)
+                    catch (NotSupportedException)
                     {
-                        input.Seek(offset, SeekOrigin.Begin);
+                        Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
                     }
-                    else
+                    catch (NotImplementedException)
                     {
-                        input.Seek(0, SeekOrigin.Begin);
+                        Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
                     }
-                }
-                catch (NotSupportedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
-                }
-                catch (NotImplementedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
                 }
 
-                byte[] buffer = new byte[8 * 1024];
+                byte[] buffer = new byte[32 * 1024 * 1024];
                 int read;
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
                 {
@@ -2268,17 +2274,20 @@ namespace SabreTools.Library.Tools
             finally
             {
                 // Seek to the beginning of the stream if possible
-                try
+                if (input.CanSeek)
                 {
-                    input.Seek(0, SeekOrigin.Begin);
-                }
-                catch (NotSupportedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
-                }
-                catch (NotImplementedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
+                    try
+                    {
+                        input.Seek(0, SeekOrigin.Begin);
+                    }
+                    catch (NotSupportedException)
+                    {
+                        Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
+                    }
+                    catch (NotImplementedException)
+                    {
+                        Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
+                    }
                 }
 
                 if (!keepReadOpen)
