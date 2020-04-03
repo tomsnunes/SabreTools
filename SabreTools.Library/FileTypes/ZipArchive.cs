@@ -19,7 +19,7 @@ using Stream = System.IO.Stream;
 #endif
 using Compress;
 using Compress.ZipFile;
-using SharpCompress.Readers;
+using NaturalSort;
 
 namespace SabreTools.Library.FileTypes
 {
@@ -93,6 +93,7 @@ namespace SabreTools.Library.FileTypes
                         || zf.Filename(i).EndsWith(Path.AltDirectorySeparatorChar.ToString())
                         || zf.Filename(i).EndsWith(Path.PathSeparator.ToString()))
                     {
+                        zf.ZipFileCloseReadStream();
                         continue;
                     }
 
@@ -286,6 +287,15 @@ namespace SabreTools.Library.FileTypes
 
                 for (int i = 0; i < zf.LocalFilesCount(); i++)
                 {
+                    // If the entry is a directory (or looks like a directory), we don't want to open it
+                    if (zf.IsDirectory(i)
+                        || zf.Filename(i).EndsWith(Path.DirectorySeparatorChar.ToString())
+                        || zf.Filename(i).EndsWith(Path.AltDirectorySeparatorChar.ToString())
+                        || zf.Filename(i).EndsWith(Path.PathSeparator.ToString()))
+                    {
+                        continue;
+                    }
+
                     // Open the read stream
                     zr = zf.ZipFileOpenReadStream(i, false, out Stream readStream, out ulong streamsize, out ushort cm);
 
@@ -293,15 +303,6 @@ namespace SabreTools.Library.FileTypes
                     if (zr != ZipReturn.ZipGood)
                     {
                         Globals.Logger.Warning("An error occurred while reading archive {0}: Zip Error - {1}", this.Filename, zr);
-                        zr = zf.ZipFileCloseReadStream();
-                        continue;
-                    }
-
-                    // If the entry ends with a directory separator, continue to the next item, if any
-                    if (zf.Filename(i).EndsWith(Path.DirectorySeparatorChar.ToString())
-                        || zf.Filename(i).EndsWith(Path.AltDirectorySeparatorChar.ToString())
-                        || zf.Filename(i).EndsWith(Path.PathSeparator.ToString()))
-                    {
                         zr = zf.ZipFileCloseReadStream();
                         continue;
                     }
@@ -360,27 +361,36 @@ namespace SabreTools.Library.FileTypes
 
             try
             {
-                SharpCompress.Archives.Zip.ZipArchive za = SharpCompress.Archives.Zip.ZipArchive.Open(this.Filename, new ReaderOptions { LeaveStreamOpen = false });
-                List<SharpCompress.Archives.Zip.ZipArchiveEntry> zipEntries = za.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
-                string lastZipEntry = null;
-                foreach (SharpCompress.Archives.Zip.ZipArchiveEntry entry in zipEntries)
+                ZipFile zf = new ZipFile();
+                ZipReturn zr = zf.ZipFileOpen(this.Filename, -1, true);
+                if (zr != ZipReturn.ZipGood)
                 {
-                    if (entry != null)
+                    throw new Exception(ZipFile.ZipErrorMessageText(zr));
+                }
+
+                List<(string, bool)> zipEntries = new List<(string, bool)>();
+                for (int i = 0; i < zf.LocalFilesCount(); i++)
+                {
+                    zipEntries.Add((zf.Filename(i), zf.IsDirectory(i)));
+                }
+
+                zipEntries = zipEntries.OrderBy(p => p.Item1, new NaturalReversedComparer()).ToList();
+                string lastZipEntry = null;
+                foreach ((string, bool) entry in zipEntries)
+                {
+                    // If the current is a superset of last, we skip it
+                    if (lastZipEntry != null && lastZipEntry.StartsWith(entry.Item1))
                     {
-                        // If the current is a superset of last, we skip it
-                        if (lastZipEntry != null && lastZipEntry.StartsWith(entry.Key))
+                        // No-op
+                    }
+                    // If the entry is a directory, we add it
+                    else
+                    {
+                        if (entry.Item2)
                         {
-                            // No-op
+                            empties.Add(entry.Item1);
                         }
-                        // If the entry is a directory, we add it
-                        else
-                        {
-                            if (entry.IsDirectory)
-                            {
-                                empties.Add(entry.Key);
-                            }
-                            lastZipEntry = entry.Key;
-                        }
+                        lastZipEntry = entry.Item1;
                     }
                 }
             }
@@ -397,7 +407,14 @@ namespace SabreTools.Library.FileTypes
         /// </summary>
         public override bool IsTorrent()
         {
-            throw new NotImplementedException();
+            ZipFile zf = new ZipFile();
+            ZipReturn zr = zf.ZipFileOpen(this.Filename, -1, true);
+            if (zr != ZipReturn.ZipGood)
+            {
+                throw new Exception(ZipFile.ZipErrorMessageText(zr));
+            }
+
+            return zf.ZipStatus == ZipStatus.TrrntZip;
         }
 
         #endregion
@@ -501,7 +518,7 @@ namespace SabreTools.Library.FileTypes
                 else
                 {
                     // Open the old archive for reading
-                    oldZipFile.ZipFileOpen(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, true);
+                    oldZipFile.ZipFileOpen(archiveFileName, -1, true);
 
                     // Map all inputs to index
                     Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
@@ -728,7 +745,7 @@ namespace SabreTools.Library.FileTypes
                 else
                 {
                     // Open the old archive for reading
-                    oldZipFile.ZipFileOpen(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, true);
+                    oldZipFile.ZipFileOpen(archiveFileName, -1, true);
 
                     // Map all inputs to index
                     Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();

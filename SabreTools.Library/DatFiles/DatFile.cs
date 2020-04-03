@@ -4064,7 +4064,7 @@ namespace SabreTools.Library.DatFiles
                     foreach (BaseFile entry in entries)
                     {
                         DatItem datItem = Utilities.GetDatItem(entry);
-                        usedInternally &= RebuildIndividualFile(datItem, file, outDir, date, inverse, outputFormat,
+                        usedInternally |= RebuildIndividualFile(datItem, file, outDir, date, inverse, outputFormat,
                             romba, updateDat, !isTorrentGzip /* isZip */, headerToCheckAgainst);
                     }
                 }
@@ -4094,8 +4094,8 @@ namespace SabreTools.Library.DatFiles
         private bool RebuildIndividualFile(DatItem datItem, string file, string outDir, bool date,
             bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool? isZip, string headerToCheckAgainst)
         {
-            // Set the output value
-            bool rebuilt = true;
+            // Set the initial output value
+            bool rebuilt = false;
 
             // If the DatItem is a Disk, force rebuilding to a folder except if TGZ
             if (datItem.ItemType == ItemType.Disk && outputFormat != OutputFormat.TorrentGzip)
@@ -4152,14 +4152,12 @@ namespace SabreTools.Library.DatFiles
                     try
                     {
                         File.Copy(file, outDir);
-                        rebuilt &= true;
+                        return true;
                     }
                     catch
                     {
-                        rebuilt = false;
+                        return false;
                     }
-
-                    return rebuilt;
                 }
 
                 // Get a generic stream for the file
@@ -4237,14 +4235,12 @@ namespace SabreTools.Library.DatFiles
                     try
                     {
                         File.Copy(file, outDir);
-                        rebuilt &= true;
+                        return true;
                     }
                     catch
                     {
-                        rebuilt = false;
+                        return false;
                     }
-
-                    return rebuilt;
                 }
 
                 // Get a generic stream for the file
