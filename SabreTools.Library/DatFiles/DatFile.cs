@@ -5796,7 +5796,7 @@ namespace SabreTools.Library.DatFiles
             }
             if ((DatFormat & DatFormat.EverdriveSMDB) != 0
                 && ((DatFormat & DatFormat.AttractMode) != 0
-                    || (DatFormat & DatFormat.Listrom) != 0)
+                    || (DatFormat & DatFormat.Listrom) != 0
                     || (DatFormat & DatFormat.MissFile) != 0))
             {
                 outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".smdb.txt", overwrite));

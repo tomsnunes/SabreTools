@@ -21,7 +21,7 @@ namespace Compress
         void ZipFileClose();
 
         ZipReturn ZipFileOpenReadStream(int index, out Stream stream, out ulong streamSize);
-        ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, out Stream stream);
+        ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, uint? datetime, out Stream stream);
         ZipReturn ZipFileCloseReadStream();
 
 

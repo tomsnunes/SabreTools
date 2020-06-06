@@ -217,7 +217,7 @@ namespace Compress.ZipFile
             return ZipReturn.ZipGood;
         }
 
-        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, out Stream stream)
+        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, uint? datetime, out Stream stream)
         {
             stream = null;
             if (ZipOpen != ZipOpenType.OpenWrite)
@@ -225,7 +225,7 @@ namespace Compress.ZipFile
                 return ZipReturn.ZipWritingToInputFile;
             }
 
-            LocalFile lf = new LocalFile(filename);
+            LocalFile lf = new LocalFile(filename, datetime);
 
             ZipReturn retVal = lf.LocalFileOpenWriteStream(_zipFs, raw, trrntzip, uncompressedSize, compressionMethod, out stream);
 
@@ -863,7 +863,7 @@ namespace Compress.ZipFile
             return zRet;
         }
 
-        public ZipReturn ZipFileAddFake(string filename, ulong fileOffset, ulong uncompressedSize, ulong compressedSize, byte[] crc32, out byte[] localHeader)
+        public ZipReturn ZipFileAddFake(string filename, ulong fileOffset, ulong uncompressedSize, ulong compressedSize, byte[] crc32, uint? datetime, out byte[] localHeader)
         {
             localHeader = null;
 
@@ -872,7 +872,7 @@ namespace Compress.ZipFile
                 return ZipReturn.ZipWritingToInputFile;
             }
 
-            LocalFile lf = new LocalFile(filename);
+            LocalFile lf = new LocalFile(filename, datetime);
             _localFiles.Add(lf);
 
             MemoryStream ms = new MemoryStream();
@@ -1087,6 +1087,7 @@ namespace Compress.ZipFile
             private ushort _compressionMethod;
             private ushort _lastModFileTime;
             private ushort _lastModFileDate;
+            private uint? _lastModFileDateTime;
             private ulong _compressedSize;
             public ulong RelativeOffsetOfLocalHeader; // only in centeral directory
 
@@ -1098,13 +1099,20 @@ namespace Compress.ZipFile
             {
             }
 
-            public LocalFile(string filename)
+            public LocalFile(string filename, uint? datetime)
             {
                 Zip64 = false;
                 GeneralPurposeBitFlag = 2; // Maximum Compression Deflating
                 _compressionMethod = 8; // Compression Method Deflate
-                _lastModFileTime = 48128;
-                _lastModFileDate = 8600;
+                if (datetime == null)
+                {
+                    _lastModFileTime = 48128;
+                    _lastModFileDate = 8600;
+                }
+                else
+                {
+                    _lastModFileDateTime = datetime;
+                }
 
                 FileName = filename;
             }
@@ -1121,15 +1129,22 @@ namespace Compress.ZipFile
             {
                 get
                 {
-                    int second = (_lastModFileTime & 0x1f) * 2;
-                    int minute = (_lastModFileTime >> 5) & 0x3f;
-                    int hour = (_lastModFileTime >> 11) & 0x1f;
+                    if (_lastModFileDateTime == null)
+                    {
+                        int second = (_lastModFileTime & 0x1f) * 2;
+                        int minute = (_lastModFileTime >> 5) & 0x3f;
+                        int hour = (_lastModFileTime >> 11) & 0x1f;
 
-                    int day = _lastModFileDate & 0x1f;
-                    int month = (_lastModFileDate >> 5) & 0x0f;
-                    int year = ((_lastModFileDate >> 9) & 0x7f) + 1980;
+                        int day = _lastModFileDate & 0x1f;
+                        int month = (_lastModFileDate >> 5) & 0x0f;
+                        int year = ((_lastModFileDate >> 9) & 0x7f) + 1980;
 
-                    return new DateTime(year, month, day, hour, minute, second);
+                        return new DateTime(year, month, day, hour, minute, second);
+                    }
+                    else
+                    {
+                        return SabreTools.Library.Tools.Utilities.ConvertMsDosTimeFormatToDateTime(_lastModFileDateTime.Value);
+                    }
                 }
             }
 
@@ -1329,8 +1344,15 @@ namespace Compress.ZipFile
                     bw.Write(versionNeededToExtract);
                     bw.Write(GeneralPurposeBitFlag);
                     bw.Write(_compressionMethod);
-                    bw.Write(_lastModFileTime);
-                    bw.Write(_lastModFileDate);
+                    if (_lastModFileDateTime == null)
+                    {
+                        bw.Write(_lastModFileTime);
+                        bw.Write(_lastModFileDate);
+                    }
+                    else
+                    {
+                        bw.Write(_lastModFileDateTime.Value);
+                    }
                     bw.Write(CRC[3]);
                     bw.Write(CRC[2]);
                     bw.Write(CRC[1]);
@@ -1636,8 +1658,15 @@ namespace Compress.ZipFile
                     bw.Write(versionNeededToExtract);
                     bw.Write(GeneralPurposeBitFlag);
                     bw.Write(_compressionMethod);
-                    bw.Write(_lastModFileTime);
-                    bw.Write(_lastModFileDate);
+                    if (_lastModFileDateTime == null)
+                    {
+                        bw.Write(_lastModFileTime);
+                        bw.Write(_lastModFileDate);
+                    }
+                    else
+                    {
+                        bw.Write(_lastModFileDateTime.Value);
+                    }
 
                     _crc32Location = (ulong)zipFs.Position;
 
@@ -1690,8 +1719,15 @@ namespace Compress.ZipFile
                     bw.Write(versionNeededToExtract);
                     bw.Write(GeneralPurposeBitFlag);
                     bw.Write(_compressionMethod);
-                    bw.Write(_lastModFileTime);
-                    bw.Write(_lastModFileDate);
+                    if (_lastModFileDateTime == null)
+                    {
+                        bw.Write(_lastModFileTime);
+                        bw.Write(_lastModFileDate);
+                    }
+                    else
+                    {
+                        bw.Write(_lastModFileDateTime.Value);
+                    }
 
                     uint tCompressedSize;
                     uint tUncompressedSize;
