@@ -5679,13 +5679,15 @@ namespace SabreTools.Library.DatFiles
             }
 
             // Missfile
-            if ((DatFormat & DatFormat.MissFile) != 0
-                && (DatFormat & DatFormat.AttractMode) == 0)
+            if (((DatFormat & DatFormat.MissFile) != 0)
+                && (DatFormat & DatFormat.AttractMode) == 0
+                && (DatFormat & DatFormat.Listrom) == 0)
             {
                 outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
             }
-            if ((DatFormat & DatFormat.MissFile) != 0
-                && (DatFormat & DatFormat.AttractMode) != 0)
+            if (((DatFormat & DatFormat.MissFile) != 0
+                && ((DatFormat & DatFormat.AttractMode) != 0
+                    || (DatFormat & DatFormat.Listrom) != 0)))
             {
                 outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".miss.txt", overwrite));
             }
@@ -5787,12 +5789,14 @@ namespace SabreTools.Library.DatFiles
             // Everdrive SMDB
             if ((DatFormat & DatFormat.EverdriveSMDB) != 0
                 && (DatFormat & DatFormat.AttractMode) == 0
+                && (DatFormat & DatFormat.Listrom) == 0
                 && (DatFormat & DatFormat.MissFile) == 0)
             {
                 outfileNames.Add(DatFormat.EverdriveSMDB, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
             }
             if ((DatFormat & DatFormat.EverdriveSMDB) != 0
                 && ((DatFormat & DatFormat.AttractMode) != 0
+                    || (DatFormat & DatFormat.Listrom) != 0)
                     || (DatFormat & DatFormat.MissFile) != 0))
             {
                 outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".smdb.txt", overwrite));
