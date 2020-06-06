@@ -811,6 +811,12 @@ namespace SabreTools.Library.Tools
                     return Field.AreaSize;
                 case "bios":
                     return Field.Bios;
+                case "biosdescription":
+                case "bios description":
+                case "biossetdescription":
+                case "biosset description":
+                case "bios set description":
+                    return Field.BiosDescription;
                 case "board":
                     return Field.Board;
                 case "cloneof":

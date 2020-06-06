@@ -96,7 +96,6 @@ namespace SabreTools
                 updateDat = false;
             Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
             OutputFormat outputFormat = OutputFormat.Folder;
-            ReplaceMode replaceMode = ReplaceMode.None;
             SkipFileType skipFileType = SkipFileType.None;
             SplittingMode splittingMode = SplittingMode.None;
             SplitType splitType = SplitType.None;
@@ -282,14 +281,6 @@ namespace SabreTools
                     case "diff-reverse-cascade":
                         updateMode |= UpdateMode.DiffReverseCascade;
                         break;
-                    case "exclude-of":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.CloneOf] = true;
-                        datHeader.ExcludeFields[(int)Field.MachineType] = true;
-                        datHeader.ExcludeFields[(int)Field.RomOf] = true;
-                        datHeader.ExcludeFields[(int)Field.Runnable] = true;
-                        datHeader.ExcludeFields[(int)Field.SampleOf] = true;
-                        break;
                     case "extension":
                         splittingMode |= SplittingMode.Extension;
                         break;
@@ -352,30 +343,6 @@ namespace SabreTools
                         break;
                     case "remove-extensions":
                         datHeader.RemoveExtension = true;
-                        break;
-                    case "remove-md5":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.MD5] = true;
-                        break;
-                    case "remove-ripemd160":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.RIPEMD160] = true;
-                        break;
-                    case "remove-sha1":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.SHA1] = true;
-                        break;
-                    case "remove-sha256":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.SHA256] = true;
-                        break;
-                    case "remove-sha384":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.SHA384] = true;
-                        break;
-                    case "remove-sha512":
-                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
-                        datHeader.ExcludeFields[(int)Field.SHA512] = true;
                         break;
                     case "remove-unicode":
                         removeUnicode = true;
@@ -480,25 +447,40 @@ namespace SabreTools
                         updateDat = true;
                         break;
                     case "update-description":
-                        replaceMode |= ReplaceMode.Description;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.Description);
                         break;
                     case "update-game-type":
-                        replaceMode |= ReplaceMode.MachineType;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.MachineType);
                         break;
                     case "update-hashes":
-                        replaceMode |= ReplaceMode.Hash;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.CRC);
+                        updateFields.Add(Field.MD5);
+                        updateFields.Add(Field.RIPEMD160);
+                        updateFields.Add(Field.SHA1);
+                        updateFields.Add(Field.SHA256);
+                        updateFields.Add(Field.SHA384);
+                        updateFields.Add(Field.SHA512);
                         break;
                     case "update-manufacturer":
-                        replaceMode |= ReplaceMode.Manufacturer;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.Manufacturer);
                         break;
                     case "update-names":
-                        replaceMode |= ReplaceMode.ItemName;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.Name);
                         break;
                     case "update-parents":
-                        replaceMode |= ReplaceMode.Parents;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.CloneOf);
+                        updateFields.Add(Field.RomOf);
+                        updateFields.Add(Field.SampleOf);
                         break;
                     case "update-year":
-                        replaceMode |= ReplaceMode.Year;
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _updateFieldListInput.Flags));
+                        updateFields.Add(Field.Year);
                         break;
 
                     #endregion
@@ -517,9 +499,8 @@ namespace SabreTools
                     case "threads":
                         int val = (int)feat.Value.GetValue();
                         if (val != Int32.MinValue)
-                        {
                             Globals.MaxThreads = val;
-                        }
+
                         break;
                     case "zip":
                         zip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
@@ -546,7 +527,7 @@ namespace SabreTools
                     case "dat":
                         datfiles.AddRange((List<string>)feat.Value.GetValue());
                         break;
-                    case "exclude-field": // TODO: Use this
+                    case "exclude-field":
                         foreach (string field in (List<string>)feat.Value.GetValue())
                         {
                             datHeader.ExcludeFields[(int)Utilities.GetField(field)] = true;
@@ -662,7 +643,7 @@ namespace SabreTools
                             filter.ItemStatuses.Positive |= Utilities.GetItemStatus(stat);
                         }
                         break;
-                    case "update-field": // TODO: Use this
+                    case "update-field":
                         foreach (string field in (List<string>)feat.Value.GetValue())
                         {
                             updateFields.Add(Utilities.GetField(field));
@@ -801,7 +782,7 @@ namespace SabreTools
                 case "Update":
                     VerifyInputs(inputs, feature);
                     InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skipFirstOutput, noAutomaticDate, filter,
-                        splitType, outDir, cleanGameNames, removeUnicode, descAsName, replaceMode, onlySame);
+                        splitType, outDir, cleanGameNames, removeUnicode, descAsName, updateFields, onlySame);
                     break;
                 // If we're using the verifier
                 case "Verify":

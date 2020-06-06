@@ -321,18 +321,6 @@ namespace SabreTools
                     longDescription: "This flag allows for a special type of diffing in which the last DAT is considered a base, and for each additional input DAT, it only leaves the files that are not in one of the previous DATs. This can allow for the creation of rollback sets or even just reduce the amount of duplicates across multiple sets.");
             }
         }
-        private static Feature _excludeOfFlag
-        {
-            get
-            {
-                return new Feature(
-                    "exclude-of",
-                    new List<string>() { "-xof", "--exclude-of" },
-                    "Exclude romof, cloneof, sampleof tags",
-                    FeatureType.Flag,
-                    longDescription: "If this flag is enabled, then the romof, cloneof, and sampleof tags will be omitted from the outputted DAT.");
-            }
-        } // TODO: Remove
         private static Feature _extensionFlag
         {
             get
@@ -585,78 +573,6 @@ namespace SabreTools
                     longDescription: "For each item, remove the extension.");
             }
         }
-        private static Feature _removeMd5Flag
-        {
-            get
-            {
-                return new Feature(
-                    "remove-md5",
-                    new List<string>() { "-rmd5", "--remove-md5" },
-                    "Remove MD5 hashes from the output",
-                    FeatureType.Flag,
-                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all MD5 hashes from the output file(s).");
-            }
-        } // TODO: Remove
-        private static Feature _removeRipeMd160Flag
-        {
-            get
-            {
-                return new Feature(
-                    "remove-ripemd160",
-                    new List<string>() { "-rripemd160", "--remove-ripemd160" },
-                    "Remove RIPEMD160 hashes from the output",
-                    FeatureType.Flag,
-                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all MD5 hashes from the output file(s).");
-            }
-        } // TODO: Remove
-        private static Feature _removeSha1Flag
-        {
-            get
-            {
-                return new Feature(
-                    "remove-sha1",
-                    new List<string>() { "-rsha1", "--remove-sha1" },
-                    "Remove SHA-1 hashes from the output",
-                    FeatureType.Flag,
-                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-1 hashes from the output file(s).");
-            }
-        } // TODO: Remove
-        private static Feature _removeSha256Flag
-        {
-            get
-            {
-                return new Feature(
-                    "remove-sha256",
-                    new List<string>() { "-rsha256", "--remove-sha256" },
-                    "Remove SHA-256 hashes from the output",
-                    FeatureType.Flag,
-                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-256 hashes from the output file(s).");
-            }
-        } // TODO: Remove
-        private static Feature _removeSha384Flag
-        {
-            get
-            {
-                return new Feature(
-                    "remove-sha384",
-                    new List<string>() { "-rsha384", "--remove-sha384" },
-                    "Remove SHA-384 hashes from the output",
-                    FeatureType.Flag,
-                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-384 hashes from the output file(s).");
-            }
-        } // TODO: Remove
-        private static Feature _removeSha512Flag
-        {
-            get
-            {
-                return new Feature(
-                    "remove-sha512",
-                    new List<string>() { "-rsha512", "--remove-sha512" },
-                    "Remove SHA-512 hashes from the output",
-                    FeatureType.Flag,
-                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all SHA-512 hashes from the output file(s).");
-            }
-        } // TODO: Remove
         private static Feature _removeUnicodeFlag
         {
             get
@@ -1677,11 +1593,11 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
                 return new Feature(
                     "update-field",
                     new List<string>() { "-uf", "--update-field" },
-                    "Update a game/rom field from base DAT(s)",
+                    "Update a game/rom field from base DATs",
                     FeatureType.List,
                     longDescription: "Update any valid item or machine field from base DAT(s). Examples include: romof, publisher, and offset.");
             }
-        } // TODO: ADD THIS TO USED FLAGS
+        }
 
         #endregion
 
@@ -2112,7 +2028,6 @@ Some special strings that can be used:
             datFromDir.AddFeature(_urlStringInput);
             datFromDir.AddFeature(_commentStringInput);
             datFromDir.AddFeature(_superdatFlag);
-            datFromDir.AddFeature(_excludeOfFlag);
             datFromDir.AddFeature(_excludeFieldListInput);
             datFromDir.AddFeature(_oneRomPerGameFlag);
             datFromDir.AddFeature(_sceneDateStripFlag);
@@ -2339,19 +2254,12 @@ The stats that are outputted are as follows:
             update.AddFeature(_forcemergingStringInput);
             update.AddFeature(_forcenodumpStringInput);
             update.AddFeature(_forcepackingStringInput);
-            update.AddFeature(_excludeOfFlag);
             update.AddFeature(_excludeFieldListInput);
             update.AddFeature(_oneRomPerGameFlag);
             update.AddFeature(_keepEmptyGamesFlag);
             update.AddFeature(_sceneDateStripFlag);
             update.AddFeature(_cleanFlag);
             update.AddFeature(_removeUnicodeFlag);
-            update.AddFeature(_removeMd5Flag);
-            update.AddFeature(_removeRipeMd160Flag);
-            update.AddFeature(_removeSha1Flag);
-            update.AddFeature(_removeSha256Flag);
-            update.AddFeature(_removeSha384Flag);
-            update.AddFeature(_removeSha512Flag);
             update.AddFeature(_descriptionAsNameFlag);
             update.AddFeature(_datMergedFlag);
             update.AddFeature(_datSplitFlag);
@@ -2377,6 +2285,8 @@ The stats that are outputted are as follows:
                 update[_diffAgainstFlag].AddFeature(_baseDatListInput);
             update.AddFeature(_baseReplaceFlag);
                 update[_baseReplaceFlag].AddFeature(_baseDatListInput);
+                update[_baseReplaceFlag].AddFeature(_updateFieldListInput);
+                    update[_baseReplaceFlag][_updateFieldListInput].AddFeature(_onlySameFlag);
                 update[_baseReplaceFlag].AddFeature(_updateNamesFlag);
                 update[_baseReplaceFlag].AddFeature(_updateHashesFlag);
                 update[_baseReplaceFlag].AddFeature(_updateDescriptionFlag);
@@ -2387,6 +2297,8 @@ The stats that are outputted are as follows:
                 update[_baseReplaceFlag].AddFeature(_updateParentsFlag);
             update.AddFeature(_reverseBaseReplaceFlag);
                 update[_reverseBaseReplaceFlag].AddFeature(_baseDatListInput);
+                update[_baseReplaceFlag].AddFeature(_updateFieldListInput);
+                    update[_baseReplaceFlag][_updateFieldListInput].AddFeature(_onlySameFlag);
                 update[_reverseBaseReplaceFlag].AddFeature(_updateNamesFlag);
                 update[_reverseBaseReplaceFlag].AddFeature(_updateHashesFlag);
                 update[_reverseBaseReplaceFlag].AddFeature(_updateDescriptionFlag);

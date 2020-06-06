@@ -302,7 +302,7 @@ namespace SabreTools
         /// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
         /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
         /// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
-        /// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
+        /// <param name="updateFields">List of Fields representing what should be updated [only for base replacement]</param>
         /// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise [only for base replacement]</param>
         private static void InitUpdate(
             List<string> inputPaths,
@@ -326,7 +326,7 @@ namespace SabreTools
             bool clean,
             bool remUnicode,
             bool descAsName,
-            ReplaceMode replaceMode,
+            List<Field> updateFields,
             bool onlySame)
         {
             // Normalize the extensions
@@ -371,17 +371,15 @@ namespace SabreTools
                 }
             }
 
-            // If no replacement mode is set, default to Names
-            if (replaceMode == ReplaceMode.None)
-            {
-                replaceMode = ReplaceMode.ItemName;
-            }
+            // If no update fields are set, default to Names
+            if (updateFields == null || updateFields.Count == 0)
+                updateFields = new List<Field>() { Field.Name };
 
             // Populate the DatData object
             DatFile userInputDat = new DatFile(datHeader);
             
             userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, clean,
-                remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
+                remUnicode, descAsName, filter, splitType, updateFields, onlySame);
         }
 
         /// <summary>

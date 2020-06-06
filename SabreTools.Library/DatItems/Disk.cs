@@ -260,11 +260,9 @@ namespace SabreTools.Library.DatItems
         {
             bool dupefound = false;
 
-            // If we don't have a rom, return false
+            // If we don't have a disk, return false
             if (this.ItemType != other.ItemType)
-            {
                 return dupefound;
-            }
 
             // Otherwise, treat it as a rom
             Disk newOther = (Disk)other;

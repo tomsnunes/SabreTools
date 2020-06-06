@@ -840,7 +840,7 @@ namespace SabreTools.Library.DatFiles
                         break;
                     case ItemType.BiosSet:
                         state += "<file type=\"biosset\" name\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
-                            + (!ExcludeFields[(int)Field.Description] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + WebUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
+                            + (!ExcludeFields[(int)Field.BiosDescription] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + WebUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
                             + (!ExcludeFields[(int)Field.Default] && ((BiosSet)rom).Default != null
                                 ? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
                                 : "")

@@ -922,7 +922,7 @@ namespace SabreTools.Library.DatFiles
                         break;
                     case ItemType.BiosSet:
                         state += "\tbiosset ( name\"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + (!ExcludeFields[(int)Field.Description] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : "")
+                            + (!ExcludeFields[(int)Field.BiosDescription] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : "")
                             + (!ExcludeFields[(int)Field.Default] && ((BiosSet)rom).Default != null
                                 ? "default " + ((BiosSet)rom).Default.ToString().ToLowerInvariant()
                                 : "")

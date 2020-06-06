@@ -362,6 +362,7 @@
 
         // BiosSet
         Default,
+        BiosDescription,
 
         // Disk
         MD5,

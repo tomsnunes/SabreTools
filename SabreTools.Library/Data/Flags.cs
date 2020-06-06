@@ -389,36 +389,16 @@ namespace SabreTools.Library.Data
     {
         CRC =       1 << 0,
         MD5 =       1 << 1,
-        SHA1 =      1 << 2,
-        SHA256 =    1 << 3,
-        SHA384 =    1 << 4,
-        SHA512 =    1 << 5,
-        RIPEMD160 = 1 << 6,
+        RIPEMD160 = 1 << 2,
+        SHA1 =      1 << 3,
+        SHA256 =    1 << 4,
+        SHA384 =    1 << 5,
+        SHA512 =    1 << 6,
 
         // Special combinations
         Standard = CRC | MD5 | SHA1,
         DeepHashes = SHA256 | SHA384 | SHA512 | RIPEMD160,
         SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512 | RIPEMD160,
-    }
-
-    /// <summary>
-    /// Determine what to replace from base DATs
-    /// </summary>
-    [Flags]
-    public enum ReplaceMode
-    {
-        None =          0x00,
-
-        // Sorted by hash
-        ItemName =      1 << 0,
-        Hash =          1 << 1,
-
-        // Sorted by machine name
-        Description =   1 << 2,
-        MachineType =   1 << 3,
-        Year =          1 << 4,
-        Manufacturer =  1 << 5,
-        Parents =       1 << 6,
     }
 
     /// <summary>

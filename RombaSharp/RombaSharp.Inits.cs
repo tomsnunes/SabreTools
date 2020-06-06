@@ -354,7 +354,7 @@ namespace RombaSharp
             // Now run the diff on the inputs
             datfile.DetermineUpdateType(dats, basedats, outdat, UpdateMode.DiffAgainst, false /* inplace */, false /* skip */,
                 false /* clean */, false /* remUnicode */, false /* descAsName */, new Filter(), SplitType.None,
-                ReplaceMode.None, false /* onlySame */);
+                new List<Field>(), false /* onlySame */);
         }
 
         /// <summary>
@@ -432,7 +432,7 @@ namespace RombaSharp
             // Now run the diff on the inputs
             datfile.DetermineUpdateType(dats, basedats, outdat, UpdateMode.DiffAgainst, false /* inplace */, false /* skip */,
                 false /* clean */, false /* remUnicode */, false /* descAsName */, new Filter(), SplitType.None,
-                ReplaceMode.None, false /* onlySame */);
+                new List<Field>(), false /* onlySame */);
         }
 
         /// <summary>

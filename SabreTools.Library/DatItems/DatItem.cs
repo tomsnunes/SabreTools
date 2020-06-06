@@ -719,18 +719,14 @@ namespace SabreTools.Library.DatItems
 
             // Check for an empty rom list first
             if (datdata.Count == 0)
-            {
                 return output;
-            }
 
             // We want to get the proper key for the DatItem
             string key = SortAndGetKey(datdata, sorted);
 
             // If the key doesn't exist, return the empty list
             if (!datdata.Contains(key))
-            {
                 return output;
-            }
 
             // Try to find duplicates
             List<DatItem> roms = datdata[key];

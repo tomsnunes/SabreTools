@@ -1487,10 +1487,10 @@ namespace SabreTools.Library.DatFiles
         /// <param name="descAsName">True to use game descriptions as the names, false otherwise (default)</param>
         /// <param name="filter">Filter object to be passed to the DatItem level</param>
         /// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-        /// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
+        /// <param name="updateFields">List of Fields representing what should be updated [only for base replacement]</param>
         /// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise [only for base replacement]</param>
         public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
-            bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
+            bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, List<Field> updateFields, bool onlySame)
         {
             // Ensure we only have files in the inputs
             List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1550,7 +1550,7 @@ namespace SabreTools.Library.DatFiles
             {
                 // Populate the combined data
                 PopulateUserData(baseFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
-                BaseReplace(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
+                BaseReplace(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, updateFields, onlySame);
             }
 
             return;
@@ -1642,11 +1642,66 @@ namespace SabreTools.Library.DatFiles
         /// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
         /// <param name="filter">Filter object to be passed to the DatItem level</param>
         /// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-        /// <param name="replaceMode">ReplaceMode representing what should be updated</param>
+        /// <param name="updateFields">List of Fields representing what should be updated [only for base replacement]</param>
         /// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise</param>
         public void BaseReplace(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-            bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
+            bool descAsName, Filter filter, SplitType splitType, List<Field> updateFields, bool onlySame)
         {
+            // Fields unique to a DatItem
+            List<Field> datItemFields = new List<Field>()
+            {
+                Field.Name,
+                Field.PartName,
+                Field.PartInterface,
+                Field.Features,
+                Field.AreaName,
+                Field.AreaSize,
+                Field.BiosDescription,
+                Field.Default,
+                Field.Language,
+                Field.Date,
+                Field.Bios,
+                Field.Size,
+                Field.Offset,
+                Field.Merge,
+                Field.Region,
+                Field.Index,
+                Field.Writable,
+                Field.Optional,
+                Field.Status,
+
+                Field.CRC,
+                Field.MD5,
+                Field.RIPEMD160,
+                Field.SHA1,
+                Field.SHA256,
+                Field.SHA384,
+                Field.SHA512,
+            };
+
+            // Fields unique to a Machine
+            List<Field> machineFields = new List<Field>()
+            {
+                Field.MachineName,
+                Field.Comment,
+                Field.Description,
+                Field.Year,
+                Field.Manufacturer,
+                Field.Publisher,
+                Field.RomOf,
+                Field.CloneOf,
+                Field.SampleOf,
+                Field.Supported,
+                Field.SourceFile,
+                Field.Runnable,
+                Field.Board,
+                Field.RebuildTo,
+                Field.Devices,
+                Field.SlotOptions,
+                Field.Infos,
+                Field.MachineType,
+            };
+
             // We want to try to replace each item in each input DAT from the base
             foreach (string path in inputFileNames)
             {
@@ -1677,9 +1732,8 @@ namespace SabreTools.Library.DatFiles
                 intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
                 filter.FilterDatFile(intDat);
 
-                // If we are matching based on hashes of any sort
-                if ((replaceMode & ReplaceMode.ItemName) != 0
-                    || (replaceMode & ReplaceMode.Hash) != 0)
+                // If we are matching based on DatItem fields of any sort
+                if (updateFields.Intersect(datItemFields).Any())
                 {
                     // For comparison's sake, we want to use CRC as the base ordering
                     BucketBy(SortedBy.CRC, DedupeType.Full);
@@ -1694,90 +1748,291 @@ namespace SabreTools.Library.DatFiles
                         foreach (DatItem datItem in datItems)
                         {
                             // If we have something other than a Rom or Disk, then this doesn't do anything
+                            // TODO: Make this do something
                             if (datItem.ItemType != ItemType.Disk && datItem.ItemType != ItemType.Rom)
                             {
-                                newDatItems.Add((DatItem)datItem.Clone());
+                                newDatItems.Add(datItem.Clone() as DatItem);
                                 continue;
                             }
 
                             List<DatItem> dupes = datItem.GetDuplicates(this, sorted: true);
-                            DatItem newDatItem = (DatItem)datItem.Clone();
+                            DatItem newDatItem = datItem.Clone() as DatItem;
+
+                            // Cast versions of the new DatItem for use below
+                            var archive = newDatItem as Archive;
+                            var biosSet = newDatItem as BiosSet;
+                            var blank = newDatItem as Blank;
+                            var disk = newDatItem as Disk;
+                            var release = newDatItem as Release;
+                            var rom = newDatItem as Rom;
+                            var sample = newDatItem as Sample;
 
                             if (dupes.Count > 0)
                             {
-                                // If we're updating names, replace using the first found name
-                                if ((replaceMode & ReplaceMode.ItemName) != 0)
+                                // Get the first duplicate for grabbing information from
+                                var firstDupe = dupes.First();
+                                var archiveDupe = firstDupe as Archive;
+                                var biosSetDupe = firstDupe as BiosSet;
+                                var blankDupe = firstDupe as Blank;
+                                var diskDupe = firstDupe as Disk;
+                                var releaseDupe = firstDupe as Release;
+                                var romDupe = firstDupe as Rom;
+                                var sampleDupe = firstDupe as Sample;
+
+                                #region Non-hash fields
+
+                                if (updateFields.Contains(Field.Name))
+                                    newDatItem.Name = firstDupe.Name;
+
+                                if (updateFields.Contains(Field.PartName))
+                                    newDatItem.PartName = firstDupe.PartName;
+
+                                if (updateFields.Contains(Field.PartInterface))
+                                    newDatItem.PartInterface = firstDupe.PartInterface;
+
+                                if (updateFields.Contains(Field.Features))
+                                    newDatItem.Features = firstDupe.Features;
+
+                                if (updateFields.Contains(Field.AreaName))
+                                    newDatItem.AreaName = firstDupe.AreaName;
+
+                                if (updateFields.Contains(Field.AreaSize))
+                                    newDatItem.AreaSize = firstDupe.AreaSize;
+
+                                if (updateFields.Contains(Field.BiosDescription))
                                 {
-                                    newDatItem.Name = dupes[0].Name;
+                                    if (newDatItem.ItemType == ItemType.BiosSet)
+                                        biosSet.Description = biosSetDupe.Description;
                                 }
 
-                                // If we're updating hashes, only replace if the current item doesn't have them
-                                if ((replaceMode & ReplaceMode.Hash) != 0)
+                                if (updateFields.Contains(Field.Default))
+                                {
+                                    if (newDatItem.ItemType == ItemType.BiosSet)
+                                        biosSet.Default = biosSetDupe.Default;
+
+                                    else if (newDatItem.ItemType == ItemType.Release)
+                                        release.Default = releaseDupe.Default;
+                                }
+
+                                if (updateFields.Contains(Field.Language))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Release)
+                                        release.Language = releaseDupe.Language;
+                                }
+
+                                if (updateFields.Contains(Field.Date))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Release)
+                                        release.Date = releaseDupe.Date;
+
+                                    else if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.Date = romDupe.Date;
+                                }
+
+                                if (updateFields.Contains(Field.Bios))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.Bios = romDupe.Bios;
+                                }
+
+                                if (updateFields.Contains(Field.Size))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.Size = romDupe.Size;
+                                }
+
+                                if (updateFields.Contains(Field.Offset))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.Offset = romDupe.Offset;
+                                }
+
+                                if (updateFields.Contains(Field.Merge))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                        disk.MergeTag = diskDupe.MergeTag;
+
+                                    else if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.MergeTag = romDupe.MergeTag;
+                                }
+
+                                if (updateFields.Contains(Field.Region))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                        disk.Region = diskDupe.Region;
+
+                                    else if (newDatItem.ItemType == ItemType.Release)
+                                        release.Region = releaseDupe.Region;
+
+                                    else if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.Region = romDupe.Region;
+                                }
+
+                                if (updateFields.Contains(Field.Index))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                        disk.Index = diskDupe.Index;
+                                }
+
+                                if (updateFields.Contains(Field.Writable))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                        disk.Writable = diskDupe.Writable;
+                                }
+
+                                if (updateFields.Contains(Field.Optional))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                        disk.Optional = diskDupe.Optional;
+
+                                    else if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.Optional = romDupe.Optional;
+                                }
+
+                                if (updateFields.Contains(Field.Status))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                        disk.ItemStatus = diskDupe.ItemStatus;
+
+                                    else if (newDatItem.ItemType == ItemType.Rom)
+                                        rom.ItemStatus = romDupe.ItemStatus;
+                                }
+
+                                #endregion
+
+                                #region Hash fields
+
+                                if (updateFields.Contains(Field.CRC))
                                 {
                                     if (newDatItem.ItemType == ItemType.Rom)
                                     {
-                                        Rom newRomItem = (Rom)newDatItem;
-                                        if (String.IsNullOrEmpty(newRomItem.CRC) && !String.IsNullOrEmpty(((Rom)dupes[0]).CRC))
-                                        {
-                                            newRomItem.CRC = ((Rom)dupes[0]).CRC;
-                                        }
-                                        if (String.IsNullOrEmpty(newRomItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
-                                        {
-                                            newRomItem.MD5 = ((Rom)dupes[0]).MD5;
-                                        }
-                                        if (String.IsNullOrEmpty(newRomItem.RIPEMD160) && !String.IsNullOrEmpty(((Rom)dupes[0]).RIPEMD160))
-                                        {
-                                            newRomItem.RIPEMD160 = ((Rom)dupes[0]).RIPEMD160;
-                                        }
-                                        if (String.IsNullOrEmpty(newRomItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
-                                        {
-                                            newRomItem.SHA1 = ((Rom)dupes[0]).SHA1;
-                                        }
-                                        if (String.IsNullOrEmpty(newRomItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
-                                        {
-                                            newRomItem.SHA256 = ((Rom)dupes[0]).SHA256;
-                                        }
-                                        if (String.IsNullOrEmpty(newRomItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
-                                        {
-                                            newRomItem.SHA384 = ((Rom)dupes[0]).SHA384;
-                                        }
-                                        if (String.IsNullOrEmpty(newRomItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
-                                        {
-                                            newRomItem.SHA512 = ((Rom)dupes[0]).SHA512;
-                                        }
-
-                                        newDatItem = (Rom)newRomItem.Clone();
+                                        if (string.IsNullOrEmpty(rom.CRC) && !string.IsNullOrEmpty(romDupe.CRC))
+                                            rom.CRC = romDupe.CRC;
                                     }
-                                    else if (newDatItem.ItemType == ItemType.Disk)
+                                }
+
+                                if (updateFields.Contains(Field.MD5))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
                                     {
-                                        Disk newDiskItem = (Disk)newDatItem;
-                                        if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Disk)dupes[0]).MD5))
-                                        {
-                                            newDiskItem.MD5 = ((Disk)dupes[0]).MD5;
-                                        }
-                                        if (String.IsNullOrEmpty(newDiskItem.RIPEMD160) && !String.IsNullOrEmpty(((Disk)dupes[0]).RIPEMD160))
-                                        {
-                                            newDiskItem.RIPEMD160 = ((Disk)dupes[0]).RIPEMD160;
-                                        }
-                                        if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA1))
-                                        {
-                                            newDiskItem.SHA1 = ((Disk)dupes[0]).SHA1;
-                                        }
-                                        if (String.IsNullOrEmpty(newDiskItem.SHA256) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA256))
-                                        {
-                                            newDiskItem.SHA256 = ((Disk)dupes[0]).SHA256;
-                                        }
-                                        if (String.IsNullOrEmpty(newDiskItem.SHA384) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA384))
-                                        {
-                                            newDiskItem.SHA384 = ((Disk)dupes[0]).SHA384;
-                                        }
-                                        if (String.IsNullOrEmpty(newDiskItem.SHA512) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA512))
-                                        {
-                                            newDiskItem.SHA512 = ((Disk)dupes[0]).SHA512;
-                                        }
-
-                                        newDatItem = (Disk)newDiskItem.Clone();
+                                        if (string.IsNullOrEmpty(disk.MD5) && !string.IsNullOrEmpty(diskDupe.MD5))
+                                            disk.MD5 = diskDupe.MD5;
                                     }
+
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                    {
+                                        if (string.IsNullOrEmpty(rom.MD5) && !string.IsNullOrEmpty(romDupe.MD5))
+                                            rom.MD5 = romDupe.MD5;
+                                    }
+                                }
+
+                                if (updateFields.Contains(Field.RIPEMD160))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                    {
+                                        if (string.IsNullOrEmpty(disk.RIPEMD160) && !string.IsNullOrEmpty(diskDupe.RIPEMD160))
+                                            disk.RIPEMD160 = diskDupe.RIPEMD160;
+                                    }
+
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                    {
+                                        if (string.IsNullOrEmpty(rom.RIPEMD160) && !string.IsNullOrEmpty(romDupe.RIPEMD160))
+                                            rom.RIPEMD160 = romDupe.RIPEMD160;
+                                    }
+                                }
+
+                                if (updateFields.Contains(Field.SHA1))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                    {
+                                        if (string.IsNullOrEmpty(disk.SHA1) && !string.IsNullOrEmpty(diskDupe.SHA1))
+                                            disk.SHA1 = diskDupe.SHA1;
+                                    }
+
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                    {
+                                        if (string.IsNullOrEmpty(rom.SHA1) && !string.IsNullOrEmpty(romDupe.SHA1))
+                                            rom.SHA1 = romDupe.SHA1;
+                                    }
+                                }
+
+                                if (updateFields.Contains(Field.SHA256))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                    {
+                                        if (string.IsNullOrEmpty(disk.SHA256) && !string.IsNullOrEmpty(diskDupe.SHA256))
+                                            disk.SHA256 = diskDupe.SHA256;
+                                    }
+
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                    {
+                                        if (string.IsNullOrEmpty(rom.SHA256) && !string.IsNullOrEmpty(romDupe.SHA256))
+                                            rom.SHA256 = romDupe.SHA256;
+                                    }
+                                }
+
+                                if (updateFields.Contains(Field.SHA384))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                    {
+                                        if (string.IsNullOrEmpty(disk.SHA384) && !string.IsNullOrEmpty(diskDupe.SHA384))
+                                            disk.SHA384 = diskDupe.SHA384;
+                                    }
+
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                    {
+                                        if (string.IsNullOrEmpty(rom.SHA384) && !string.IsNullOrEmpty(romDupe.SHA384))
+                                            rom.SHA384 = romDupe.SHA384;
+                                    }
+                                }
+
+                                if (updateFields.Contains(Field.SHA512))
+                                {
+                                    if (newDatItem.ItemType == ItemType.Disk)
+                                    {
+                                        if (string.IsNullOrEmpty(disk.SHA512) && !string.IsNullOrEmpty(diskDupe.SHA512))
+                                            disk.SHA512 = diskDupe.SHA512;
+                                    }
+
+                                    if (newDatItem.ItemType == ItemType.Rom)
+                                    {
+                                        if (string.IsNullOrEmpty(rom.SHA512) && !string.IsNullOrEmpty(romDupe.SHA512))
+                                            rom.SHA512 = romDupe.SHA512;
+                                    }
+                                }
+
+                                #endregion
+
+                                // Now assign back the duplicate archive to the original
+                                switch (newDatItem.ItemType)
+                                {
+                                    case ItemType.Archive:
+                                        newDatItem = archive.Clone() as Archive;
+                                        break;
+
+                                    case ItemType.BiosSet:
+                                        newDatItem = biosSet.Clone() as BiosSet;
+                                        break;
+
+                                    case ItemType.Blank:
+                                        newDatItem = blank.Clone() as Blank;
+                                        break;
+
+                                    case ItemType.Disk:
+                                        newDatItem = disk.Clone() as Disk;
+                                        break;
+
+                                    case ItemType.Release:
+                                        newDatItem = release.Clone() as Release;
+                                        break;
+
+                                    case ItemType.Rom:
+                                        newDatItem = rom.Clone() as Rom;
+                                        break;
+
+                                    case ItemType.Sample:
+                                        newDatItem = sample.Clone() as Sample;
+                                        break;
                                 }
                             }
 
@@ -1790,12 +2045,8 @@ namespace SabreTools.Library.DatFiles
                     });
                 }
 
-                // If we are matching based on names of any sort
-                if ((replaceMode & ReplaceMode.Description) != 0
-                    || (replaceMode & ReplaceMode.MachineType) != 0
-                    || (replaceMode & ReplaceMode.Year) != 0
-                    || (replaceMode & ReplaceMode.Manufacturer) != 0
-                    || (replaceMode & ReplaceMode.Parents) != 0)
+                // If we are matching based on Machine fields of any sort
+                if (updateFields.Intersect(machineFields).Any())
                 {
                     // For comparison's sake, we want to use Machine Name as the base ordering
                     BucketBy(SortedBy.Game, DedupeType.Full);
@@ -1809,34 +2060,67 @@ namespace SabreTools.Library.DatFiles
                         List<DatItem> newDatItems = new List<DatItem>();
                         foreach (DatItem datItem in datItems)
                         {
-                            DatItem newDatItem = (DatItem)datItem.Clone();
+                            DatItem newDatItem = datItem.Clone() as DatItem;
                             if (Contains(key) && this[key].Count() > 0)
                             {
-                                if ((replaceMode & ReplaceMode.Description) != 0)
+                                var firstDupe = this[key][0];
+
+                                if (updateFields.Contains(Field.MachineName))
+                                    newDatItem.MachineName = firstDupe.MachineName;
+
+                                if (updateFields.Contains(Field.Comment))
+                                    newDatItem.Comment = firstDupe.Comment;
+
+                                if (updateFields.Contains(Field.Description))
                                 {
                                     if (!onlySame || (onlySame && newDatItem.MachineName == newDatItem.MachineDescription))
-                                    {
-                                        newDatItem.MachineDescription = this[key][0].MachineDescription;
-                                    }
+                                        newDatItem.MachineDescription = firstDupe.MachineDescription;
                                 }
-                                if ((replaceMode & ReplaceMode.MachineType) != 0)
-                                {
-                                    newDatItem.MachineType = this[key][0].MachineType;
-                                }
-                                if ((replaceMode & ReplaceMode.Year) != 0)
-                                {
-                                    newDatItem.Year = this[key][0].Year;
-                                }
-                                if ((replaceMode & ReplaceMode.Manufacturer) != 0)
-                                {
-                                    newDatItem.Manufacturer = this[key][0].Manufacturer;
-                                }
-                                if ((replaceMode & ReplaceMode.Parents) != 0)
-                                {
-                                    newDatItem.CloneOf = this[key][0].CloneOf;
-                                    newDatItem.RomOf = this[key][0].RomOf;
-                                    newDatItem.SampleOf = this[key][0].SampleOf;
-                                }
+
+                                if (updateFields.Contains(Field.Year))
+                                    newDatItem.Year = firstDupe.Year;
+
+                                if (updateFields.Contains(Field.Manufacturer))
+                                    newDatItem.Manufacturer = firstDupe.Manufacturer;
+
+                                if (updateFields.Contains(Field.Publisher))
+                                    newDatItem.Publisher = firstDupe.Publisher;
+
+                                if (updateFields.Contains(Field.RomOf))
+                                    newDatItem.RomOf = firstDupe.RomOf;
+
+                                if (updateFields.Contains(Field.CloneOf))
+                                    newDatItem.CloneOf = firstDupe.CloneOf;
+
+                                if (updateFields.Contains(Field.SampleOf))
+                                    newDatItem.SampleOf = firstDupe.SampleOf;
+
+                                if (updateFields.Contains(Field.Supported))
+                                    newDatItem.Supported = firstDupe.Supported;
+
+                                if (updateFields.Contains(Field.SourceFile))
+                                    newDatItem.SourceFile = firstDupe.SourceFile;
+
+                                if (updateFields.Contains(Field.Runnable))
+                                    newDatItem.Runnable = firstDupe.Runnable;
+
+                                if (updateFields.Contains(Field.Board))
+                                    newDatItem.Board = firstDupe.Board;
+
+                                if (updateFields.Contains(Field.RebuildTo))
+                                    newDatItem.RebuildTo = firstDupe.RebuildTo;
+
+                                if (updateFields.Contains(Field.Devices))
+                                    newDatItem.Devices = firstDupe.Devices;
+
+                                if (updateFields.Contains(Field.SlotOptions))
+                                    newDatItem.SlotOptions = firstDupe.SlotOptions;
+
+                                if (updateFields.Contains(Field.Infos))
+                                    newDatItem.Infos = firstDupe.Infos;
+
+                                if (updateFields.Contains(Field.MachineType))
+                                    newDatItem.MachineType = firstDupe.MachineType;
                             }
 
                             newDatItems.Add(newDatItem);
@@ -1897,9 +2181,7 @@ namespace SabreTools.Library.DatFiles
                     foreach (DatItem datItem in datItems)
                     {
                         if (!datItem.HasDuplicates(this, true))
-                        {
                             keepDatItems.Add(datItem);
-                        }
                     }
 
                     // Now add the new list to the key

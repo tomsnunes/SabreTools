@@ -291,10 +291,6 @@ Options:
 		  preserving the directory structure of the inputted folder, if
 		  applicable.
 
-	  -xof, --exclude-of		  Exclude romof, cloneof, sampleof tags
-		  If this flag is enabled, then the romof, cloneof, and sampleof tags
-		  will be omitted from the outputted DAT.
-
 	  -ef=, --exclude-field=	  Exclude a game/rom field from outputs
 		  Exclude any valid item or machine field from outputs. Examples
 		  include: romof, publisher, and offset.
@@ -1067,10 +1063,6 @@ Options:
 		  Set the forcepacking tag to the given value.
 		  Possible values are: None, Zip, Unzip
 
-	  -xof, --exclude-of		  Exclude romof, cloneof, sampleof tags
-		  If this flag is enabled, then the romof, cloneof, and sampleof tags
-		  will be omitted from the outputted DAT.
-
 	  -ef=, --exclude-field=	  Exclude a game/rom field from outputs
 		  Exclude any valid item or machine field from outputs. Examples
 		  include: romof, publisher, and offset.
@@ -1099,30 +1091,6 @@ Options:
 		  By default, the character set from the original file(s) will be used
 		  for item naming. This flag removes all Unicode characters from the
 		  item names, machine names, and machine descriptions.
-
-	  -rmd5, --remove-md5		 Remove MD5 hashes from the output
-		  By default, all available hashes will be written out to the DAT. This
-		  will remove all MD5 hashes from the output file(s).
-
-	  -rripemd160, --remove-ripemd160	Remove RIPEMD160 hashes from the output
-		  By default, all available hashes will be written out to the DAT. This
-		  will remove all RIPEMD160 hashes from the output file(s).
-
-	  -rsha1, --remove-sha1	   Remove SHA-1 hashes from the output
-		  By default, all available hashes will be written out to the DAT. This
-		  will remove all SHA-1 hashes from the output file(s).
-
-	  -rsha256, --remove-sha256   Remove SHA-256 hashes from the output
-		  By default, all available hashes will be written out to the DAT. This
-		  will remove all SHA-256 hashes from the output file(s).
-
-	  -rsha384, --remove-sha384   Remove SHA-384 hashes from the output
-		  By default, all available hashes will be written out to the DAT. This
-		  will remove all SHA-384 hashes from the output file(s).
-
-	  -rsha512, --remove-sha512   Remove SHA-512 hashes from the output
-		  By default, all available hashes will be written out to the DAT. This
-		  will remove all SHA-512 hashes from the output file(s).
 
 	  -dan, --description-as-name Use description instead of machine name
 		  By default, all DATs are converted exactly as they are input.
@@ -1254,6 +1222,17 @@ Options:
 			  Add a DAT or folder of DATs to the base set to be used for all
 			  operations. Multiple instances of this flag are allowed.
 			  [Both base-replace and reverse-base-replace]
+
+		  -uf, --update-field	   Update a game/rom field from base DATs
+			  Update any valid item or machine field from base DAT(s). Examples
+			  include: romof, publisher, and offset.
+			  [Both base-replace and reverse-base-replace]
+
+			  -ons, --only-same		   Only update description if machine name matches description
+				  Normally, updating the description will always overwrite if
+				  the machine names are the same. With this flag, descriptions
+				  will only be overwritten if they are the same as the machine
+				  names.
 
 		  -un, --update-names		 Update item names from base DATs
 			  This flag enables updating of item names from base DATs.
@@ -1757,10 +1736,12 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 	Note: This would output the created files to the SabreTools folder
 
 	Long form:
-		SabreTools.exe --update --output-type=cmp --exclude-of Path\To\Dats
+		SabreTools.exe --update --output-type=cmp --exclude-of=romof
+		--exclude-of=sampleof --exclude-of=cloneof Path\To\Dats
 
 	Short form:
-		SabreTools.exe -ud -oc -xof Path\To\Dats
+		SabreTools.exe -ud -oc -ef=romof --ef=sampleof --ef=cloneof
+		Path\To\Dats
 
 -- Example 3 --
 	Create an XML DAT from a folder of zipped sets setting a custom name
@@ -1894,13 +1875,18 @@ This section contains remappings from old flag names to new ones for the purpose
 -rc, --rev-cascade -> -drc, --diff-reverse-cascade
 -rc, --reverse-cascade -> -drc, --diff-reverse-cascade
 -rep, --rep-ext -> -rep, --replace-extension
--rmd5, --rem-md5 -> -rmd5, --remove-md5
+-rmd5, --rem-md5 -> -ef=md5, --exclude-field=md5
+-rmd5, --remove-md5 -> -ef=md5, --exclude-field=md5
 -rme, --rem-ext -> -rme, --remove-extensions
 -rn, --rom-name -> -rn, --item-name
--rsha1, --rem-sha1 -> -rsha1, --remove-sha1
--rsha256, --rem-sha256 -> -rsha256, --remove-sha256
--rsha384, --rem-sha384 -> -rsha384, --remove-sha384
--rsha512, --rem-sha512 -> -rsha512, --remove-sha512
+-rsha1, --rem-sha1 -> -ef=sha1, --exclude-field=sha1
+-rsha1, --remove-sha1 -> -ef=sha1, --exclude-field=sha1
+-rsha256, --rem-sha256 -> -ef=sha256, --exclude-field=sha256
+-rsha256, --remove-sha256 ->-ef=sha256, --exclude-field=sha256
+-rsha384, --rem-sha384 -> -ef=sha384, --exclude-field=sha384
+-rsha384, --remove-sha384 -> -ef=sha384, --exclude-field=sha384
+-rsha512, --rem-sha512 -> -ef=sha512, --exclude-field=sha512
+-rsha512, --remove-sha512 -> -ef=sha512, --exclude-field=sha512
 -rt, --rom-type -> -rt, --item-type
 -ru, --rem-uni -> -ru, --remove-unicode
 -sf, --skip -> -sf, --skip-first-output
@@ -1920,3 +1906,7 @@ This section contains remappings from old flag names to new ones for the purpose
 -tzstd, --tzstd -> -tzstd, --torrent-zstd
 -udd, --update-desc -> -udd, --update-description
 -um, --update-manu -> -um, --update-manufacturer
+-xof, --exclude-of -> (-ef=romof -ef=cloneof -ef=sampleof
+	-ef=runnable -ef=machinetype), (--exclude-field=romof
+	--exclude-field=cloneof --exclude-field=sampleof
+	--exclude-field=runnable --exclude-field=machinetype)
