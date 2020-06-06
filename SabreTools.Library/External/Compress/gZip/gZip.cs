@@ -266,7 +266,7 @@ namespace Compress.gZip
 
         public byte[] ExtraData;
 
-        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong unCompressedSize, ushort compressionMethod, out Stream stream)
+        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong unCompressedSize, ushort compressionMethod, uint? datetime, out Stream stream)
         {
             using (BinaryWriter zipBw = new BinaryWriter(_zipFs, Encoding.UTF8, true))
             {

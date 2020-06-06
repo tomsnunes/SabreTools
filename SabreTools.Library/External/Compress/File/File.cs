@@ -195,7 +195,7 @@ namespace Compress.File
             return ZipReturn.ZipGood;
         }
 
-        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, out Stream stream)
+        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, uint? datetime, out Stream stream)
         {
             _inStream.Position = 0;
             stream = _inStream;

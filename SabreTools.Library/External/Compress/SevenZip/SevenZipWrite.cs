@@ -99,7 +99,7 @@ namespace Compress.SevenZip
             // do nothing here for 7zip
         }
 
-        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, out Stream stream)
+        public ZipReturn ZipFileOpenWriteStream(bool raw, bool trrntzip, string filename, ulong uncompressedSize, ushort compressionMethod, uint? datetime, out Stream stream)
         {
             return ZipFileOpenWriteStream(filename, uncompressedSize, out stream);
         }
