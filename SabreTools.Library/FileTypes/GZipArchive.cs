@@ -243,7 +243,7 @@ namespace SabreTools.Library.FileTypes
                             var gz = new gZip();
                             ZipReturn ret = gz.ZipFileOpen(this.Filename);
                             ret = gz.ZipFileOpenReadStream(0, out Stream gzstream, out ulong streamSize);
-                            BaseFile gzipEntryRom = Utilities.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
+                            BaseFile gzipEntryRom = Utilities.GetStreamInfo(gzstream, gzstream.Length, omitFromScan);
                             gzipEntryRom.Filename = gz.Filename(0);
                             gzipEntryRom.Parent = gamename;
                             gzipEntryRom.Date = (date && gz.TimeStamp > 0 ? gz.TimeStamp.ToString() : null);

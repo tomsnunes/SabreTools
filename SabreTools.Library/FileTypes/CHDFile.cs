@@ -158,21 +158,15 @@ namespace SabreTools.Library.FileTypes
             m_br = new BinaryReader(chdstream);
 
             _headerVersion = ValidateHeaderVersion();
-
             if (_headerVersion != null)
             {
                 byte[] hash = GetHashFromHeader();
-
                 if (hash != null)
                 {
                     if (hash.Length == Constants.MD5Length)
-                    {
                         this.MD5 = hash;
-                    }
                     else if (hash.Length == Constants.SHA1Length)
-                    {
                         this.SHA1 = hash;
-                    }
                 }
             }
         }
@@ -197,9 +191,7 @@ namespace SabreTools.Library.FileTypes
 
                 // If no signature could be read, return null
                 if (m_signature == null || m_signature.Length == 0)
-                {
                     return null;
-                }
 
                 if (!m_signature.StartsWith(Constants.CHDSignature, exact: true))
                 {

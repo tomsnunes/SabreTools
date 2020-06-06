@@ -862,6 +862,9 @@ namespace SabreTools.Library.DatItems
                             ((Rom)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Rom)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Rom)file).MD5)
                                 ? ((Rom)file).MD5
                                 : ((Rom)saveditem).MD5);
+                            ((Rom)saveditem).RIPEMD160 = (String.IsNullOrWhiteSpace(((Rom)saveditem).RIPEMD160) && !String.IsNullOrWhiteSpace(((Rom)file).RIPEMD160)
+                                ? ((Rom)file).RIPEMD160
+                                : ((Rom)saveditem).RIPEMD160);
                             ((Rom)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Rom)file).SHA1)
                                 ? ((Rom)file).SHA1
                                 : ((Rom)saveditem).SHA1);
@@ -880,6 +883,9 @@ namespace SabreTools.Library.DatItems
                             ((Disk)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Disk)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Disk)file).MD5)
                                 ? ((Disk)file).MD5
                                 : ((Disk)saveditem).MD5);
+                            ((Disk)saveditem).RIPEMD160 = (String.IsNullOrWhiteSpace(((Disk)saveditem).RIPEMD160) && !String.IsNullOrWhiteSpace(((Disk)file).RIPEMD160)
+                                ? ((Disk)file).RIPEMD160
+                                : ((Disk)saveditem).RIPEMD160);
                             ((Disk)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Disk)file).SHA1)
                                 ? ((Disk)file).SHA1
                                 : ((Disk)saveditem).SHA1);

@@ -76,10 +76,10 @@ namespace SabreTools.Library.DatFiles
                 {
                     Name = gameinfo[1].Substring(fullname[0].Length + 1),
                     Size = -1, // No size provided, but we don't want the size being 0
-                    CRC = Utilities.CleanHashData(gameinfo[4], 8),
-                    MD5 = Utilities.CleanHashData(gameinfo[3], 32),
-                    SHA1 = Utilities.CleanHashData(gameinfo[2], 40),
-                    SHA256 = Utilities.CleanHashData(gameinfo[0], 64),
+                    CRC = Utilities.CleanHashData(gameinfo[4], Constants.CRCLength),
+                    MD5 = Utilities.CleanHashData(gameinfo[3], Constants.MD5Length),
+                    SHA1 = Utilities.CleanHashData(gameinfo[2], Constants.SHA1Length),
+                    SHA256 = Utilities.CleanHashData(gameinfo[0], Constants.SHA256Length),
                     ItemStatus = ItemStatus.None,
 
                     MachineName = fullname[0],

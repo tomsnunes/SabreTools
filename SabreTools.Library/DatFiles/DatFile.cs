@@ -816,6 +816,23 @@ namespace SabreTools.Library.DatFiles
         }
 
         /// <summary>
+        /// Number of items with a RIPEMD160 hash
+        /// </summary>
+        public long RIPEMD160Count
+        {
+            get
+            {
+                EnsureDatStats();
+                return _datStats.RIPEMD160Count;
+            }
+            private set
+            {
+                EnsureDatStats();
+                _datStats.RIPEMD160Count = value;
+            }
+        }
+
+        /// <summary>
         /// Number of items with a SHA-1 hash
         /// </summary>
         public long SHA1Count
@@ -1376,6 +1393,12 @@ namespace SabreTools.Library.DatFiles
                 BucketBy(SortedBy.SHA1, deduperoms, lower, norename);
             }
 
+            // If all items are supposed to have a SHA-1, we sort by that
+            else if (RomCount + DiskCount - NodumpCount == RIPEMD160Count)
+            {
+                BucketBy(SortedBy.RIPEMD160, deduperoms, lower, norename);
+            }
+
             // If all items are supposed to have a MD5, we sort by that
             else if (RomCount + DiskCount - NodumpCount == MD5Count)
             {
@@ -1702,6 +1725,10 @@ namespace SabreTools.Library.DatFiles
                                         {
                                             newRomItem.MD5 = ((Rom)dupes[0]).MD5;
                                         }
+                                        if (String.IsNullOrEmpty(newRomItem.RIPEMD160) && !String.IsNullOrEmpty(((Rom)dupes[0]).RIPEMD160))
+                                        {
+                                            newRomItem.RIPEMD160 = ((Rom)dupes[0]).RIPEMD160;
+                                        }
                                         if (String.IsNullOrEmpty(newRomItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
                                         {
                                             newRomItem.SHA1 = ((Rom)dupes[0]).SHA1;
@@ -1727,6 +1754,10 @@ namespace SabreTools.Library.DatFiles
                                         if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Disk)dupes[0]).MD5))
                                         {
                                             newDiskItem.MD5 = ((Disk)dupes[0]).MD5;
+                                        }
+                                        if (String.IsNullOrEmpty(newDiskItem.RIPEMD160) && !String.IsNullOrEmpty(((Disk)dupes[0]).RIPEMD160))
+                                        {
+                                            newDiskItem.RIPEMD160 = ((Disk)dupes[0]).RIPEMD160;
                                         }
                                         if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Disk)dupes[0]).SHA1))
                                         {
@@ -3129,6 +3160,7 @@ namespace SabreTools.Library.DatFiles
                 // Sanitize the hashes from null, hex sizes, and "true blank" strings
                 itemRom.CRC = Utilities.CleanHashData(itemRom.CRC, Constants.CRCLength);
                 itemRom.MD5 = Utilities.CleanHashData(itemRom.MD5, Constants.MD5Length);
+                itemRom.RIPEMD160 = Utilities.CleanHashData(itemRom.RIPEMD160, Constants.RIPEMD160Length);
                 itemRom.SHA1 = Utilities.CleanHashData(itemRom.SHA1, Constants.SHA1Length);
                 itemRom.SHA256 = Utilities.CleanHashData(itemRom.SHA256, Constants.SHA256Length);
                 itemRom.SHA384 = Utilities.CleanHashData(itemRom.SHA384, Constants.SHA384Length);
@@ -3138,6 +3170,7 @@ namespace SabreTools.Library.DatFiles
                 if (itemRom.Size == -1
                     && String.IsNullOrWhiteSpace(itemRom.CRC)
                     && String.IsNullOrWhiteSpace(itemRom.MD5)
+                    && String.IsNullOrWhiteSpace(itemRom.RIPEMD160)
                     && !String.IsNullOrWhiteSpace(itemRom.SHA1)
                     && String.IsNullOrWhiteSpace(itemRom.SHA256)
                     && String.IsNullOrWhiteSpace(itemRom.SHA384)
@@ -3151,6 +3184,7 @@ namespace SabreTools.Library.DatFiles
                 else if ((itemRom.Size == 0 || itemRom.Size == -1)
                     && ((itemRom.CRC == Constants.CRCZero || String.IsNullOrWhiteSpace(itemRom.CRC))
                         || itemRom.MD5 == Constants.MD5Zero
+                        || itemRom.RIPEMD160 == Constants.RIPEMD160Zero
                         || itemRom.SHA1 == Constants.SHA1Zero
                         || itemRom.SHA256 == Constants.SHA256Zero
                         || itemRom.SHA384 == Constants.SHA384Zero
@@ -3160,12 +3194,14 @@ namespace SabreTools.Library.DatFiles
                     itemRom.Size = Constants.SizeZero;
                     itemRom.CRC = Constants.CRCZero;
                     itemRom.MD5 = Constants.MD5Zero;
+                    itemRom.RIPEMD160 = null;
+                    //itemRom.RIPEMD160 = Constants.RIPEMD160Zero;
                     itemRom.SHA1 = Constants.SHA1Zero;
                     itemRom.SHA256 = null;
-                    itemRom.SHA384 = null;
-                    itemRom.SHA512 = null;
                     //itemRom.SHA256 = Constants.SHA256Zero;
+                    itemRom.SHA384 = null;
                     //itemRom.SHA384 = Constants.SHA384Zero;
+                    itemRom.SHA512 = null;
                     //itemRom.SHA512 = Constants.SHA512Zero;
                 }
                 // If the file has no size and it's not the above case, skip and log
@@ -3179,6 +3215,7 @@ namespace SabreTools.Library.DatFiles
                     && itemRom.Size > 0
                     && String.IsNullOrWhiteSpace(itemRom.CRC)
                     && String.IsNullOrWhiteSpace(itemRom.MD5)
+                    && String.IsNullOrWhiteSpace(itemRom.RIPEMD160)
                     && String.IsNullOrWhiteSpace(itemRom.SHA1)
                     && String.IsNullOrWhiteSpace(itemRom.SHA256)
                     && String.IsNullOrWhiteSpace(itemRom.SHA384)
@@ -3196,6 +3233,7 @@ namespace SabreTools.Library.DatFiles
 
                 // Sanitize the hashes from null, hex sizes, and "true blank" strings
                 itemDisk.MD5 = Utilities.CleanHashData(itemDisk.MD5, Constants.MD5Length);
+                itemDisk.RIPEMD160 = Utilities.CleanHashData(itemDisk.RIPEMD160, Constants.RIPEMD160Length);
                 itemDisk.SHA1 = Utilities.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
                 itemDisk.SHA256 = Utilities.CleanHashData(itemDisk.SHA256, Constants.SHA256Length);
                 itemDisk.SHA384 = Utilities.CleanHashData(itemDisk.SHA384, Constants.SHA384Length);
@@ -3204,6 +3242,7 @@ namespace SabreTools.Library.DatFiles
                 // If the file has aboslutely no hashes, skip and log
                 if (itemDisk.ItemStatus != ItemStatus.Nodump
                     && String.IsNullOrWhiteSpace(itemDisk.MD5)
+                    && String.IsNullOrWhiteSpace(itemDisk.RIPEMD160)
                     && String.IsNullOrWhiteSpace(itemDisk.SHA1)
                     && String.IsNullOrWhiteSpace(itemDisk.SHA256)
                     && String.IsNullOrWhiteSpace(itemDisk.SHA384)
@@ -4866,6 +4905,27 @@ namespace SabreTools.Library.DatFiles
                 DatFormat = this.DatFormat,
                 DedupeRoms = this.DedupeRoms,
             };
+            DatFile ripemd160 = new DatFile
+            {
+                FileName = this.FileName + " (RIPEMD160)",
+                Name = this.Name + " (RIPEMD160)",
+                Description = this.Description + " (RIPEMD160)",
+                Category = this.Category,
+                Version = this.Version,
+                Date = this.Date,
+                Author = this.Author,
+                Email = this.Email,
+                Homepage = this.Homepage,
+                Url = this.Url,
+                Comment = this.Comment,
+                Header = this.Header,
+                Type = this.Type,
+                ForceMerging = this.ForceMerging,
+                ForceNodump = this.ForceNodump,
+                ForcePacking = this.ForcePacking,
+                DatFormat = this.DatFormat,
+                DedupeRoms = this.DedupeRoms,
+            };
             DatFile md5 = new DatFile
             {
                 FileName = this.FileName + " (MD5)",
@@ -4973,13 +5033,19 @@ namespace SabreTools.Library.DatFiles
                     {
                         sha1.Add(key, item);
                     }
-                    // If the file has no SHA-1 but has an MD5
+                    // If the file has a SHA-1
+                    else if ((item.ItemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).RIPEMD160))
+                        || (item.ItemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).RIPEMD160)))
+                    {
+                        ripemd160.Add(key, item);
+                    }
+                    // If the file has an MD5
                     else if ((item.ItemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).MD5))
                         || (item.ItemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).MD5)))
                     {
                         md5.Add(key, item);
                     }
-                    // If the file has no MD5 but a CRC
+                    // If the file has a CRC
                     else if ((item.ItemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).CRC)))
                     {
                         crc.Add(key, item);
@@ -4999,6 +5065,7 @@ namespace SabreTools.Library.DatFiles
             success &= sha384.Write(outDir);
             success &= sha256.Write(outDir);
             success &= sha1.Write(outDir);
+            success &= ripemd160.Write(outDir);
             success &= md5.Write(outDir);
             success &= crc.Write(outDir);
 
@@ -5333,6 +5400,7 @@ namespace SabreTools.Library.DatFiles
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
     Roms with MD5:           " + MD5Count + @"
+    Roms with RIPEMD160:     " + RIPEMD160Count + @"
     Roms with SHA-1:         " + SHA1Count + @"
     Roms with SHA-256:       " + SHA256Count + @"
     Roms with SHA-384:       " + SHA384Count + @"
@@ -5670,6 +5738,12 @@ namespace SabreTools.Library.DatFiles
                 outfileNames.Add(DatFormat.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", overwrite));
             };
 
+            // Redump RIPEMD160
+            if ((DatFormat & DatFormat.RedumpRIPEMD160) != 0)
+            {
+                outfileNames.Add(DatFormat.RedumpRIPEMD160, CreateOutfileNamesHelper(outDir, ".ripemd160", overwrite));
+            };
+
             // Redump SFV
             if ((DatFormat & DatFormat.RedumpSFV) != 0)
             {
@@ -5895,6 +5969,7 @@ namespace SabreTools.Library.DatFiles
                 publisher = item.Publisher,
                 crc = string.Empty,
                 md5 = string.Empty,
+                ripemd160 = string.Empty,
                 sha1 = string.Empty,
                 sha256 = string.Empty,
                 sha384 = string.Empty,
@@ -5917,6 +5992,7 @@ namespace SabreTools.Library.DatFiles
             {
                 crc = ((Rom)item).CRC;
                 md5 = ((Rom)item).MD5;
+                ripemd160 = ((Rom)item).RIPEMD160;
                 sha1 = ((Rom)item).SHA1;
                 sha256 = ((Rom)item).SHA256;
                 sha384 = ((Rom)item).SHA384;
@@ -5926,6 +6002,7 @@ namespace SabreTools.Library.DatFiles
             else if (item.ItemType == ItemType.Disk)
             {
                 md5 = ((Disk)item).MD5;
+                ripemd160 = ((Disk)item).RIPEMD160;
                 sha1 = ((Disk)item).SHA1;
                 sha256 = ((Disk)item).SHA256;
                 sha384 = ((Disk)item).SHA384;
@@ -5941,6 +6018,7 @@ namespace SabreTools.Library.DatFiles
                 .Replace("%publisher%", publisher)
                 .Replace("%crc%", crc)
                 .Replace("%md5%", md5)
+                .Replace("%ripemd160%", ripemd160)
                 .Replace("%sha1%", sha1)
                 .Replace("%sha256%", sha256)
                 .Replace("%sha384%", sha384)

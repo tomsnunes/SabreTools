@@ -176,6 +176,10 @@ Options:
 		  This allows the user to skip calculating the MD5 for each of the
 		  files which will speed up the creation of the DAT.
 
+	  -nr160, --skip-ripemd160	Don't include RIPEMD160 in output
+		  This allows the user to skip calculating the RIPEMD160 for each of
+		  the files which will speed up the creation of the DAT.
+
 	  -ns, --skip-sha1			Don't include SHA-1 in output
 		  This allows the user to skip calculating the SHA-1 for each of the
 		  files which will speed up the creation of the DAT.
@@ -222,6 +226,7 @@ Options:
 		  msx, openmsx		- openMSX Software List
 		  ol, offlinelist	- OfflineList XML
 		  rc, romcenter		- RomCenter
+		  ripemd160         - RIPEMD160
 		  sd, sabredat		- SabreDat XML
 		  sfv				- SFV
 		  sha1				- SHA1
@@ -416,6 +421,18 @@ Options:
 		  Include only items without this MD5 hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
+
+	  -ripemd160=, --ripemd160=	  Filter by RIPEMD160 hash
+		  Include only items with this RIPEMD160 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nripemd160=, --not-ripemd160=	Filter by not RIPEMD160 hash
+		  Include only items without this RIPEMD160 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
 
 	  -sha1=, --sha1=			 Filter by SHA-1 hash
 		  Include only items with this SHA-1 hash in the output. Additionally,
@@ -751,6 +768,7 @@ Options:
 		  msx, openmsx		- openMSX Software List
 		  ol, offlinelist	- OfflineList XML
 		  rc, romcenter		- RomCenter
+		  ripemd160			- RIPEMD160
 		  sd, sabredat		- SabreDat XML
 		  sfv				- SFV
 		  sha1				- SHA1
@@ -924,6 +942,7 @@ Options:
 		  msx, openmsx		- openMSX Software List
 		  ol, offlinelist	- OfflineList XML
 		  rc, romcenter		- RomCenter
+		  ripemd160			- RIPEMD160
 		  sd, sabredat		- SabreDat XML
 		  sfv				- SFV
 		  sha1				- SHA1
@@ -949,6 +968,7 @@ Options:
 			  - %publisher% - Replaced with game Publisher
 			  - %crc% - Replaced with the CRC
 			  - %md5% - Replaced with the MD5
+			  - %ripemd160% - Replaced with the RIPEMD160
 			  - %sha1% - Replaced with the SHA-1
 			  - %sha256% - Replaced with the SHA-256
 			  - %sha384% - Replaced with the SHA-384
@@ -1083,6 +1103,10 @@ Options:
 	  -rmd5, --remove-md5		 Remove MD5 hashes from the output
 		  By default, all available hashes will be written out to the DAT. This
 		  will remove all MD5 hashes from the output file(s).
+
+	  -rripemd160, --remove-ripemd160	Remove RIPEMD160 hashes from the output
+		  By default, all available hashes will be written out to the DAT. This
+		  will remove all RIPEMD160 hashes from the output file(s).
 
 	  -rsha1, --remove-sha1	   Remove SHA-1 hashes from the output
 		  By default, all available hashes will be written out to the DAT. This
@@ -1371,6 +1395,18 @@ Options:
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
+	  -ripemd160=, --ripemd160=	 Filter by RIPEMD160 hash
+		  Include only items with this RIPEMD160 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nripemd160=, --not-ripemd160=  Filter by not RIPEMD160 hash
+		  Include only items without this RIPEMD160 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
 	  -sha1=, --sha1=			 Filter by SHA-1 hash
 		  Include only items with this SHA-1 hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
@@ -1616,6 +1652,18 @@ Options:
 		  the user can specify an exact match or full C#-style regex for
 		  pattern matching. Multiple instances of this flag are allowed.
 
+	  -ripemd160=, --ripemd160=	 Filter by RIPEMD160 hash
+		  Include only items with this RIPEMD160 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
+	  -nripemd160=, --not-ripemd160=  Filter by not RIPEMD160 hash
+		  Include only items without this RIPEMD160 hash in the output.
+		  Additionally, the user can specify an exact match or full C#-style
+		  regex for pattern matching. Multiple instances of this flag are
+		  allowed.
+
 	  -sha1=, --sha1=			 Filter by SHA-1 hash
 		  Include only items with this SHA-1 hash in the output. Additionally,
 		  the user can specify an exact match or full C#-style regex for
@@ -1827,6 +1875,7 @@ This section contains remappings from old flag names to new ones for the purpose
 -ool, --output-ol -> -ot=ol, --output-type=offlinelist
 -ool, --output-offlinelist -> -ot=ol, --output-type=offlinelist
 -or, --output-rc -> -ot=rc, --output-type=romcenter
+-oripemd160, --output-ripemd160 -> -ot=ripemd160, --output-type=ripemd160
 -or, --output-romcenter -> -ot=rc, --output-type=romcenter
 -os, --output-sd -> -ot=sd, --output-type=sabredat
 -os, --output-sabredat -> -ot=sd, --output-type=sabredat

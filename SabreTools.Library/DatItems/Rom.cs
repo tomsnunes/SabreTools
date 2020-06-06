@@ -14,6 +14,7 @@ namespace SabreTools.Library.DatItems
 
         private byte[] _crc; // 8 bytes
         private byte[] _md5; // 16 bytes
+        private byte[] _ripemd160; // 20 bytes
         private byte[] _sha1; // 20 bytes
         private byte[] _sha256; // 32 bytes
         private byte[] _sha384; // 48 bytes
@@ -49,6 +50,15 @@ namespace SabreTools.Library.DatItems
         {
             get { return _md5.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_md5); }
             set { _md5 = Utilities.StringToByteArray(value); }
+        }
+
+        /// <summary>
+        /// File RIPEMD160 hash
+        /// </summary>
+        public string RIPEMD160
+        {
+            get { return _ripemd160.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_ripemd160); }
+            set { _ripemd160 = Utilities.StringToByteArray(value); }
         }
 
         /// <summary>
@@ -153,6 +163,10 @@ namespace SabreTools.Library.DatItems
             {
                 _md5 = null;
             }
+            if ((omitFromScan & Hash.RIPEMD160) == 0)
+            {
+                _ripemd160 = null;
+            }
             if ((omitFromScan & Hash.SHA1) == 0)
             {
                 _sha1 = null;
@@ -188,6 +202,7 @@ namespace SabreTools.Library.DatItems
             this.Size = baseFile.Size ?? -1;
             _crc = baseFile.CRC;
             _md5 = baseFile.MD5;
+            _ripemd160 = baseFile.RIPEMD160;
             _sha1 = baseFile.SHA1;
             _sha256 = baseFile.SHA256;
             _sha384 = baseFile.SHA384;
@@ -243,6 +258,7 @@ namespace SabreTools.Library.DatItems
                 Size = this.Size,
                 _crc = this._crc,
                 _md5 = this._md5,
+                _ripemd160 = this._ripemd160,
                 _sha1 = this._sha1,
                 _sha256 = this._sha256,
                 _sha384 = this._sha384,
@@ -274,6 +290,7 @@ namespace SabreTools.Library.DatItems
                 && (this.Name == newOther.Name)
                 && (this._crc.IsNullOrWhiteSpace() && newOther._crc.IsNullOrWhiteSpace())
                 && (this._md5.IsNullOrWhiteSpace() && newOther._md5.IsNullOrWhiteSpace())
+                && (this._ripemd160.IsNullOrWhiteSpace() && newOther._ripemd160.IsNullOrWhiteSpace())
                 && (this._sha1.IsNullOrWhiteSpace() && newOther._sha1.IsNullOrWhiteSpace())
                 && (this._sha256.IsNullOrWhiteSpace() && newOther._sha256.IsNullOrWhiteSpace())
                 && (this._sha384.IsNullOrWhiteSpace() && newOther._sha384.IsNullOrWhiteSpace())
@@ -285,6 +302,7 @@ namespace SabreTools.Library.DatItems
             // If we can determine that the roms have no non-empty hashes in common, we return false
             else if ((this._crc.IsNullOrWhiteSpace() || newOther._crc.IsNullOrWhiteSpace())
                 && (this._md5.IsNullOrWhiteSpace() || newOther._md5.IsNullOrWhiteSpace())
+                && (this._ripemd160.IsNullOrWhiteSpace() || newOther._ripemd160.IsNullOrWhiteSpace())
                 && (this._sha1.IsNullOrWhiteSpace() || newOther._sha1.IsNullOrWhiteSpace())
                 && (this._sha256.IsNullOrWhiteSpace() || newOther._sha256.IsNullOrWhiteSpace())
                 && (this._sha384.IsNullOrWhiteSpace() || newOther._sha384.IsNullOrWhiteSpace())
@@ -297,6 +315,7 @@ namespace SabreTools.Library.DatItems
             else if ((this.Size == -1)
                 && ((this._crc.IsNullOrWhiteSpace() || newOther._crc.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._crc, newOther._crc))
                 && ((this._md5.IsNullOrWhiteSpace() || newOther._md5.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._md5, newOther._md5))
+                && ((this._ripemd160.IsNullOrWhiteSpace() || newOther._ripemd160.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._ripemd160, newOther._ripemd160))
                 && ((this._sha1.IsNullOrWhiteSpace() || newOther._sha1.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._sha1, newOther._sha1))
                 && ((this._sha256.IsNullOrWhiteSpace() || newOther._sha256.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._sha256, newOther._sha256))
                 && ((this._sha384.IsNullOrWhiteSpace() || newOther._sha384.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._sha384, newOther._sha384))
@@ -309,6 +328,7 @@ namespace SabreTools.Library.DatItems
             else if ((this.Size == newOther.Size)
                 && ((this._crc.IsNullOrWhiteSpace() || newOther._crc.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._crc, newOther._crc))
                 && ((this._md5.IsNullOrWhiteSpace() || newOther._md5.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._md5, newOther._md5))
+                && ((this._ripemd160.IsNullOrWhiteSpace() || newOther._ripemd160.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._ripemd160, newOther._ripemd160))
                 && ((this._sha1.IsNullOrWhiteSpace() || newOther._sha1.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._sha1, newOther._sha1))
                 && ((this._sha256.IsNullOrWhiteSpace() || newOther._sha256.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._sha256, newOther._sha256))
                 && ((this._sha384.IsNullOrWhiteSpace() || newOther._sha384.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._sha384, newOther._sha384))

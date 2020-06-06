@@ -90,6 +90,7 @@ namespace SabreTools.Library.DatFiles
                     Size = Constants.SizeZero,
                     CRC = Constants.CRCZero,
                     MD5 = Constants.MD5Zero,
+                    RIPEMD160 = Constants.RIPEMD160Zero,
                     SHA1 = Constants.SHA1Zero,
                     ItemStatus = ItemStatus.None,
 

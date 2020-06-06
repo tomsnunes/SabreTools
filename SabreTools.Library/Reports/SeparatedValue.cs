@@ -60,6 +60,7 @@ namespace SabreTools.Library.Reports
                     + "\"" + _datFile.DiskCount + "\"{0}"
                     + "\"" + _datFile.CRCCount + "\"{0}"
                     + "\"" + _datFile.MD5Count + "\"{0}"
+                    + "\"" + _datFile.RIPEMD160Count + "\"{0}"
                     + "\"" + _datFile.SHA1Count + "\"{0}"
                     + "\"" + _datFile.SHA256Count + "\"{0}"
                     + "\"" + _datFile.SHA384Count + "\"{0}"

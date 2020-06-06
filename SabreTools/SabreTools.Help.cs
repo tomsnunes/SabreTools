@@ -597,6 +597,18 @@ namespace SabreTools
                     longDescription: "By default, all available hashes will be written out to the DAT. This will remove all MD5 hashes from the output file(s).");
             }
         } // TODO: Remove
+        private static Feature _removeRipeMd160Flag
+        {
+            get
+            {
+                return new Feature(
+                    "remove-ripemd160",
+                    new List<string>() { "-rripemd160", "--remove-ripemd160" },
+                    "Remove RIPEMD160 hashes from the output",
+                    FeatureType.Flag,
+                    longDescription: "By default, all available hashes will be written out to the DAT. This will remove all MD5 hashes from the output file(s).");
+            }
+        } // TODO: Remove
         private static Feature _removeSha1Flag
         {
             get
@@ -811,6 +823,18 @@ namespace SabreTools
                     "Don't include MD5 in output",
                     FeatureType.Flag,
                     longDescription: "This allows the user to skip calculating the MD5 for each of the files which will speed up the creation of the DAT.");
+            }
+        }
+        private static Feature _skipRipeMd160Flag
+        {
+            get
+            {
+                return new Feature(
+                    "skip-ripemd160",
+                    new List<string>() { "-nr160", "--skip-ripemd160" },
+                    "Include RIPEMD160 in output", // TODO: Invert this later
+                    FeatureType.Flag,
+                    longDescription: "This allows the user to skip calculating the RIPEMD160 for each of the files which will speed up the creation of the DAT.");
             }
         }
         private static Feature _skipSha1Flag
@@ -1442,6 +1466,18 @@ Possible values are: None, Bios, Device, Mechanical");
                     longDescription: "Include only items without this MD5 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
             }
         }
+        private static Feature _notRipeMd160ListInput
+        {
+            get
+            {
+                return new Feature(
+                    "not-ripemd160",
+                    new List<string>() { "-nripemd160", "--not-ripemd160" },
+                    "Filter by not RIPEMD160 hash",
+                    FeatureType.List,
+                    longDescription: "Include only items without this RIPEMD160 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
+            }
+        }
         private static Feature _notSha1ListInput
         {
             get
@@ -1527,6 +1563,7 @@ Possible values are:
     msx, openmsx     - openMSX Software List
     ol, offlinelist  - OfflineList XML
     rc, romcenter    - RomCenter
+    ripemd160        - RIPEMD160
     sd, sabredat     - SabreDat XML
     sfv              - SFV
     sha1             - SHA1
@@ -1558,6 +1595,18 @@ Possible values are:
     ssv              - Standardized Semicolon-Separated Value
     text             - Generic textfile
     tsv              - Standardized Tab-Separated Value");
+            }
+        }
+        private static Feature _ripeMd160ListInput
+        {
+            get
+            {
+                return new Feature(
+                    "ripemd160",
+                    new List<string>() { "-ripemd160", "--ripemd160" },
+                    "Filter by RIPEMD160 hash",
+                    FeatureType.List,
+                    longDescription: "Include only items with this RIPEMD160 hash in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
             }
         }
         private static Feature _sha1ListInput
@@ -1876,6 +1925,7 @@ Some special strings that can be used:
 - %publisher% - Replaced with game Publisher
 - %crc% - Replaced with the CRC
 - %md5% - Replaced with the MD5
+- %ripemd160% - Replaced with the RIPEMD160
 - %sha1% - Replaced with the SHA-1
 - %sha256% - Replaced with the SHA-256
 - %sha384% - Replaced with the SHA-384
@@ -2038,6 +2088,7 @@ Some special strings that can be used:
                 FeatureType.Flag,
                 longDescription: "Create a DAT file from an input directory or set of files. By default, this will output a DAT named based on the input directory and the current date. It will also treat all archives as possible games and add all three hashes (CRC, MD5, SHA-1) for each file.");
             datFromDir.AddFeature(_skipMd5Flag);
+            datFromDir.AddFeature(_skipRipeMd160Flag);
             datFromDir.AddFeature(_skipSha1Flag);
             datFromDir.AddFeature(_skipSha256Flag);
             datFromDir.AddFeature(_skipSha384Flag);
@@ -2086,6 +2137,8 @@ Some special strings that can be used:
             datFromDir.AddFeature(_notCrcListInput);
             datFromDir.AddFeature(_md5ListInput);
             datFromDir.AddFeature(_notMd5ListInput);
+            datFromDir.AddFeature(_ripeMd160ListInput);
+            datFromDir.AddFeature(_notRipeMd160ListInput);
             datFromDir.AddFeature(_sha1ListInput);
             datFromDir.AddFeature(_notSha1ListInput);
             datFromDir.AddFeature(_sha256ListInput);
@@ -2294,6 +2347,7 @@ The stats that are outputted are as follows:
             update.AddFeature(_cleanFlag);
             update.AddFeature(_removeUnicodeFlag);
             update.AddFeature(_removeMd5Flag);
+            update.AddFeature(_removeRipeMd160Flag);
             update.AddFeature(_removeSha1Flag);
             update.AddFeature(_removeSha256Flag);
             update.AddFeature(_removeSha384Flag);
@@ -2361,6 +2415,8 @@ The stats that are outputted are as follows:
             update.AddFeature(_notCrcListInput);
             update.AddFeature(_md5ListInput);
             update.AddFeature(_notMd5ListInput);
+            update.AddFeature(_ripeMd160ListInput);
+            update.AddFeature(_notRipeMd160ListInput);
             update.AddFeature(_sha1ListInput);
             update.AddFeature(_notSha1ListInput);
             update.AddFeature(_sha256ListInput);
@@ -2418,6 +2474,8 @@ The stats that are outputted are as follows:
             verify.AddFeature(_notCrcListInput);
             verify.AddFeature(_md5ListInput);
             verify.AddFeature(_notMd5ListInput);
+            verify.AddFeature(_ripeMd160ListInput);
+            verify.AddFeature(_notRipeMd160ListInput);
             verify.AddFeature(_sha1ListInput);
             verify.AddFeature(_notSha1ListInput);
             verify.AddFeature(_sha256ListInput);

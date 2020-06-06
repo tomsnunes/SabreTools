@@ -121,6 +121,12 @@ namespace SabreTools.Library.DatFiles
                             case "md5 hash":
                                 columns.Add("DatItem.MD5");
                                 break;
+                            case "ripemd":
+                            case "ripemd160":
+                            case "ripemd hash":
+                            case "ripemd160 hash":
+                                columns.Add("DatItem.RIPEMD160");
+                                break;
                             case "sha1":
                             case "sha-1":
                             case "sha1 hash":
@@ -174,8 +180,8 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Set the output item information
-                string machineName = null, machineDesc = null, name = null, crc = null, md5 = null, sha1 = null,
-                    sha256 = null, sha384 = null, sha512 = null, date = null;
+                string machineName = null, machineDesc = null, name = null, crc = null, md5 = null,
+                    ripemd160 = null, sha1 = null, sha256 = null, sha384 = null, sha512 = null, date = null;
                 long size = -1;
                 ItemType itemType = ItemType.Rom;
                 ItemStatus status = ItemStatus.None;
@@ -219,6 +225,9 @@ namespace SabreTools.Library.DatFiles
                             break;
                         case "DatItem.MD5":
                             md5 = Utilities.CleanHashData(value, Constants.MD5Length);
+                            break;
+                        case "DatItem.RIPEMD160":
+                            ripemd160 = Utilities.CleanHashData(value, Constants.RIPEMD160Length);
                             break;
                         case "DatItem.SHA1":
                             sha1 = Utilities.CleanHashData(value, Constants.SHA1Length);
@@ -271,6 +280,7 @@ namespace SabreTools.Library.DatFiles
                         {
                             Name = name,
                             MD5 = md5,
+                            RIPEMD160 = ripemd160,
                             SHA1 = sha1,
                             SHA256 = sha256,
                             SHA384 = sha384,
@@ -302,6 +312,7 @@ namespace SabreTools.Library.DatFiles
                             Size = size,
                             CRC = crc,
                             MD5 = md5,
+                            RIPEMD160 = ripemd160,
                             SHA1 = sha1,
                             SHA256 = sha256,
                             SHA384 = sha384,
@@ -458,6 +469,7 @@ namespace SabreTools.Library.DatFiles
                     size = "",
                     crc = "",
                     md5 = "",
+                    ripemd160 = "",
                     sha1 = "",
                     sha256 = "",
                     sha384 = "",
@@ -477,6 +489,7 @@ namespace SabreTools.Library.DatFiles
                     size = ((Rom)rom).Size.ToString();
                     crc = ((Rom)rom).CRC;
                     md5 = ((Rom)rom).MD5;
+                    ripemd160 = ((Rom)rom).RIPEMD160;
                     sha1 = ((Rom)rom).SHA1;
                     sha256 = ((Rom)rom).SHA256;
                     sha384 = ((Rom)rom).SHA384;
@@ -488,6 +501,7 @@ namespace SabreTools.Library.DatFiles
                     type = "disk";
                     diskname = rom.Name;
                     md5 = ((Disk)rom).MD5;
+                    ripemd160 = ((Disk)rom).RIPEMD160;
                     sha1 = ((Disk)rom).SHA1;
                     sha256 = ((Disk)rom).SHA256;
                     sha384 = ((Disk)rom).SHA384;
@@ -508,6 +522,7 @@ namespace SabreTools.Library.DatFiles
                     + "{0}\"" + (!ExcludeFields[(int)Field.Size] ? size : "") + "\""
                     + "{0}\"" + (!ExcludeFields[(int)Field.CRC] ? crc : "") + "\""
                     + "{0}\"" + (!ExcludeFields[(int)Field.MD5] ? md5 : "") + "\""
+                    // + "{0}\"" + (!ExcludeFields[(int)Field.RIPEMD160] ? ripemd160 : "") + "\""
                     + "{0}\"" + (!ExcludeFields[(int)Field.SHA1] ? sha1 : "") + "\""
                     + "{0}\"" + (!ExcludeFields[(int)Field.SHA256] ? sha256 : "") + "\""
                     // + "{0}\"" + (!ExcludeFields[(int)Field.SHA384] ? sha384 : "") + "\""

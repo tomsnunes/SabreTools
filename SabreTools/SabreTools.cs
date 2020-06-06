@@ -357,6 +357,10 @@ namespace SabreTools
                         Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
                         datHeader.ExcludeFields[(int)Field.MD5] = true;
                         break;
+                    case "remove-ripemd160":
+                        Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
+                        datHeader.ExcludeFields[(int)Field.RIPEMD160] = true;
+                        break;
                     case "remove-sha1":
                         Globals.Logger.User("This flag '{0}' is depreciated, please use {1} instead", feat.Key, String.Join(", ", _excludeFieldListInput.Flags));
                         datHeader.ExcludeFields[(int)Field.SHA1] = true;
@@ -414,6 +418,9 @@ namespace SabreTools
                         break;
                     case "skip-md5":
                         omitFromScan |= Hash.MD5;
+                        break;
+                    case "skip-ripemd160":
+                        omitFromScan &= ~Hash.RIPEMD160; // This needs to be inverted later
                         break;
                     case "skip-sha1":
                         omitFromScan |= Hash.SHA1;
@@ -596,6 +603,9 @@ namespace SabreTools
                     case "not-md5":
                         filter.MD5.NegativeSet.AddRange((List<string>)feat.Value.GetValue());
                         break;
+                    case "not-ripemd160":
+                        filter.RIPEMD160.NegativeSet.AddRange((List<string>)feat.Value.GetValue());
+                        break;
                     case "not-sha1":
                         filter.SHA1.NegativeSet.AddRange((List<string>)feat.Value.GetValue());
                         break;
@@ -630,6 +640,9 @@ namespace SabreTools
                         {
                             statDatFormat |= Utilities.GetStatFormat(rt);
                         }
+                        break;
+                    case "ripemd160":
+                        filter.RIPEMD160.PositiveSet.AddRange((List<string>)feat.Value.GetValue());
                         break;
                     case "sha1":
                         filter.SHA1.PositiveSet.AddRange((List<string>)feat.Value.GetValue());

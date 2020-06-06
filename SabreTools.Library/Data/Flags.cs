@@ -351,24 +351,29 @@ namespace SabreTools.Library.Data
         RedumpMD5 =             1 << 18,
 
         /// <summary>
+        /// RIPEMD160 hash list
+        /// </summary>
+        RedumpRIPEMD160 =       1 << 19,
+
+        /// <summary>
         /// SHA-1 hash list
         /// </summary>
-        RedumpSHA1 =            1 << 19,
+        RedumpSHA1 =            1 << 20,
 
         /// <summary>
         /// SHA-256 hash list
         /// </summary>
-        RedumpSHA256 =          1 << 20,
+        RedumpSHA256 =          1 << 21,
 
         /// <summary>
         /// SHA-384 hash list
         /// </summary>
-        RedumpSHA384 =          1 << 21,
+        RedumpSHA384 =          1 << 22,
 
         /// <summary>
         /// SHA-512 hash list
         /// </summary>
-        RedumpSHA512 =          1 << 22,
+        RedumpSHA512 =          1 << 23,
 
         #endregion
 
@@ -388,11 +393,12 @@ namespace SabreTools.Library.Data
         SHA256 =    1 << 3,
         SHA384 =    1 << 4,
         SHA512 =    1 << 5,
+        RIPEMD160 = 1 << 6,
 
         // Special combinations
         Standard = CRC | MD5 | SHA1,
-        DeepHashes = SHA256 | SHA384 | SHA512,
-        SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512,
+        DeepHashes = SHA256 | SHA384 | SHA512 | RIPEMD160,
+        SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512 | RIPEMD160,
     }
 
     /// <summary>

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -15,6 +16,7 @@ using SabreTools.Library.DatItems;
 using SabreTools.Library.FileTypes;
 using SabreTools.Library.Reports;
 using SabreTools.Library.Skippers;
+using Compress.ThreadReaders;
 
 #if MONO
 using System.IO;
@@ -638,6 +640,8 @@ namespace SabreTools.Library.Tools
                     return new OpenMSX(baseDat);
                 case DatFormat.RedumpMD5:
                     return new Hashfile(baseDat, Hash.MD5);
+                case DatFormat.RedumpRIPEMD160:
+                    return new Hashfile(baseDat, Hash.RIPEMD160);
                 case DatFormat.RedumpSFV:
                     return new Hashfile(baseDat, Hash.CRC);
                 case DatFormat.RedumpSHA1:
@@ -759,6 +763,8 @@ namespace SabreTools.Library.Tools
                 case "rc":
                 case "romcenter":
                     return DatFormat.RomCenter;
+                case "ripemd160":
+                    return DatFormat.RedumpRIPEMD160;
                 case "sd":
                 case "sabredat":
                     return DatFormat.SabreDat;
@@ -857,6 +863,8 @@ namespace SabreTools.Library.Tools
                     return Field.RebuildTo;
                 case "region":
                     return Field.Region;
+                case "ripemd160":
+                    return Field.RIPEMD160;
                 case "romof":
                     return Field.RomOf;
                 case "runnable":
@@ -1242,6 +1250,8 @@ namespace SabreTools.Library.Tools
                     return DatFormat.CSV;
                 case "md5":
                     return DatFormat.RedumpMD5;
+                case "ripemd160":
+                    return DatFormat.RedumpRIPEMD160;
                 case "sfv":
                     return DatFormat.RedumpSFV;
                 case "sha1":
@@ -1366,13 +1376,11 @@ namespace SabreTools.Library.Tools
         /// </summary>
         /// <param name="input">Filename to get information from</param>
         /// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
-        /// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
         /// <param name="date">True if the file Date should be included, false otherwise (default)</param>
         /// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
         /// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
         /// <returns>Populated BaseFile object if success, empty one on error</returns>
-        public static BaseFile GetFileInfo(string input, Hash omitFromScan = 0x0,
-            long offset = 0, bool date = false, string header = null, bool chdsAsFiles = true)
+        public static BaseFile GetFileInfo(string input, Hash omitFromScan = 0x0, bool date = false, string header = null, bool chdsAsFiles = true)
         {
             // Add safeguard if file doesn't exist
             if (!File.Exists(input))
@@ -1395,7 +1403,7 @@ namespace SabreTools.Library.Tools
 
                     // Transform the stream and get the information from it
                     rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
-                    baseFile = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
+                    baseFile = GetStreamInfo(outputStream, outputStream.Length, omitFromScan, false, chdsAsFiles);
 
                     // Dispose of the streams
                     outputStream.Dispose();
@@ -1405,13 +1413,13 @@ namespace SabreTools.Library.Tools
                 else
                 {
                     long length = new FileInfo(input).Length;
-                    baseFile = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
+                    baseFile = GetStreamInfo(TryOpenRead(input), length, omitFromScan, false, chdsAsFiles);
                 }
             }
             else
             {
                 long length = new FileInfo(input).Length;
-                baseFile = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
+                baseFile = GetStreamInfo(TryOpenRead(input), length, omitFromScan, false, chdsAsFiles);
             }
 
             // Add unique data from the file
@@ -2097,172 +2105,130 @@ namespace SabreTools.Library.Tools
         /// <param name="input">Filename to get information from</param>
         /// <param name="size">Size of the input stream</param>
         /// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
-        /// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
         /// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
         /// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
         /// <returns>Populated BaseFile object if success, empty one on error</returns>
-        public static BaseFile GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
-            long? offset = null, bool keepReadOpen = false, bool chdsAsFiles = true)
+        public static BaseFile GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0, bool keepReadOpen = false, bool chdsAsFiles = true)
         {
-            // We first check to see if it's a CHD
-            if (chdsAsFiles == false && GetCHDInfo(input) != null)
+            return GetStreamInfoAsync(input, size, omitFromScan, keepReadOpen, chdsAsFiles).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Retrieve file information for a single file
+        /// </summary>
+        /// <param name="input">Filename to get information from</param>
+        /// <param name="size">Size of the input stream</param>
+        /// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
+        /// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
+        /// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
+        /// <returns>Populated BaseFile object if success, empty one on error</returns>
+        public static async Task<BaseFile> GetStreamInfoAsync(Stream input, long size, Hash omitFromScan = 0x0, bool keepReadOpen = false, bool chdsAsFiles = true)
+        {
+            // We first check to see if it's a CHD if we have to
+            if (!chdsAsFiles)
             {
-                // Seek to the starting position, if one is set
-                if (input.CanSeek && offset.HasValue)
-                {
-                    try
-                    {
-                        if (offset < 0)
-                        {
-                            input.Seek(offset.Value, SeekOrigin.End);
-                        }
-                        else if (offset >= 0)
-                        {
-                            input.Seek(offset.Value, SeekOrigin.Begin);
-                        }
-                    }
-                    catch (NotSupportedException)
-                    {
-                        Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
-                    }
-                    catch (NotImplementedException)
-                    {
-                        Globals.Logger.Warning("Stream does not support seeking to starting offset. Stream position not changed");
-                    }
-                }
-                    
-                // Get the BaseFile from the information
                 BaseFile chd = GetCHDInfo(input);
+                SeekIfPossible(input);
 
-                // Seek to the beginning of the stream if possible
-                try
+                // If we found a valid CHD
+                if (chd != null)
                 {
-                    input.Seek(0, SeekOrigin.Begin);
-                }
-                catch (NotSupportedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
-                }
-                catch (NotImplementedException)
-                {
-                    Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
-                }
+                    if (!keepReadOpen)
+                        input.Dispose();
 
-                if (!keepReadOpen)
-                {
-                    input.Dispose();
+                    return chd;
                 }
-
-                return chd;
             }
 
-            BaseFile rom = new BaseFile() 
+            BaseFile rom = new BaseFile()
             {
                 Size = size,
             };
 
             try
             {
-                // Initialize the hashers
-                OptimizedCRC crc = new OptimizedCRC();
-                MD5 md5 = MD5.Create();
-                SHA1 sha1 = SHA1.Create();
-                SHA256 sha256 = SHA256.Create();
-                SHA384 sha384 = SHA384.Create();
-                SHA512 sha512 = SHA512.Create();
-
-                // Seek to the starting position, if one is set
-                if (input.CanSeek && offset.HasValue)
+                // Get a list of hashers to run over the buffer
+                List<Hasher> hashers = new List<Hasher>()
                 {
-                    try
-                    {
-                        if (offset < 0)
-                        {
-                            input.Seek(offset.Value, SeekOrigin.End);
-                        }
-                        else if (offset >= 0)
-                        {
-                            input.Seek(offset.Value, SeekOrigin.Begin);
-                        }
-                    }
-                    catch (NotSupportedException)
-                    {
-                        Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
-                    }
-                    catch (NotImplementedException)
-                    {
-                        Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
-                    }
+                    new Hasher(Hash.CRC),
+                    new Hasher(Hash.MD5),
+#if NET_FRAMEWORK
+                    new Hasher(Hash.RIPEMD160),
+#endif
+                    new Hasher(Hash.SHA1),
+                    new Hasher(Hash.SHA256),
+                    new Hasher(Hash.SHA384),
+                    new Hasher(Hash.SHA512),
+                };
+
+                // Initialize the hashing helpers
+                var loadBuffer = new ThreadLoadBuffer(input);
+                int buffersize = 3 * 1024 * 1024;
+                byte[] buffer0 = new byte[buffersize];
+                byte[] buffer1 = new byte[buffersize];
+
+                /*
+                Please note that some of the following code is adapted from
+                RomVault. This is a modified version of how RomVault does
+                threaded hashing. As such, some of the terminology and code
+                is the same, though variable names and comments may have
+                been tweaked to better fit this code base.
+                */
+
+                // Pre load the first buffer
+                int next = size > buffersize ? buffersize : (int)size;
+                input.Read(buffer0, 0, next);
+                int current = next;
+                size -= next;
+                bool bufferSelect = true;
+
+                while (current > 0)
+                {
+                    // Trigger the buffer load on the second buffer
+                    next = size > buffersize ? buffersize : (int)size;
+                    if (next > 0)
+                        loadBuffer.Trigger(bufferSelect ? buffer1 : buffer0, next);
+
+                    byte[] buffer = bufferSelect ? buffer0 : buffer1;
+
+                    // Run hashes in parallel
+                    await Task.WhenAll(hashers.Select(h => h.Process(buffer, current)));
+
+                    // Wait for the load buffer worker, if needed
+                    if (next > 0)
+                        loadBuffer.Wait();
+
+                    // Setup for the next hashing step
+                    current = next;
+                    size -= next;
+                    bufferSelect = !bufferSelect;
                 }
 
-                byte[] buffer = new byte[32 * 1024 * 1024];
-                int read;
-                while ((read = input.Read(buffer, 0, (int)Math.Min(size, buffer.Length))) > 0)
-                {
-                    size -= read;
+                // Finalize all hashing helpers
+                loadBuffer.Finish();
+                await Task.WhenAll(hashers.Select(h => h.Finalize()));
 
-                    crc.Update(buffer, 0, read);
-                    if ((omitFromScan & Hash.MD5) == 0)
-                    {
-                        md5.TransformBlock(buffer, 0, read, buffer, 0);
-                    }
-                    if ((omitFromScan & Hash.SHA1) == 0)
-                    {
-                        sha1.TransformBlock(buffer, 0, read, buffer, 0);
-                    }
-                    if ((omitFromScan & Hash.SHA256) == 0)
-                    {
-                        sha256.TransformBlock(buffer, 0, read, buffer, 0);
-                    }
-                    if ((omitFromScan & Hash.SHA384) == 0)
-                    {
-                        sha384.TransformBlock(buffer, 0, read, buffer, 0);
-                    }
-                    if ((omitFromScan & Hash.SHA512) == 0)
-                    {
-                        sha512.TransformBlock(buffer, 0, read, buffer, 0);
-                    }
-
-                    if (size <= 0)
-                        break;
-                }
-
-                crc.Update(buffer, 0, 0);
-                rom.CRC = BitConverter.GetBytes(crc.Value).Reverse().ToArray();
-
+                // Get the results
+                if ((omitFromScan & Hash.CRC) == 0)
+                    rom.CRC = hashers.First(h => h.HashType == Hash.CRC).GetHash();
                 if ((omitFromScan & Hash.MD5) == 0)
-                {
-                    md5.TransformFinalBlock(buffer, 0, 0);
-                    rom.MD5 = md5.Hash;
-                }
+                    rom.MD5 = hashers.First(h => h.HashType == Hash.MD5).GetHash();
+#if NET_FRAMEWORK
+                if ((omitFromScan & Hash.RIPEMD160) == 0)
+                    rom.RIPEMD160 = hashers.First(h => h.HashType == Hash.RIPEMD160).GetHash();
+#endif
                 if ((omitFromScan & Hash.SHA1) == 0)
-                {
-                    sha1.TransformFinalBlock(buffer, 0, 0);
-                    rom.SHA1 = sha1.Hash;
-                }
+                    rom.SHA1 = hashers.First(h => h.HashType == Hash.SHA1).GetHash();
                 if ((omitFromScan & Hash.SHA256) == 0)
-                {
-                    sha256.TransformFinalBlock(buffer, 0, 0);
-                    rom.SHA256 = sha256.Hash;
-                }
+                    rom.SHA256 = hashers.First(h => h.HashType == Hash.SHA256).GetHash();
                 if ((omitFromScan & Hash.SHA384) == 0)
-                {
-                    sha384.TransformFinalBlock(buffer, 0, 0);
-                    rom.SHA384 = sha384.Hash;
-                }
+                    rom.SHA384 = hashers.First(h => h.HashType == Hash.SHA384).GetHash();
                 if ((omitFromScan & Hash.SHA512) == 0)
-                {
-                    sha512.TransformFinalBlock(buffer, 0, 0);
-                    rom.SHA512 = sha512.Hash;
-                }
+                    rom.SHA512 = hashers.First(h => h.HashType == Hash.SHA512).GetHash();
 
                 // Dispose of the hashers
-                crc.Dispose();
-                md5.Dispose();
-                sha1.Dispose();
-                sha256.Dispose();
-                sha384.Dispose();
-                sha512.Dispose();
+                loadBuffer.Dispose();
+                hashers.ForEach(h => h.Dispose());
             }
             catch (IOException)
             {
@@ -2270,27 +2236,10 @@ namespace SabreTools.Library.Tools
             }
             finally
             {
-                // Seek to the beginning of the stream if possible
-                if (input.CanSeek)
-                {
-                    try
-                    {
-                        input.Seek(0, SeekOrigin.Begin);
-                    }
-                    catch (NotSupportedException)
-                    {
-                        Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
-                    }
-                    catch (NotImplementedException)
-                    {
-                        Globals.Logger.Verbose("Stream does not support seeking to beginning. Stream position not changed");
-                    }
-                }
-
                 if (!keepReadOpen)
-                {
                     input.Dispose();
-                }
+                else
+                    SeekIfPossible(input);
             }
 
             return rom;
@@ -2350,6 +2299,33 @@ namespace SabreTools.Library.Tools
             if (bytesToAddToTail.Count() > 0)
             {
                 bw.Write(bytesToAddToTail);
+            }
+        }
+
+        /// <summary>
+        /// Seek to a specific point in the stream, if possible
+        /// </summary>
+        /// <param name="input">Input stream to try seeking on</param>
+        /// <param name="offset">Optional offset to seek to</param>
+        public static void SeekIfPossible(Stream input, long offset = 0)
+        {
+            if (input.CanSeek)
+            {
+                try
+                {
+                    if (offset < 0)
+                        input.Seek(offset, SeekOrigin.End);
+                    else if (offset >= 0)
+                        input.Seek(offset, SeekOrigin.Begin);
+                }
+                catch (NotSupportedException)
+                {
+                    Globals.Logger.Verbose("Stream does not support seeking to starting offset. Stream position not changed");
+                }
+                catch (NotImplementedException)
+                {
+                    Globals.Logger.Warning("Stream does not support seeking to starting offset. Stream position not changed");
+                }
             }
         }
 
@@ -2638,6 +2614,13 @@ namespace SabreTools.Library.Tools
                             ? ((Disk)item).MD5
                             : Constants.MD5Zero));
                     break;
+                case SortedBy.RIPEMD160:
+                    key = (item.ItemType == ItemType.Rom
+                        ? ((Rom)item).RIPEMD160
+                        : (item.ItemType == ItemType.Disk
+                            ? ((Disk)item).RIPEMD160
+                            : Constants.RIPEMD160Zero));
+                    break;
                 case SortedBy.SHA1:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).SHA1
@@ -2874,6 +2857,7 @@ namespace SabreTools.Library.Tools
                 case "csv":
                 case "dat":
                 case "md5":
+                case "ripemd160":
                 case "sfv":
                 case "sha1":
                 case "sha256":
