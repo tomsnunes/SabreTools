@@ -82,7 +82,6 @@ namespace SabreTools.Library.Tools
 #if NET_FRAMEWORK
                 case Hash.RIPEMD160:
 #endif
-                case Hash.RIPEMD160:
                 case Hash.SHA1:
                 case Hash.SHA256:
                 case Hash.SHA384:
