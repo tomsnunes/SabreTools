@@ -1,22 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using EndOfStreamException = System.IO.EndOfStreamException;
-using FileStream = System.IO.FileStream;
-using MemoryStream = System.IO.MemoryStream;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-#endif
 using Compress.ZipFile;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
@@ -318,7 +307,7 @@ namespace SabreTools.Library.FileTypes
         public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
         {
             bool success = false;
-            string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+            string tempFile = Path.Combine(outDir, $"tmp{Guid.NewGuid()}");
 
             // If either input is null or empty, return
             if (inputStream == null || rom == null || rom.Name == null)
@@ -333,7 +322,7 @@ namespace SabreTools.Library.FileTypes
             }
 
             // Get the output archive name from the first rebuild rom
-            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".tar") ? "" : ".tar"));
+            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".tar") ? string.Empty : ".tar"));
 
             // Set internal variables
             TarArchive oldTarFile = TarArchive.Create();
@@ -352,7 +341,7 @@ namespace SabreTools.Library.FileTypes
                 {
                     // Get temporary date-time if possible
                     DateTime? usableDate = null;
-                    if (date && !String.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out DateTime dt))
+                    if (date && !string.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out DateTime dt))
                     {
                         usableDate = dt;
                     }
@@ -405,7 +394,7 @@ namespace SabreTools.Library.FileTypes
 
                         // Get temporary date-time if possible
                         DateTime? usableDate = null;
-                        if (date && !String.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out DateTime dt))
+                        if (date && !string.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out DateTime dt))
                         {
                             usableDate = dt;
                         }
@@ -471,7 +460,7 @@ namespace SabreTools.Library.FileTypes
         public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
         {
             bool success = false;
-            string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+            string tempFile = Path.Combine(outDir, $"tmp{Guid.NewGuid()}");
 
             // If either list of roms is null or empty, return
             if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
@@ -495,7 +484,7 @@ namespace SabreTools.Library.FileTypes
             }
 
             // Get the output archive name from the first rebuild rom
-            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".tar") ? "" : ".tar"));
+            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".tar") ? string.Empty : ".tar"));
 
             // Set internal variables
             TarArchive oldTarFile = TarArchive.Create();
@@ -531,7 +520,7 @@ namespace SabreTools.Library.FileTypes
 
                         // Get temporary date-time if possible
                         DateTime? usableDate = null;
-                        if (date && !String.IsNullOrWhiteSpace(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out DateTime dt))
+                        if (date && !string.IsNullOrWhiteSpace(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out DateTime dt))
                         {
                             usableDate = dt;
                         }
@@ -591,7 +580,7 @@ namespace SabreTools.Library.FileTypes
                         {
                             // Get temporary date-time if possible
                             DateTime? usableDate = null;
-                            if (date && !String.IsNullOrWhiteSpace(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out DateTime dt))
+                            if (date && !string.IsNullOrWhiteSpace(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out DateTime dt))
                             {
                                 usableDate = dt;
                             }

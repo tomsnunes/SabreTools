@@ -249,9 +249,9 @@ namespace SabreTools.Library.Data
         Logiqx =                1 << 0,
 
         /// <summary>
-        /// Logiqx XML (using gmae)
+        /// Logiqx XML (using game)
         /// </summary>
-        LogiqxDepreciated =     1 << 1,
+        LogiqxDeprecated =     1 << 1,
 
         /// <summary>
         /// MAME Softare List XML
@@ -376,6 +376,8 @@ namespace SabreTools.Library.Data
         RedumpSHA512 =          1 << 23,
 
         #endregion
+
+        // TODO: Add JSON output. Just for kicks
 
         // Specialty combinations
         ALL = Int32.MaxValue,

@@ -1,25 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-using Directory = Alphaleonis.Win32.Filesystem.Directory;
-using PathFormat = Alphaleonis.Win32.Filesystem.PathFormat;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using BinaryReader = System.IO.BinaryReader;
-using FileStream = System.IO.FileStream;
-using MemoryStream = System.IO.MemoryStream;
-using SearchOption = System.IO.SearchOption;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-#endif
 
 namespace SabreTools.Library.FileTypes
 {
@@ -75,7 +61,7 @@ namespace SabreTools.Library.FileTypes
                 Directory.CreateDirectory(this.Filename);
                 Directory.CreateDirectory(outDir);
 
-                Directory.Copy(this.Filename, outDir, true, PathFormat.FullPath);
+                DirectoryCopy(this.Filename, outDir, true);
             }
             catch (Exception ex)
             {
@@ -84,6 +70,45 @@ namespace SabreTools.Library.FileTypes
             }
 
             return true;
+        }
+
+        // https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
         }
 
         /// <summary>
@@ -110,7 +135,7 @@ namespace SabreTools.Library.FileTypes
                 string match = files.Where(s => s.EndsWith(entryName)).FirstOrDefault();
 
                 // If we had a file, copy that over to the new name
-                if (!String.IsNullOrWhiteSpace(match))
+                if (!string.IsNullOrWhiteSpace(match))
                 {
                     realentry = match;
                     File.Copy(match, Path.Combine(outDir, entryName));
@@ -149,7 +174,7 @@ namespace SabreTools.Library.FileTypes
                 string match = files.Where(s => s.EndsWith(entryName)).FirstOrDefault();
 
                 // If we had a file, copy that over to the new name
-                if (!String.IsNullOrWhiteSpace(match))
+                if (!string.IsNullOrWhiteSpace(match))
                 {
                     Utilities.TryOpenRead(match).CopyTo(ms);
                     realentry = match;
@@ -185,6 +210,7 @@ namespace SabreTools.Library.FileTypes
                     BaseFile nf = Utilities.GetFileInfo(file, omitFromScan: omitFromScan, date: date);
                     _children.Add(nf);
                 }
+
                 foreach (string dir in Directory.EnumerateDirectories(this.Filename, "*", SearchOption.TopDirectoryOnly))
                 {
                     Folder fl = new Folder(dir);
@@ -285,7 +311,7 @@ namespace SabreTools.Library.FileTypes
 
                     if (rom.ItemType == ItemType.Rom)
                     {
-                        if (date && !String.IsNullOrWhiteSpace(((Rom)rom).Date))
+                        if (date && !string.IsNullOrWhiteSpace(((Rom)rom).Date))
                         {
                             File.SetCreationTime(fileName, DateTime.Parse(((Rom)rom).Date));
                         }

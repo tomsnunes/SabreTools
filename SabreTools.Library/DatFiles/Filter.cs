@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-#endif
 
 namespace SabreTools.Library.DatFiles
 {
     /// <summary>
     /// Represents the filtering operations that need to be performed on a set of items, usually a DAT
     /// </summary>
+    /// TODO: Can this use `Field` instead of explicit filters?
     public class Filter
     {
         #region Pubically facing variables

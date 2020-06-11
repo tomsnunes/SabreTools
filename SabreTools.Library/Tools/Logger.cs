@@ -1,17 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using FileStream = System.IO.FileStream;
-using StreamWriter = System.IO.StreamWriter;
-#endif
 
 namespace SabreTools.Library.Tools
 {
@@ -58,13 +50,11 @@ namespace SabreTools.Library.Tools
             _tofile = tofile;
             _warnings = false;
             _errors = false;
-            _filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ")." + Utilities.GetExtension(filename);
+            _filename = $"{Path.GetFileNameWithoutExtension(filename)} ({DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}).{Utilities.GetExtension(filename)}";
             _filter = filter;
 
             if (!Directory.Exists(_basepath))
-            {
                 Directory.CreateDirectory(_basepath);
-            }
 
             Start();
         }
@@ -77,9 +67,7 @@ namespace SabreTools.Library.Tools
         {
             _start = DateTime.Now;
             if (!_tofile)
-            {
                 return true;
-            }
 
             try
             {
@@ -87,8 +75,8 @@ namespace SabreTools.Library.Tools
                 _log = new StreamWriter(logfile, Encoding.UTF8, (int)(4 * Constants.KibiByte), true);
                 _log.AutoFlush = true;
 
-                _log.WriteLine("Logging started " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                _log.WriteLine(string.Format("Command run: {0}", Globals.CommandLineArgs));
+                _log.WriteLine($"Logging started {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+                _log.WriteLine($"Command run: {Globals.CommandLineArgs}");
             }
             catch
             {
@@ -108,38 +96,31 @@ namespace SabreTools.Library.Tools
             if (!suppress)
             {
                 if (_warnings)
-                {
                     Console.WriteLine("There were warnings in the last run! Check the log for more details");
-                }
+
                 if (_errors)
-                {
                     Console.WriteLine("There were errors in the last run! Check the log for more details");
-                }
 
                 TimeSpan span = DateTime.Now.Subtract(_start);
 
                 // Special case for multi-day runs
-                string total = "";
+                string total = string.Empty;
                 if (span >= TimeSpan.FromDays(1))
-                {
                     total = span.ToString(@"d\:hh\:mm\:ss");
-                }
                 else
-                {
                     total = span.ToString(@"hh\:mm\:ss");
-                }
 
                 if (!_tofile)
                 {
-                    Console.WriteLine("Total runtime: " + total);
+                    Console.WriteLine($"Total runtime: {total}");
                     return true;
                 }
 
                 try
                 {
-                    _log.WriteLine("Logging ended " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    _log.WriteLine("Total runtime: " + total);
-                    Console.WriteLine("Total runtime: " + total);
+                    _log.WriteLine($"Logging ended {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+                    _log.WriteLine($"Total runtime: {total}");
+                    Console.WriteLine($"Total runtime: {total}");
                     _log.Close();
                 }
                 catch
@@ -173,15 +154,11 @@ namespace SabreTools.Library.Tools
         {
             // If the log level is less than the filter level, we skip it but claim we didn't
             if (loglevel < _filter)
-            {
                 return true;
-            }
 
             // USER and ERROR writes to console
             if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
-            {
-                Console.WriteLine((loglevel == LogLevel.ERROR && appendPrefix ? loglevel.ToString() + " " : "") + output);
-            }
+                Console.WriteLine((loglevel == LogLevel.ERROR && appendPrefix ? loglevel.ToString() + " " : string.Empty) + output);
 
             // If we're writing to file, use the existing stream
             if (_tofile)
@@ -190,7 +167,7 @@ namespace SabreTools.Library.Tools
                 {
                     lock(_lock)
                     {
-                        _log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "") + output);
+                        _log.WriteLine((appendPrefix ? $"{loglevel} - {DateTime.Now} - " : string.Empty) + output);
                     }
                 }
                 catch (Exception ex)
@@ -230,7 +207,7 @@ namespace SabreTools.Library.Tools
                 {
                     lock (_lock)
                     {
-                        _log.Write(DateTime.Now + " - " + output);
+                        _log.Write($"{DateTime.Now} - {output}");
                     }
                 }
                 catch
@@ -247,34 +224,11 @@ namespace SabreTools.Library.Tools
         /// Write the given string as a verbose message to the log output
         /// </summary>
         /// <param name="output">String to be written log</param>
-        /// <param name="args">Optional arguments for string formatting</param>
-        /// <returns>True if the output could be written, false otherwise</returns>s
-        public bool Verbose(string output, params object[] args)
-        {
-            return Log(args.Length == 0 ? output: string.Format(output, args), LogLevel.VERBOSE, true);
-        }
-
-        /// <summary>
-        /// Write the given string as a verbose message to the log output
-        /// </summary>
-        /// <param name="output">String to be written log</param>
         /// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
-        /// <param name="args">Optional arguments for string formatting</param>
         /// <returns>True if the output could be written, false otherwise</returns>
-        public bool Verbose(string output, bool appendPrefix = true, params object[] args)
+        public bool Verbose(string output, bool appendPrefix = true)
         {
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.VERBOSE, appendPrefix);
-        }
-
-        /// <summary>
-        /// Write the given string as a user message to the log output
-        /// </summary>
-        /// <param name="output">String to be written log</param>
-        /// <param name="args">Optional arguments for string formatting</param>
-        /// <returns>True if the output could be written, false otherwise</returns>
-        public bool User(string output, params object[] args)
-        {
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.USER, true);
+            return Log(output, LogLevel.VERBOSE, appendPrefix);
         }
 
         /// <summary>
@@ -282,23 +236,10 @@ namespace SabreTools.Library.Tools
         /// </summary>
         /// <param name="output">String to be written log</param>
         /// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
-        /// <param name="args">Optional arguments for string formatting</param>
         /// <returns>True if the output could be written, false otherwise</returns>
-        public bool User(string output, bool appendPrefix = true, params object[] args)
+        public bool User(string output, bool appendPrefix = true)
         {
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.USER, appendPrefix);
-        }
-
-        /// <summary>
-        /// Write the given string as a warning to the log output
-        /// </summary>
-        /// <param name="output">String to be written log</param>
-        /// <param name="args">Optional arguments for string formatting</param>
-        /// <returns>True if the output could be written, false otherwise</returns>
-        public bool Warning(string output, params object[] args)
-        {
-            _warnings = true;
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.WARNING, true);
+            return Log(output, LogLevel.USER, appendPrefix);
         }
 
         /// <summary>
@@ -306,24 +247,11 @@ namespace SabreTools.Library.Tools
         /// </summary>
         /// <param name="output">String to be written log</param>
         /// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
-        /// <param name="args">Optional arguments for string formatting</param>
         /// <returns>True if the output could be written, false otherwise</returns>
-        public bool Warning(string output, bool appendPrefix = true, params object[] args)
+        public bool Warning(string output, bool appendPrefix = true)
         {
             _warnings = true;
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.WARNING, appendPrefix);
-        }
-
-        /// <summary>
-        /// Writes the given string as an error in the log
-        /// </summary>
-        /// <param name="output">String to be written log</param>
-        /// <param name="args">Optional arguments for string formatting</param>
-        /// <returns>True if the output could be written, false otherwise</returns>
-        public bool Error(string output, params object[] args)
-        {
-            _errors = true;
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.ERROR, true);
+            return Log(output, LogLevel.WARNING, appendPrefix);
         }
 
         /// <summary>
@@ -331,12 +259,11 @@ namespace SabreTools.Library.Tools
         /// </summary>
         /// <param name="output">String to be written log</param>
         /// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
-        /// <param name="args">Optional arguments for string formatting</param>
         /// <returns>True if the output could be written, false otherwise</returns>
-        public bool Error(string output, bool appendPrefix = true, params object[] args)
+        public bool Error(string output, bool appendPrefix = true)
         {
             _errors = true;
-            return Log(args.Length == 0 ? output : string.Format(output, args), LogLevel.ERROR, appendPrefix);
+            return Log(output, LogLevel.ERROR, appendPrefix);
         }
 
         /// <summary>

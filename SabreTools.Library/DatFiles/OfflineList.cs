@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
+using System.IO;
 using System.Text;
 using System.Xml;
+
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using FileStream = System.IO.FileStream;
-using StreamWriter = System.IO.StreamWriter;
-#endif
 using NaturalSort;
 
 namespace SabreTools.Library.DatFiles
@@ -61,9 +53,7 @@ namespace SabreTools.Library.DatFiles
 
             // If we got a null reader, just return
             if (xtr == null)
-            {
                 return;
-            }
 
             // Otherwise, read the file to the end
             try
@@ -86,12 +76,14 @@ namespace SabreTools.Library.DatFiles
                             // Skip the configuration node now that we've processed it
                             xtr.Skip();
                             break;
+
                         case "games":
                             ReadGames(xtr.ReadSubtree(), keep, clean, remUnicode);
 
                             // Skip the games node now that we've processed it
                             xtr.Skip();
                             break;
+
                         default:
                             xtr.Read();
                             break;
@@ -100,7 +92,7 @@ namespace SabreTools.Library.DatFiles
             }
             catch (Exception ex)
             {
-                Globals.Logger.Warning("Exception found while parsing '{0}': {1}", filename, ex);
+                Globals.Logger.Warning($"Exception found while parsing '{filename}': {ex}");
 
                 // For XML errors, just skip the affected node
                 xtr?.Read();
@@ -120,9 +112,7 @@ namespace SabreTools.Library.DatFiles
 
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -138,63 +128,73 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Get all configuration items (ONLY OVERWRITE IF THERE'S NO DATA)
-                string content = "";
+                string content = string.Empty;
                 switch (reader.Name.ToLowerInvariant())
                 {
                     case "datname":
                         content = reader.ReadElementContentAsString();
-                        Name = (String.IsNullOrWhiteSpace(Name) ? content : Name);
+                        Name = (string.IsNullOrWhiteSpace(Name) ? content : Name);
                         superdat = superdat || content.Contains(" - SuperDAT");
                         if (keep && superdat)
                         {
-                            Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+                            Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
                         }
                         break;
+
                     case "datversion":
                         content = reader.ReadElementContentAsString();
-                        Version = (String.IsNullOrWhiteSpace(Version) ? content : Version);
+                        Version = (string.IsNullOrWhiteSpace(Version) ? content : Version);
                         break;
+
                     case "system":
                         content = reader.ReadElementContentAsString();
                         // string system = content;
                         break;
+
                     case "screenshotswidth":
                         content = reader.ReadElementContentAsString();
                         // string screenshotsWidth = content; // Int32?
                         break;
+
                     case "screenshotsheight":
                         content = reader.ReadElementContentAsString();
                         // string screenshotsHeight = content; // Int32?
                         break;
+
                     case "infos":
                         ReadInfos(reader.ReadSubtree());
 
                         // Skip the infos node now that we've processed it
                         reader.Skip();
                         break;
+
                     case "canopen":
                         ReadCanOpen(reader.ReadSubtree());
 
                         // Skip the canopen node now that we've processed it
                         reader.Skip();
                         break;
+
                     case "newdat":
                         ReadNewDat(reader.ReadSubtree());
 
                         // Skip the newdat node now that we've processed it
                         reader.Skip();
                         break;
+
                     case "search":
                         ReadSearch(reader.ReadSubtree());
 
                         // Skip the search node now that we've processed it
                         reader.Skip();
                         break;
+
                     case "romtitle":
                         content = reader.ReadElementContentAsString();
                         // string romtitle = content;
 
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -210,9 +210,7 @@ namespace SabreTools.Library.DatFiles
         {
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -236,78 +234,91 @@ namespace SabreTools.Library.DatFiles
                         // string title_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "location":
                         // string location_visible = reader.GetAttribute("visible"); // (true|false)
                         // string location_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string location_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "publisher":
                         // string publisher_visible = reader.GetAttribute("visible"); // (true|false)
                         // string publisher_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string publisher_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "sourcerom":
                         // string sourceRom_visible = reader.GetAttribute("visible"); // (true|false)
                         // string sourceRom_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string sourceRom_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "savetype":
                         // string saveType_visible = reader.GetAttribute("visible"); // (true|false)
                         // string saveType_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string saveType_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "romsize":
                         // string romSize_visible = reader.GetAttribute("visible"); // (true|false)
                         // string romSize_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string romSize_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "releasenumber":
                         // string releaseNumber_visible = reader.GetAttribute("visible"); // (true|false)
                         // string releaseNumber_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string releaseNumber_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "languagenumber":
                         // string languageNumber_visible = reader.GetAttribute("visible"); // (true|false)
                         // string languageNumber_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string languageNumber_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "comment":
                         // string comment_visible = reader.GetAttribute("visible"); // (true|false)
                         // string comment_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string comment_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "romcrc":
                         // string romCRC_visible = reader.GetAttribute("visible"); // (true|false)
                         // string romCRC_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string romCRC_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "im1crc":
                         // string im1CRC_visible = reader.GetAttribute("visible"); // (true|false)
                         // string im1CRC_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string im1CRC_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "im2crc":
                         // string im2CRC_visible = reader.GetAttribute("visible"); // (true|false)
                         // string im2CRC_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string im2CRC_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     case "languages":
                         // string languages_visible = reader.GetAttribute("visible"); // (true|false)
                         // string languages_inNamingOption = reader.GetAttribute("inNamingOption"); // (true|false)
                         // string languages_default = reader.GetAttribute("default"); // (true|false)
                         reader.Read();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -326,9 +337,7 @@ namespace SabreTools.Library.DatFiles
 
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -349,6 +358,7 @@ namespace SabreTools.Library.DatFiles
                     case "extension":
                         extensions.Add(reader.ReadElementContentAsString());
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -364,9 +374,7 @@ namespace SabreTools.Library.DatFiles
         {
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -382,22 +390,25 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Get all newdat items
-                string content = "";
+                string content = string.Empty;
                 switch (reader.Name.ToLowerInvariant())
                 {
                     case "datversionurl":
                         content = reader.ReadElementContentAsString();
-                        Url = (String.IsNullOrWhiteSpace(Name) ? content : Url);
+                        Url = (string.IsNullOrWhiteSpace(Name) ? content : Url);
                         break;
+
                     case "daturl":
                         // string fileName = reader.GetAttribute("fileName");
                         content = reader.ReadElementContentAsString();
                         // string url = content;
                         break;
+
                     case "imurl":
                         content = reader.ReadElementContentAsString();
                         // string url = content;
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -413,9 +424,7 @@ namespace SabreTools.Library.DatFiles
         {
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -431,7 +440,7 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Get all search items
-                string content = "";
+                string content = string.Empty;
                 switch (reader.Name.ToLowerInvariant())
                 {
                     case "to":
@@ -444,6 +453,7 @@ namespace SabreTools.Library.DatFiles
                         // Skip the to node now that we've processed it
                         reader.Skip();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -459,9 +469,7 @@ namespace SabreTools.Library.DatFiles
         {
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -477,7 +485,7 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Get all search items
-                string content = "";
+                string content = string.Empty;
                 switch (reader.Name.ToLowerInvariant())
                 {
                     case "find":
@@ -486,6 +494,7 @@ namespace SabreTools.Library.DatFiles
                         content = reader.ReadElementContentAsString();
                         // string findValue = content;
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -509,9 +518,7 @@ namespace SabreTools.Library.DatFiles
         {
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -535,6 +542,7 @@ namespace SabreTools.Library.DatFiles
                         // Skip the game node now that we've processed it
                         reader.Skip();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -557,16 +565,14 @@ namespace SabreTools.Library.DatFiles
             bool remUnicode)
         {
             // Prepare all internal variables
-            string releaseNumber = "", key = "", publisher = "", duplicateid = "";
+            string releaseNumber = string.Empty, key = string.Empty, publisher = string.Empty, duplicateid = string.Empty;
             long size = -1;
             List<Rom> roms = new List<Rom>();
             Machine machine = new Machine();
 
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -582,82 +588,80 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Get all games items
-                string content = "";
+                string content = string.Empty;
                 switch (reader.Name.ToLowerInvariant())
                 {
                     case "imagenumber":
                         content = reader.ReadElementContentAsString();
                         // string imageNumber = content;
-
                         break;
+
                     case "releasenumber":
                         releaseNumber = reader.ReadElementContentAsString();
-
                         break;
+
                     case "title":
                         content = reader.ReadElementContentAsString();
                         machine.Name = content;
-
                         break;
+
                     case "savetype":
                         content = reader.ReadElementContentAsString();
                         // string saveType = content;
-
                         break;
+
                     case "romsize":
                         if (!Int64.TryParse(reader.ReadElementContentAsString(), out size))
-                        {
                             size = -1;
-                        }
 
                         break;
+
                     case "publisher":
                         publisher = reader.ReadElementContentAsString();
-
                         break;
+
                     case "location":
                         content = reader.ReadElementContentAsString();
                         // string location = content;
-
                         break;
+
                     case "sourcerom":
                         content = reader.ReadElementContentAsString();
                         // string sourceRom = content;
-
                         break;
+
                     case "language":
                         content = reader.ReadElementContentAsString();
                         // string language = content;
-
                         break;
+
                     case "files":
                         roms = ReadFiles(reader.ReadSubtree(), releaseNumber, machine.Name, keep, clean, remUnicode);
-
                         // Skip the files node now that we've processed it
                         reader.Skip();
                         break;
+
                     case "im1crc":
                         content = reader.ReadElementContentAsString();
                         // string im1crc = content;
-
                         break;
+
                     case "im2crc":
                         content = reader.ReadElementContentAsString();
                         // string im2crc = content;
-
                         break;
+
                     case "comment":
                         machine.Comment = reader.ReadElementContentAsString();
-
                         break;
+
                     case "duplicateid":
                         duplicateid = reader.ReadElementContentAsString();
                         if (duplicateid != "0")
-                        {
                             machine.CloneOf = duplicateid;
-                        }
 
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -700,9 +704,7 @@ namespace SabreTools.Library.DatFiles
 
             // If there's no subtree to the configuration, skip it
             if (reader == null)
-            {
                 return roms;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
@@ -723,9 +725,10 @@ namespace SabreTools.Library.DatFiles
                     case "romcrc":
                         extensionToCrc.Add(
                             new Tuple<string, string>(
-                                reader.GetAttribute("extension") ?? "",
+                                reader.GetAttribute("extension") ?? string.Empty,
                                 reader.ReadElementContentAsString().ToLowerInvariant()));
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -737,7 +740,7 @@ namespace SabreTools.Library.DatFiles
             {
                 roms.Add(new Rom()
                 {
-                    Name = (releaseNumber != "0" ? releaseNumber + " - " : "") + machineName + pair.Item1,
+                    Name = (releaseNumber != "0" ? releaseNumber + " - " : string.Empty) + machineName + pair.Item1,
                     CRC = Utilities.CleanHashData(pair.Item2, Constants.CRCLength),
 
                     ItemStatus = ItemStatus.None,
@@ -757,20 +760,21 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                Globals.Logger.User("Opening file for writing: {0}", outfile);
+                Globals.Logger.User($"Opening file for writing: {outfile}");
                 FileStream fs = Utilities.TryCreate(outfile);
 
                 // If we get back null for some reason, just log and return
                 if (fs == null)
                 {
-                    Globals.Logger.Warning("File '{0}' could not be created for writing! Please check to see if the file is writable", outfile);
+                    Globals.Logger.Warning($"File '{outfile}' could not be created for writing! Please check to see if the file is writable");
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                XmlTextWriter xtw = new XmlTextWriter(fs, new UTF8Encoding(false));
+                xtw.Formatting = Formatting.Indented;
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(xtw);
 
                 // Write out each of the machines and roms
                 string lastgame = null;
@@ -797,18 +801,12 @@ namespace SabreTools.Library.DatFiles
                             continue;
                         }
 
-                        // If we have a different game and we're not at the start of the list, output the end of last item
-                        if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                        {
-                            WriteEndGame(sw);
-                        }
-
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (rom.ItemType == ItemType.Rom
                             && ((Rom)rom).Size == -1
                             && ((Rom)rom).CRC == "null")
                         {
-                            Globals.Logger.Verbose("Empty folder found: {0}", rom.MachineName);
+                            Globals.Logger.Verbose($"Empty folder found: {rom.MachineName}");
 
                             rom.Name = (rom.Name == "null" ? "-" : rom.Name);
                             ((Rom)rom).Size = Constants.SizeZero;
@@ -822,7 +820,7 @@ namespace SabreTools.Library.DatFiles
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(xtw, rom, ignoreblanks);
 
                         // Set the new data to compare against
                         lastgame = rom.MachineName;
@@ -830,10 +828,10 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Write the file footer out
-                WriteFooter(sw);
+                WriteFooter(xtw);
 
                 Globals.Logger.Verbose("File written!" + Environment.NewLine);
-                sw.Dispose();
+                xtw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -848,81 +846,174 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(XmlTextWriter xtw)
         {
             try
             {
-                string header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
-                            + "<dat xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"datas.xsd\">\n"
-                            + "\t<configuration>\n"
-                            + "\t\t<datName>" + WebUtility.HtmlEncode(Name) + "</datName>\n"
-                            + "\t\t<datVersion>" + Count + "</datVersion>\n"
-                            + "\t\t<system>none</system>\n"
-                            + "\t\t<screenshotsWidth>240</screenshotsWidth>\n"
-                            + "\t\t<screenshotsHeight>160</screenshotsHeight>\n"
-                            + "\t\t<infos>\n"
-                            + "\t\t\t<title visible=\"false\" inNamingOption=\"true\" default=\"false\"/>\n"
-                            + "\t\t\t<location visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
-                            + "\t\t\t<publisher visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
-                            + "\t\t\t<sourceRom visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
-                            + "\t\t\t<saveType visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
-                            + "\t\t\t<romSize visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
-                            + "\t\t\t<releaseNumber visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
-                            + "\t\t\t<languageNumber visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
-                            + "\t\t\t<comment visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
-                            + "\t\t\t<romCRC visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
-                            + "\t\t\t<im1CRC visible=\"false\" inNamingOption=\"false\" default=\"false\"/>\n"
-                            + "\t\t\t<im2CRC visible=\"false\" inNamingOption=\"false\" default=\"false\"/>\n"
-                            + "\t\t\t<languages visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
-                            + "\t\t</infos>\n"
-                            + "\t\t<canOpen>\n"
-                            + "\t\t\t<extension>.bin</extension>\n"
-                            + "\t\t</canOpen>\n"
-                            + "\t\t<newDat>\n"
-                            + "\t\t\t<datVersionURL>" + WebUtility.HtmlEncode(Url) + "</datVersionURL>\n"
-                            + "\t\t\t<datURL fileName=\"" + WebUtility.HtmlEncode(FileName) + ".zip\">" + WebUtility.HtmlEncode(Url) + "</datURL>\n"
-                            + "\t\t\t<imURL>" + WebUtility.HtmlEncode(Url) + "</imURL>\n"
-                            + "\t\t</newDat>\n"
-                            + "\t\t<search>\n"
-                            + "\t\t\t<to value=\"location\" default=\"true\" auto=\"true\"/>\n"
-                            + "\t\t\t<to value=\"romSize\" default=\"true\" auto=\"false\"/>\n"
-                            + "\t\t\t<to value=\"languages\" default=\"true\" auto=\"true\"/>\n"
-                            + "\t\t\t<to value=\"saveType\" default=\"false\" auto=\"false\"/>\n"
-                            + "\t\t\t<to value=\"publisher\" default=\"false\" auto=\"true\"/>\n"
-                            + "\t\t\t<to value=\"sourceRom\" default=\"false\" auto=\"true\"/>\n"
-                            + "\t\t</search>\n"
-                            + "\t\t<romTitle >%u - %n</romTitle>\n"
-                            + "\t</configuration>\n"
-                            + "\t<games>\n";
+                xtw.WriteStartDocument(false);
 
-                // Write the header out
-                sw.Write(header);
-                sw.Flush();
-            }
-            catch (Exception ex)
-            {
-                Globals.Logger.Error(ex.ToString());
-                return false;
-            }
+                xtw.WriteStartElement("dat");
+                xtw.WriteAttributeString("xsi", "xmlns", "http://www.w3.org/2001/XMLSchema-instance");
+                xtw.WriteAttributeString("noNamespaceSchemaLocation", "xsi", "datas.xsd");
 
-            return true;
-        }
+                xtw.WriteStartElement("configuration");
+                xtw.WriteElementString("datName", Name);
+                xtw.WriteElementString("datVersion", Count.ToString());
+                xtw.WriteElementString("system", "none");
+                xtw.WriteElementString("screenshotsWidth", "240");
+                xtw.WriteElementString("screenshotsHeight", "160");
 
-        /// <summary>
-        /// Write out Game start using the supplied StreamWriter
-        /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
-        /// <returns>True if the data was written, false on error</returns>
-        private bool WriteEndGame(StreamWriter sw)
-        {
-            try
-            {
-                string state = "\t\t</game>\n";
+                xtw.WriteStartElement("infos");
 
-                sw.Write(state);
-                sw.Flush();
+                xtw.WriteStartElement("title");
+                xtw.WriteAttributeString("visible", "false");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("location");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("publisher");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("sourceRom");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("saveType");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("romSize");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("releaseNumber");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("languageNumber");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("comment");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("romCRC");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("im1CRC");
+                xtw.WriteAttributeString("visible", "false");
+                xtw.WriteAttributeString("inNamingOption", "false");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("im2CRC");
+                xtw.WriteAttributeString("visible", "false");
+                xtw.WriteAttributeString("inNamingOption", "false");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("languages");
+                xtw.WriteAttributeString("visible", "true");
+                xtw.WriteAttributeString("inNamingOption", "true");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteEndElement();
+
+                // End infos
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("canOpen");
+                xtw.WriteElementString("extension", ".bin");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("newDat");
+                xtw.WriteElementString("datVersionURL", Url);
+
+                xtw.WriteStartElement("datUrl");
+                xtw.WriteAttributeString("fileName", $"{FileName}.zip");
+                xtw.WriteString(Url);
+                xtw.WriteEndElement();
+
+                xtw.WriteElementString("imURL", Url);
+
+                // End newDat
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("search");
+
+                xtw.WriteStartElement("to");
+                xtw.WriteAttributeString("value", "location");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteAttributeString("auto", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("to");
+                xtw.WriteAttributeString("value", "romSize");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteAttributeString("auto", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("to");
+                xtw.WriteAttributeString("value", "languages");
+                xtw.WriteAttributeString("default", "true");
+                xtw.WriteAttributeString("auto", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("to");
+                xtw.WriteAttributeString("value", "saveType");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteAttributeString("auto", "false");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("to");
+                xtw.WriteAttributeString("value", "publisher");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteAttributeString("auto", "true");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("to");
+                xtw.WriteAttributeString("value", "sourceRom");
+                xtw.WriteAttributeString("default", "false");
+                xtw.WriteAttributeString("auto", "true");
+                xtw.WriteEndElement();
+
+                // End search
+                xtw.WriteEndElement();
+
+                xtw.WriteElementString("romTitle", "%u - %n");
+
+                // End configuration
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("games");
+
+                xtw.Flush();
             }
             catch (Exception ex)
             {
@@ -936,72 +1027,104 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+        private bool WriteDatItem(XmlTextWriter xtw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
-            if (ignoreblanks
-                && (rom.ItemType == ItemType.Rom
-                && (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
-            {
+            if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
                 return true;
-            }
 
             try
             {
-                string state = "";
+                string state = string.Empty;
 
                 // Pre-process the item name
-                ProcessItemName(rom, true);
+                ProcessItemName(datItem, true);
 
-                state += "\t\t<game>\n"
-                            + "\t\t\t<imageNumber>1</imageNumber>\n"
-                            + "\t\t\t<releaseNumber>1</releaseNumber>\n"
-                            + "\t\t\t<title>" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "</title>\n"
-                            + "\t\t\t<saveType>None</saveType>\n";
+                // Build the state based on excluded fields
+                xtw.WriteStartElement("game");
+                xtw.WriteElementString("imageNumber", "1");
+                xtw.WriteElementString("releaseNumber", "1");
+                xtw.WriteElementString("title", datItem.GetField(Field.Name, ExcludeFields));
+                xtw.WriteElementString("saveType", "None");
 
-                if (rom.ItemType == ItemType.Rom)
+                if (datItem.ItemType == ItemType.Rom)
                 {
-                    state += "\t\t\t<romSize>" + (!ExcludeFields[(int)Field.Size] ? ((Rom)rom).Size.ToString() : "") + "</romSize>\n";
+                    var rom = datItem as Rom;
+                    xtw.WriteElementString("romSize", datItem.GetField(Field.Size, ExcludeFields));
                 }
 
-                state += "\t\t\t<publisher>None</publisher>\n"
-                    + "\t\t\t<location>0</location>\n"
-                    + "\t\t\t<sourceRom>None</sourceRom>\n"
-                    + "\t\t\t<language>0</language>\n";
+                xtw.WriteElementString("publisher", "None");
+                xtw.WriteElementString("location", "0");
+                xtw.WriteElementString("sourceRom", "None");
+                xtw.WriteElementString("language", "0");
 
-                if (rom.ItemType == ItemType.Disk)
+                if (datItem.ItemType == ItemType.Disk)
                 {
-                    state += "\t\t\t<files>\n"
-                        + (((Disk)rom).MD5 != null
-                            ? "\t\t\t\t<romMD5 extension=\".chd\">" + (!ExcludeFields[(int)Field.MD5] ? ((Disk)rom).MD5.ToUpperInvariant() : "") + "</romMD5>\n"
-                            : "\t\t\t\t<romSHA1 extension=\".chd\">" + (!ExcludeFields[(int)Field.SHA1] ? ((Disk)rom).SHA1.ToUpperInvariant() : "") + "</romSHA1>\n")
-                        + "\t\t\t</files>\n";
+                    var disk = datItem as Disk;
+                    xtw.WriteStartElement("files");
+                    if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                    {
+                        xtw.WriteStartElement("romMD5");
+                        xtw.WriteAttributeString("extension", ".chd");
+                        xtw.WriteString(disk.MD5.ToUpperInvariant());
+                        xtw.WriteEndElement();
+                    }
+                    else if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
+                    {
+                        xtw.WriteStartElement("romSHA1");
+                        xtw.WriteAttributeString("extension", ".chd");
+                        xtw.WriteString(disk.SHA1.ToUpperInvariant());
+                        xtw.WriteEndElement();
+                    }
+
+                    // End files
+                    xtw.WriteEndElement();
                 }
-                else if (rom.ItemType == ItemType.Rom)
+                else if (datItem.ItemType == ItemType.Rom)
                 {
-                    string tempext = "." + Utilities.GetExtension(((Rom)rom).Name);
+                    var rom = datItem as Rom;
+                    string tempext = "." + Utilities.GetExtension(rom.Name);
 
-                    state += "\t\t\t<files>\n"
-                        + (((Rom)rom).CRC != null
-                            ? "\t\t\t\t<romCRC extension=\"" + tempext + "\">" + (!ExcludeFields[(int)Field.CRC] ? ((Rom)rom).CRC.ToUpperInvariant() : "") + "</romCRC>\n"
-                            : ((Rom)rom).MD5 != null
-                                ? "\t\t\t\t<romMD5 extension=\"" + tempext + "\">" + (!ExcludeFields[(int)Field.MD5] ? ((Rom)rom).MD5.ToUpperInvariant() : "") + "</romMD5>\n"
-                                : "\t\t\t\t<romSHA1 extension=\"" + tempext + "\">" + (!ExcludeFields[(int)Field.SHA1] ? ((Rom)rom).SHA1.ToUpperInvariant() : "") + "</romSHA1>\n")
-                        + "\t\t\t</files>\n";
+                    xtw.WriteStartElement("files");
+                    if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
+                    {
+                        xtw.WriteStartElement("romCRC");
+                        xtw.WriteAttributeString("extension", tempext);
+                        xtw.WriteString(rom.CRC.ToUpperInvariant());
+                        xtw.WriteEndElement();
+                    }
+                    else if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                    {
+                        xtw.WriteStartElement("romMD5");
+                        xtw.WriteAttributeString("extension", tempext);
+                        xtw.WriteString(rom.MD5.ToUpperInvariant());
+                        xtw.WriteEndElement();
+                    }
+                    else if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
+                    {
+                        xtw.WriteStartElement("romSHA1");
+                        xtw.WriteAttributeString("extension", tempext);
+                        xtw.WriteString(rom.SHA1.ToUpperInvariant());
+                        xtw.WriteEndElement();
+                    }
+
+                    // End files
+                    xtw.WriteEndElement();
                 }
 
-                state += "\t\t\t<im1CRC>00000000</im1CRC>\n"
-                    + "\t\t\t<im2CRC>00000000</im2CRC>\n"
-                    + "\t\t\t<comment></comment>\n"
-                    + "\t\t\t<duplicateID>0</duplicateID>\n"
-                    + "\t\t</game>\n";
+                xtw.WriteElementString("im1CRC", "00000000");
+                xtw.WriteElementString("im2CRC", "00000000");
+                xtw.WriteElementString("comment", "");
+                xtw.WriteElementString("duplicateID", "0");
+                
+                // End game
+                xtw.WriteEndElement();
 
-                sw.Write(state);
-                sw.Flush();
+                xtw.Flush();
             }
             catch (Exception ex)
             {
@@ -1015,25 +1138,45 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT footer using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteFooter(StreamWriter sw)
+        private bool WriteFooter(XmlTextWriter xtw)
         {
             try
             {
-                string footer = "\t\t</game>"
-                            + "\t</games>\n"
-                            + "\t<gui>\n"
-                            + "\t\t<images width=\"487\" height=\"162\">\n"
-                            + "\t\t\t<image x=\"0\" y=\"0\" width=\"240\" height=\"160\"/>\n"
-                            + "\t\t\t<image x=\"245\" y=\"0\" width=\"240\" height=\"160\"/>\n"
-                            + "\t\t</images>\n"
-                            + "\t</gui>\n"
-                            + "</dat>";
+                // End games
+                xtw.WriteEndElement();
 
-                // Write the footer out
-                sw.Write(footer);
-                sw.Flush();
+                xtw.WriteStartElement("gui");
+
+                xtw.WriteStartElement("images");
+                xtw.WriteAttributeString("width", "487");
+                xtw.WriteAttributeString("height", "162");
+
+                xtw.WriteStartElement("image");
+                xtw.WriteAttributeString("x", "0");
+                xtw.WriteAttributeString("y", "0");
+                xtw.WriteAttributeString("width", "240");
+                xtw.WriteAttributeString("height", "160");
+                xtw.WriteEndElement();
+
+                xtw.WriteStartElement("image");
+                xtw.WriteAttributeString("x", "245");
+                xtw.WriteAttributeString("y", "0");
+                xtw.WriteAttributeString("width", "240");
+                xtw.WriteAttributeString("height", "160");
+                xtw.WriteEndElement();
+
+                // End images
+                xtw.WriteEndElement();
+
+                // End gui
+                xtw.WriteEndElement();
+
+                // End dat
+                xtw.WriteEndElement();
+
+                xtw.Flush();
             }
             catch (Exception ex)
             {

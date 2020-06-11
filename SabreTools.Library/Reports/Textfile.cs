@@ -1,15 +1,8 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 
 using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using Stream = System.IO.Stream;
-#endif
 
 namespace SabreTools.Library.Reports
 {
@@ -63,13 +56,10 @@ namespace SabreTools.Library.Reports
     Roms with SHA-512:       " + _datFile.SHA512Count + "\n";
 
             if (_baddumpCol)
-            {
                 line += "	Roms with BadDump status: " + _datFile.BaddumpCount + "\n";
-            }
+
             if (_nodumpCol)
-            {
                 line += "	Roms with Nodump status: " + _datFile.NodumpCount + "\n";
-            }
 
             // For spacing between DATs
             line += "\n\n";

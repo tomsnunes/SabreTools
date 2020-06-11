@@ -1,34 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Help
 {
     public class Feature
     {
-        #region Private instance variables
+        #region Protected instance variables
 
-        private FeatureType _featureType;
-        private bool _foundOnce = false;
-
-        // Specific value types
-        private bool _valueBool = false;
-        private int _valueInt32 = Int32.MinValue;
-        private long _valueInt64 = Int64.MinValue;
-        private string _valueString = null;
-        private List<string> _valueList = null;
+        protected FeatureType _featureType;
+        protected bool _foundOnce = false;
+        protected object _value = null;
 
         #endregion
 
         #region Publicly facing variables
 
-        public string Name { get; private set; }
-        public List<string> Flags { get; private set; }
-        public string Description { get; private set; }
-        public string LongDescription { get; private set; } // TODO: Use this to generate README.1ST?
-        public Dictionary<string, Feature> Features { get; private set; }
+        public string Name { get; protected set; }
+        public List<string> Flags { get; protected set; }
+        public string Description { get; protected set; }
+        public string LongDescription { get; protected set; } // TODO: Use this to generate README.1ST?
+        public Dictionary<string, Feature> Features { get; protected set; }
 
         #endregion
 
@@ -74,7 +68,7 @@ namespace SabreTools.Library.Help
         /// </summary>
         public Feature this[string name]
         {
-            get { return this.Features[name]; }
+            get { return this.Features.ContainsKey(name) ? this.Features[name] : null; }
             set { this.Features[name] = value; }
         }
 
@@ -83,7 +77,7 @@ namespace SabreTools.Library.Help
         /// </summary>
         public Feature this[Feature subfeature]
         {
-            get { return this.Features[subfeature.Name]; }
+            get { return this.Features.ContainsKey(subfeature.Name) ? this.Features[subfeature.Name] : null; }
             set { this.Features[subfeature.Name] = value; }
         }
 
@@ -139,24 +133,7 @@ namespace SabreTools.Library.Help
         /// <returns>True if the flag was found, false otherwise</returns>
         public bool ContainsFlag(string name)
         {
-            bool success = false;
-
-            // Loop through the flags
-            foreach (string flag in this.Flags)
-            {
-                if (flag == name)
-                {
-                    success = true;
-                    break;
-                }
-                else if (flag.TrimStart('-') == name)
-                {
-                    success = true;
-                    break;
-                }
-            }
-
-            return success;
+            return this.Flags.Any(f => f == name || f.TrimStart('-') == name);
         }
 
         /// <summary>
@@ -166,19 +143,7 @@ namespace SabreTools.Library.Help
         /// <returns>True if the flag was found, false otherwise</returns>
         public bool StartsWith(char c)
         {
-            bool success = false;
-
-            // Loop through the flags
-            foreach (string flag in this.Flags)
-            {
-                if (flag.TrimStart('-').ToLowerInvariant()[0] == c)
-                {
-                    success = true;
-                    break;
-                }
-            }
-
-            return success;
+            return this.Flags.Any(f => f.TrimStart('-').ToLowerInvariant()[0] == c);
         }
 
         #endregion
@@ -197,7 +162,7 @@ namespace SabreTools.Library.Help
             List<string> outputList = new List<string>();
 
             // Build the output string first
-            string output = "";
+            string output = string.Empty;
 
             // Add the pre-space first
             output += CreatePadding(pre);
@@ -223,17 +188,13 @@ namespace SabreTools.Library.Help
             }
 
             // Now add all flags
-            output += String.Join(", ", newflags);
+            output += string.Join(", ", newflags);
 
             // If we have a midpoint set, check to see if the string needs padding
             if (midpoint > 0 && output.Length < midpoint)
-            {
                 output += CreatePadding(midpoint - output.Length);
-            }
             else
-            {
                 output += " ";
-            }
 
             // Append the description
             output += this.Description;
@@ -257,20 +218,20 @@ namespace SabreTools.Library.Help
                     // If we have a newline character, reset the line and continue
                     if (split[i].Contains("\n"))
                     {
-                        string[] subsplit = split[i].Replace("\r", "").Split('\n');
+                        string[] subsplit = split[i].Replace("\r", string.Empty).Split('\n');
                         for (int j = 0; j < subsplit.Length - 1; j++)
                         {
                             // Add the next word only if the total length doesn't go above the width of the screen
                             if (output.Length + subsplit[j].Length < width)
                             {
-                                output += (output.Length == pre + 4 ? "" : " ") + subsplit[j];
+                                output += (output.Length == pre + 4 ? string.Empty : " ") + subsplit[j];
                             }
                             // Otherwise, we want to cache the line to output and create a new blank string
                             else
                             {
                                 outputList.Add(output);
                                 output = CreatePadding(pre + 4);
-                                output += (output.Length == pre + 4 ? "" : " ") + subsplit[j];
+                                output += (output.Length == pre + 4 ? string.Empty : " ") + subsplit[j];
                             }
 
                             outputList.Add(output);
@@ -284,20 +245,20 @@ namespace SabreTools.Library.Help
                     // Add the next word only if the total length doesn't go above the width of the screen
                     if (output.Length + split[i].Length < width)
                     {
-                        output += (output.Length == pre + 4 ? "" : " ") + split[i];
+                        output += (output.Length == pre + 4 ? string.Empty : " ") + split[i];
                     }
                     // Otherwise, we want to cache the line to output and create a new blank string
                     else
                     {
                         outputList.Add(output);
                         output = CreatePadding(pre + 4);
-                        output += (output.Length == pre + 4 ? "" : " ") + split[i];
+                        output += (output.Length == pre + 4 ? string.Empty : " ") + split[i];
                     }
                 }
 
                 // Add the last created output and a blank line for clarity
                 outputList.Add(output);
-                outputList.Add("");
+                outputList.Add(string.Empty);
             }
 
             return outputList;
@@ -310,11 +271,12 @@ namespace SabreTools.Library.Help
         /// <returns>String with requested number of blank spaces</returns>
         private string CreatePadding(int spaces)
         {
-            string blank = "";
+            string blank = string.Empty;
             for (int i = 0; i < spaces; i++)
             {
                 blank += " ";
             }
+
             return blank;
         }
 
@@ -331,7 +293,7 @@ namespace SabreTools.Library.Help
             List<string> outputList = new List<string>();
 
             // Build the output string first
-            string output = "";
+            string output = string.Empty;
 
             // Normalize based on the tab level
             int preAdjusted = pre;
@@ -366,17 +328,13 @@ namespace SabreTools.Library.Help
             }
 
             // Now add all flags
-            output += String.Join(", ", newflags);
+            output += string.Join(", ", newflags);
 
             // If we have a midpoint set, check to see if the string needs padding
             if (midpoint > 0 && output.Length < midpointAdjusted)
-            {
                 output += CreatePadding(midpointAdjusted - output.Length);
-            }
             else
-            {
                 output += " ";
-            }
 
             // Append the description
             output += this.Description;
@@ -400,20 +358,20 @@ namespace SabreTools.Library.Help
                     // If we have a newline character, reset the line and continue
                     if (split[i].Contains("\n"))
                     {
-                        string[] subsplit = split[i].Replace("\r", "").Split('\n');
+                        string[] subsplit = split[i].Replace("\r", string.Empty).Split('\n');
                         for (int j = 0; j < subsplit.Length - 1; j++)
                         {
                             // Add the next word only if the total length doesn't go above the width of the screen
                             if (output.Length + subsplit[j].Length < width)
                             {
-                                output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[j];
+                                output += (output.Length == preAdjusted + 4 ? string.Empty : " ") + subsplit[j];
                             }
                             // Otherwise, we want to cache the line to output and create a new blank string
                             else
                             {
                                 outputList.Add(output);
                                 output = CreatePadding(preAdjusted + 4);
-                                output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[j];
+                                output += (output.Length == preAdjusted + 4 ? string.Empty : " ") + subsplit[j];
                             }
 
                             outputList.Add(output);
@@ -427,20 +385,20 @@ namespace SabreTools.Library.Help
                     // Add the next word only if the total length doesn't go above the width of the screen
                     if (output.Length + split[i].Length < width)
                     {
-                        output += (output.Length == preAdjusted + 4 ? "" : " ") + split[i];
+                        output += (output.Length == preAdjusted + 4 ? string.Empty : " ") + split[i];
                     }
                     // Otherwise, we want to cache the line to output and create a new blank string
                     else
                     {
                         outputList.Add(output);
                         output = CreatePadding(preAdjusted + 4);
-                        output += (output.Length == preAdjusted + 4 ? "" : " ") + split[i];
+                        output += (output.Length == preAdjusted + 4 ? string.Empty : " ") + split[i];
                     }
                 }
 
                 // Add the last created output and a blank line for clarity
                 outputList.Add(output);
-                outputList.Add("");
+                outputList.Add(string.Empty);
             }
 
             // Now let's append all subfeatures
@@ -471,132 +429,148 @@ namespace SabreTools.Library.Help
                     valid = !input.Contains("=") && this.Flags.Contains(input);
                     if (valid)
                     {
-                        _valueBool = true;
+                        _value = true;
 
                         // If we've already found this feature before
                         if (_foundOnce && !ignore)
-                        {
                             valid = false;
-                        }
 
                         _foundOnce = true;
                     }
+
                     break;
+
                 // If we have an Int32, try to parse it if at all possible
                 case FeatureType.Int32:
                     valid = input.Contains("=") && this.Flags.Contains(input.Split('=')[0]);
                     if (valid)
                     {
                         if (!Int32.TryParse(input.Split('=')[1], out int value))
-                        {
                             value = Int32.MinValue;
-                        }
-                        _valueInt32 = value;
+
+                        _value = value;
 
                         // If we've already found this feature before
                         if (_foundOnce && !ignore)
-                        {
                             valid = false;
-                        }
 
                         _foundOnce = true;
                     }
+
                     break;
+
                 // If we have an Int32, try to parse it if at all possible
                 case FeatureType.Int64:
                     valid = input.Contains("=") && this.Flags.Contains(input.Split('=')[0]);
                     if (valid)
                     {
                         if (!Int64.TryParse(input.Split('=')[1], out long value))
-                        {
                             value = Int64.MinValue;
-                        }
-                        _valueInt64 = value;
+
+                        _value = value;
 
                         // If we've already found this feature before
                         if (_foundOnce && !ignore)
-                        {
                             valid = false;
-                        }
 
                         _foundOnce = true;
                     }
+
                     break;
+
                 // If we have an input, make sure it has an equals sign in it
                 case FeatureType.List:
                     valid = input.Contains("=") && this.Flags.Contains(input.Split('=')[0]);
                     if (valid)
                     {
-                        if (_valueList == null)
-                        {
-                            _valueList = new List<string>();
-                        }
+                        if (_value == null)
+                            _value = new List<string>();
 
-                        _valueList.Add(input.Split('=')[1]);
+                        (_value as List<string>).Add(input.Split('=')[1]);
                     }
+
                     break;
+
                 case FeatureType.String:
                     valid = input.Contains("=") && this.Flags.Contains(input.Split('=')[0]);
                     if (valid)
                     {
-                        _valueString = input.Split('=')[1];
+                        _value = input.Split('=')[1];
 
                         // If we've already found this feature before
                         if (_foundOnce && !ignore)
-                        {
                             valid = false;
-                        }
 
                         _foundOnce = true;
                     }
+
                     break;
             }
 
             // If we haven't found a valid flag and we're not looking for just this feature, check to see if any of the subfeatures are valid
             if (!valid && !exact)
-            {
-                foreach (string feature in this.Features.Keys)
-                {
-                    valid = this.Features[feature].ValidateInput(input);
-
-                    // If we've found a valid feature, we break out
-                    if (valid)
-                    {
-                        break;
-                    }
-                }
-            }
+                valid = this.Features.Keys.Any(k => this.Features[k].ValidateInput(input));
 
             // If we're not valid at this point, we want to check if this flag is a file or a folder
             if (!valid)
-            {
                 valid = File.Exists(input) || Directory.Exists(input);
-            }
 
             return valid;
         }
 
         /// <summary>
-        /// Get the proper value associated with this feature
+        /// Get the boolean value associated with this feature
         /// </summary>
-        /// <returns>Value associated with this feature</returns>
-        public object GetValue()
+        public bool GetBoolValue()
         {
-            switch (_featureType)
-            {
-                case FeatureType.Flag:
-                    return _valueBool;
-                case FeatureType.Int32:
-                    return _valueInt32;
-                case FeatureType.Int64:
-                    return _valueInt64;
-                case FeatureType.List:
-                    return _valueList;
-                case FeatureType.String:
-                    return _valueString;
-            }
+            if (_featureType != FeatureType.Flag)
+                throw new ArgumentException("Feature is not a flag");
 
-            return null;
+            return (_value as bool?).HasValue ? (_value as bool?).Value : false;
+        }
+
+        /// <summary>
+        /// Get the string value associated with this feature
+        /// </summary>
+        public string GetStringValue()
+        {
+            if (_featureType != FeatureType.String)
+                throw new ArgumentException("Feature is not a string");
+
+            return (_value as string);
+        }
+
+        /// <summary>
+        /// Get the Int32 value associated with this feature
+        /// </summary>
+        public int GetInt32Value()
+        {
+            if (_featureType != FeatureType.Int32)
+                throw new ArgumentException("Feature is not an int");
+
+            return (_value as int?).HasValue ? (_value as int?).Value : int.MinValue;
+        }
+
+        /// <summary>
+        /// Get the Int64 value associated with this feature
+        /// </summary>
+        public long GetInt64Value()
+        {
+            if (_featureType != FeatureType.Int64)
+                throw new ArgumentException("Feature is not a long");
+
+            return (_value as long?).HasValue ? (_value as long?).Value : long.MinValue;
+        }
+
+        /// <summary>
+        /// Get the List\<string\> value associated with this feature
+        /// </summary>
+        public List<string> GetListValue()
+        {
+            if (_featureType != FeatureType.List)
+                throw new ArgumentException("Feature is not a list");
+
+            return (_value as List<string>) ?? new List<string>();
         }
 
         /// <summary>
@@ -605,20 +579,18 @@ namespace SabreTools.Library.Help
         /// <returns>True if the feature is enabled, false otherwise</returns>
         public bool IsEnabled()
         {
-            object obj = GetValue();
-
             switch (_featureType)
             {
                 case FeatureType.Flag:
-                    return (bool)obj;
-                case FeatureType.Int32:
-                    return (int)obj != Int32.MinValue;
-                case FeatureType.Int64:
-                    return (long)obj != Int64.MinValue;
-                case FeatureType.List:
-                    return obj != null;
+                    return (_value as bool?) == true;
                 case FeatureType.String:
-                    return obj != null;
+                    return (_value as string) != null;
+                case FeatureType.Int32:
+                    return (_value as int?).HasValue && (_value as int?).Value != int.MinValue;
+                case FeatureType.Int64:
+                    return (_value as long?).HasValue && (_value as long?).Value != long.MinValue;
+                case FeatureType.List:
+                    return (_value as List<string>) != null;
             }
 
             return false;

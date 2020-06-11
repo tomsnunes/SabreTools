@@ -38,11 +38,11 @@ namespace SabreTools.Library.DatItems
         /// </summary>
         public Release()
         {
-            this.Name = "";
+            this.Name = string.Empty;
             this.ItemType = ItemType.Release;
-            this.Region = "";
-            this.Language = "";
-            this.Date = "";
+            this.Region = string.Empty;
+            this.Language = string.Empty;
+            this.Date = string.Empty;
             this.Default = null;
         }
 
@@ -102,12 +102,10 @@ namespace SabreTools.Library.DatItems
         {
             // If we don't have a release return false
             if (this.ItemType != other.ItemType)
-            {
                 return false;
-            }
 
-            // Otherwise, treat it as a reease
-            Release newOther = (Release)other;
+            // Otherwise, treat it as a Release
+            Release newOther = other as Release;
 
             // If the archive information matches
             return (this.Name == newOther.Name

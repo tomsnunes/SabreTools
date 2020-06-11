@@ -155,13 +155,13 @@ namespace SabreTools.Library.DatFiles
                 {
                     string needleString = needle as string;
                     string strawString = straw as string;
-                    if (!String.IsNullOrWhiteSpace(strawString) && needleString != null)
+                    if (!string.IsNullOrWhiteSpace(strawString) && needleString != null)
                     {
                         string regexStraw = strawString;
 
                         // If the straw has no special characters at all (excluding whitespace), treat it as an exact match
                         if (regexStraw == Regex.Escape(regexStraw).Replace("\\ ", " "))
-                            regexStraw = "^" + regexStraw + "$";
+                            regexStraw = $"^{regexStraw}$";
 
                         // Check if a match is found with the regex
                         found |= Regex.IsMatch(needleString, regexStraw, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);

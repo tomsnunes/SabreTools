@@ -1,16 +1,8 @@
 ﻿using System;
+using System.IO;
 
 using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using Stream = System.IO.Stream;
-using StreamWriter = System.IO.StreamWriter;
-#endif
 
 namespace SabreTools.Library.Reports
 {
@@ -51,9 +43,7 @@ namespace SabreTools.Library.Reports
             _datFile = datfile;
 
             if (!stream.CanWrite)
-            {
                 throw new ArgumentException(nameof(stream));
-            }
 
             _writer = new StreamWriter(stream);
             _baddumpCol = baddumpCol;

@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using FileStream = System.IO.FileStream;
-using StreamReader = System.IO.StreamReader;
-using StreamWriter = System.IO.StreamWriter;
-#endif
 using NaturalSort;
 
 namespace SabreTools.Library.DatFiles
@@ -64,9 +56,7 @@ namespace SabreTools.Library.DatFiles
 
                 // Comments in CMP DATs start with a #
                 if (line.Trim().StartsWith("#"))
-                {
                     continue;
-                }
 
                 // If the line is the header or a game
                 if (Regex.IsMatch(line, Constants.HeaderPatternCMP))
@@ -86,11 +76,11 @@ namespace SabreTools.Library.DatFiles
                         || normalizedValue == "game"       // Used by most CMP DATs
                         || normalizedValue == "machine")   // Possibly used by MAME CMP DATs
                     {
-                        ReadSet(sr, false, filename, sysid, srcid, keep, clean, remUnicode);
+                        ReadSet(sr, false, filename, sysid, srcid, clean, remUnicode);
                     }
                     else if (normalizedValue == "resource")  // Used by some other DATs to denote a BIOS set
                     {
-                        ReadSet(sr, true, filename, sysid, srcid, keep, clean, remUnicode);
+                        ReadSet(sr, true, filename, sysid, srcid, clean, remUnicode);
                     }
                 }
             }
@@ -109,9 +99,7 @@ namespace SabreTools.Library.DatFiles
 
             // If there's no subtree to the header, skip it
             if (reader == null || reader.EndOfStream)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             string line = reader.ReadLine();
@@ -126,16 +114,15 @@ namespace SabreTools.Library.DatFiles
 
                 // Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
                 GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
-                string itemval = gc[2].Value.Replace("\"", "");
+                string itemval = gc[2].Value.Replace("\"", string.Empty);
 
                 if (line.Trim().StartsWith("Name:"))
                 {
-                    Name = (String.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
+                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
                     superdat = superdat || itemval.Contains(" - SuperDAT");
+
                     if (keep && superdat)
-                    {
-                        Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
-                    }
+                        Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
 
                     line = reader.ReadLine();
                     continue;
@@ -145,79 +132,76 @@ namespace SabreTools.Library.DatFiles
                 {
                     case "name":
                     case "Name:":
-                        Name = (String.IsNullOrWhiteSpace(Name) ? itemval : Name);
+                        Name = (string.IsNullOrWhiteSpace(Name) ? itemval : Name);
                         superdat = superdat || itemval.Contains(" - SuperDAT");
+
                         if (keep && superdat)
-                        {
-                            Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
-                        }
+                            Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+
                         break;
                     case "description":
                     case "Description:":
-                        Description = (String.IsNullOrWhiteSpace(Description) ? itemval : Description);
+                        Description = (string.IsNullOrWhiteSpace(Description) ? itemval : Description);
                         break;
                     case "rootdir":
                     case "Rootdir:":
-                        RootDir = (String.IsNullOrWhiteSpace(RootDir) ? itemval : RootDir);
+                        RootDir = (string.IsNullOrWhiteSpace(RootDir) ? itemval : RootDir);
                         break;
                     case "category":
                     case "Category:":
-                        Category = (String.IsNullOrWhiteSpace(Category) ? itemval : Category);
+                        Category = (string.IsNullOrWhiteSpace(Category) ? itemval : Category);
                         break;
                     case "version":
                     case "Version:":
-                        Version = (String.IsNullOrWhiteSpace(Version) ? itemval : Version);
+                        Version = (string.IsNullOrWhiteSpace(Version) ? itemval : Version);
                         break;
                     case "date":
                     case "Date:":
-                        Date = (String.IsNullOrWhiteSpace(Date) ? itemval : Date);
+                        Date = (string.IsNullOrWhiteSpace(Date) ? itemval : Date);
                         break;
                     case "author":
                     case "Author:":
-                        Author = (String.IsNullOrWhiteSpace(Author) ? itemval : Author);
+                        Author = (string.IsNullOrWhiteSpace(Author) ? itemval : Author);
                         break;
                     case "email":
                     case "Email:":
-                        Email = (String.IsNullOrWhiteSpace(Email) ? itemval : Email);
+                        Email = (string.IsNullOrWhiteSpace(Email) ? itemval : Email);
                         break;
                     case "homepage":
                     case "Homepage:":
-                        Homepage = (String.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
+                        Homepage = (string.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
                         break;
                     case "url":
                     case "Url:":
-                        Url = (String.IsNullOrWhiteSpace(Url) ? itemval : Url);
+                        Url = (string.IsNullOrWhiteSpace(Url) ? itemval : Url);
                         break;
                     case "comment":
                     case "Comment:":
-                        Comment = (String.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
+                        Comment = (string.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
                         break;
                     case "header":
                     case "Header:":
-                        Header = (String.IsNullOrWhiteSpace(Header) ? itemval : Header);
+                        Header = (string.IsNullOrWhiteSpace(Header) ? itemval : Header);
                         break;
                     case "type":
                     case "Type:":
-                        Type = (String.IsNullOrWhiteSpace(Type) ? itemval : Type);
+                        Type = (string.IsNullOrWhiteSpace(Type) ? itemval : Type);
                         superdat = superdat || itemval.Contains("SuperDAT");
                         break;
                     case "forcemerging":
                         if (ForceMerging == ForceMerging.None)
-                        {
                             ForceMerging = Utilities.GetForceMerging(itemval);
-                        }
+                        
                         break;
                     case "forcezipping":
                         if (ForcePacking == ForcePacking.None)
-                        {
                             ForcePacking = Utilities.GetForcePacking(itemval);
-                        }
+
                         break;
                     case "forcepacking":
                         if (ForcePacking == ForcePacking.None)
-                        {
                             ForcePacking = Utilities.GetForcePacking(itemval);
-                        }
+
                         break;
                 }
 
@@ -233,7 +217,6 @@ namespace SabreTools.Library.DatFiles
         /// <param name="filename">Name of the file to be parsed</param>
         /// <param name="sysid">System ID for the DAT</param>
         /// <param name="srcid">Source ID for the DAT</param>
-        /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
         /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
         /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
         private void ReadSet(
@@ -246,7 +229,6 @@ namespace SabreTools.Library.DatFiles
             int srcid,
 
             // Miscellaneous
-            bool keep,
             bool clean,
             bool remUnicode)
         {
@@ -259,9 +241,7 @@ namespace SabreTools.Library.DatFiles
 
             // If there's no subtree to the header, skip it
             if (reader == null || reader.EndOfStream)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             string line = reader.ReadLine();
@@ -287,21 +267,13 @@ namespace SabreTools.Library.DatFiles
                     containsItems = true;
                     ItemType temptype = ItemType.Rom;
                     if (line.Trim().StartsWith("rom ("))
-                    {
                         temptype = ItemType.Rom;
-                    }
                     else if (line.Trim().StartsWith("disk ("))
-                    {
                         temptype = ItemType.Disk;
-                    }
                     else if (line.Trim().StartsWith("file ("))
-                    {
                         temptype = ItemType.Rom;
-                    }
                     else if (line.Trim().StartsWith("sample"))
-                    {
                         temptype = ItemType.Sample;
-                    }
 
                     // Create the proper DatItem based on the type
                     DatItem item = Utilities.GetDatItem(temptype);
@@ -316,7 +288,7 @@ namespace SabreTools.Library.DatFiles
                     // If we have a sample, treat it special
                     if (temptype == ItemType.Sample)
                     {
-                        line = line.Trim().Remove(0, 6).Trim().Replace("\"", ""); // Remove "sample" from the input string
+                        line = line.Trim().Remove(0, 6).Trim().Replace("\"", string.Empty); // Remove "sample" from the input string
                         item.Name = line;
 
                         // Now process and add the sample
@@ -348,7 +320,7 @@ namespace SabreTools.Library.DatFiles
                                     && linegc[i] != "sha384"
                                     && linegc[i] != "sha512")
                                 {
-                                    item.Name += " " + linegc[i];
+                                    item.Name += $" {linegc[i]}";
                                 }
 
                                 // Perform correction
@@ -361,58 +333,57 @@ namespace SabreTools.Library.DatFiles
                             {
                                 long tempsize = -1;
                                 if (!Int64.TryParse(linegc[++i], out tempsize))
-                                {
                                     tempsize = 0;
-                                }
+
                                 ((Rom)item).Size = tempsize;
                             }
 
                             // Get the date from the next part
                             else if (linegc[i] == "date")
                             {
-                                ((Rom)item).Date = linegc[++i].Replace("\"", "") + " " + linegc[++i].Replace("\"", "");
+                                ((Rom)item).Date = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
                             }
 
                             // Get the CRC from the next part
                             else if (linegc[i] == "crc")
                             {
-                                ((Rom)item).CRC = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).CRC = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
 
                             // Get the MD5 from the next part
                             else if (linegc[i] == "md5")
                             {
-                                ((Rom)item).MD5 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).MD5 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
 
                             // Get the RIPEMD160 from the next part
                             else if (linegc[i] == "ripemd160")
                             {
-                                ((Rom)item).RIPEMD160 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).RIPEMD160 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
 
                             // Get the SHA1 from the next part
                             else if (linegc[i] == "sha1")
                             {
-                                ((Rom)item).SHA1 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).SHA1 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
 
                             // Get the SHA256 from the next part
                             else if (linegc[i] == "sha256")
                             {
-                                ((Rom)item).SHA256 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).SHA256 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
 
                             // Get the SHA384 from the next part
                             else if (linegc[i] == "sha384")
                             {
-                                ((Rom)item).SHA384 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).SHA384 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
 
                             // Get the SHA512 from the next part
                             else if (linegc[i] == "sha512")
                             {
-                                ((Rom)item).SHA512 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+                                ((Rom)item).SHA512 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
                             }
                         }
 
@@ -426,7 +397,7 @@ namespace SabreTools.Library.DatFiles
                     for (int i = 0; i < linegc.Length; i++)
                     {
                         // Look at the current item and use it if possible
-                        string quoteless = linegc[i].Replace("\"", "");
+                        string quoteless = linegc[i].Replace("\"", string.Empty);
                         switch (quoteless)
                         {
                             //If the item is empty, we automatically skip it because it's a fluke
@@ -440,189 +411,188 @@ namespace SabreTools.Library.DatFiles
                             case "verified":
                                 ItemStatus tempStandaloneStatus = Utilities.GetItemStatus(quoteless);
                                 if (item.ItemType == ItemType.Rom)
-                                {
                                     ((Rom)item).ItemStatus = tempStandaloneStatus;
-                                }
                                 else if (item.ItemType == ItemType.Disk)
-                                {
                                     ((Disk)item).ItemStatus = tempStandaloneStatus;
-                                }
+
                                 break;
 
                             // Regular attributes
                             case "name":
-                                quoteless = linegc[++i].Replace("\"", "");
+                                quoteless = linegc[++i].Replace("\"", string.Empty);
                                 item.Name = quoteless;
                                 break;
                             case "size":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     if (Int64.TryParse(quoteless, out long size))
-                                    {
                                         ((Rom)item).Size = size;
-                                    }
                                     else
-                                    {
                                         ((Rom)item).Size = -1;
-                                    }
                                 }
+
                                 break;
                             case "crc":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).CRC = Utilities.CleanHashData(quoteless, Constants.CRCLength);
                                 }
+
                                 break;
                             case "md5":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).MD5 = Utilities.CleanHashData(quoteless, Constants.MD5Length);
                                 }
                                 else if (item.ItemType == ItemType.Disk)
                                 {
                                     i++;
-                                    quoteless = linegc[i].Replace("\"", "");
+                                    quoteless = linegc[i].Replace("\"", string.Empty);
                                     ((Disk)item).MD5 = Utilities.CleanHashData(quoteless, Constants.MD5Length);
                                 }
+
                                 break;
                             case "ripemd160":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).RIPEMD160 = Utilities.CleanHashData(quoteless, Constants.RIPEMD160Length);
                                 }
                                 else if (item.ItemType == ItemType.Disk)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Disk)item).RIPEMD160 = Utilities.CleanHashData(quoteless, Constants.RIPEMD160Length);
                                 }
+
                                 break;
                             case "sha1":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).SHA1 = Utilities.CleanHashData(quoteless, Constants.SHA1Length);
                                 }
                                 else if (item.ItemType == ItemType.Disk)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Disk)item).SHA1 = Utilities.CleanHashData(quoteless, Constants.SHA1Length);
                                 }
+
                                 break;
                             case "sha256":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).SHA256 = Utilities.CleanHashData(quoteless, Constants.SHA256Length);
                                 }
                                 else if (item.ItemType == ItemType.Disk)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Disk)item).SHA256 = Utilities.CleanHashData(quoteless, Constants.SHA256Length);
                                 }
+
                                 break;
                             case "sha384":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).SHA384 = Utilities.CleanHashData(quoteless, Constants.SHA384Length);
                                 }
                                 else if (item.ItemType == ItemType.Disk)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Disk)item).SHA384 = Utilities.CleanHashData(quoteless, Constants.SHA384Length);
                                 }
+
                                 break;
                             case "sha512":
                                 if (item.ItemType == ItemType.Rom)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Rom)item).SHA512 = Utilities.CleanHashData(quoteless, Constants.SHA512Length);
                                 }
                                 else if (item.ItemType == ItemType.Disk)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Disk)item).SHA512 = Utilities.CleanHashData(quoteless, Constants.SHA512Length);
                                 }
+
                                 break;
                             case "status":
                             case "flags":
-                                quoteless = linegc[++i].Replace("\"", "");
+                                quoteless = linegc[++i].Replace("\"", string.Empty);
                                 ItemStatus tempFlagStatus = Utilities.GetItemStatus(quoteless);
                                 if (item.ItemType == ItemType.Rom)
-                                {
                                     ((Rom)item).ItemStatus = tempFlagStatus;
-                                }
                                 else if (item.ItemType == ItemType.Disk)
-                                {
                                     ((Disk)item).ItemStatus = tempFlagStatus;
-                                }
+
                                 break;
                             case "date":
                                 if (item.ItemType == ItemType.Rom)
                                 {
                                     // If we have quotes in the next item, assume only one item
                                     if (linegc[i + 1].Contains("\""))
-                                    {
-                                        quoteless = linegc[++i].Replace("\"", "");
-                                    }
+                                        quoteless = linegc[++i].Replace("\"", string.Empty);
+
                                     // Otherwise, we assume we need to read the next two items
                                     else
-                                    {
-                                        quoteless = linegc[++i].Replace("\"", "") + " " + linegc[++i].Replace("\"", "");
-                                    }
+                                        quoteless = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
+
                                     ((Rom)item).Date = quoteless;
                                 }
                                 else if (item.ItemType == ItemType.Release)
                                 {
                                     // If we have quotes in the next item, assume only one item
                                     if (linegc[i + 1].Contains("\""))
-                                    {
-                                        quoteless = linegc[++i].Replace("\"", "");
-                                    }
+                                        quoteless = linegc[++i].Replace("\"", string.Empty);
+
                                     // Otherwise, we assume we need to read the next two items
                                     else
-                                    {
-                                        quoteless = linegc[++i].Replace("\"", "") + " " + linegc[++i].Replace("\"", "");
-                                    }
+                                        quoteless = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
+
                                     ((Release)item).Date = quoteless;
                                 }
+
                                 break;
                             case "default":
                                 if (item.ItemType == ItemType.BiosSet)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((BiosSet)item).Default = Utilities.GetYesNo(quoteless.ToLowerInvariant());
                                 }
                                 else if (item.ItemType == ItemType.Release)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Release)item).Default = Utilities.GetYesNo(quoteless.ToLowerInvariant());
                                 }
+
                                 break;
                             case "description":
                                 if (item.ItemType == ItemType.BiosSet)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((BiosSet)item).Description = quoteless.ToLowerInvariant();
                                 }
+
                                 break;
                             case "region":
                                 if (item.ItemType == ItemType.Release)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Release)item).Region = quoteless.ToLowerInvariant();
                                 }
+
                                 break;
                             case "language":
                                 if (item.ItemType == ItemType.Release)
                                 {
-                                    quoteless = linegc[++i].Replace("\"", "");
+                                    quoteless = linegc[++i].Replace("\"", string.Empty);
                                     ((Release)item).Language = quoteless.ToLowerInvariant();
                                 }
+
                                 break;
                         }
                     }
@@ -636,7 +606,7 @@ namespace SabreTools.Library.DatFiles
 
                 // Set-specific lines have a known pattern
                 GroupCollection setgc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
-                string itemval = setgc[2].Value.Replace("\"", "");
+                string itemval = setgc[2].Value.Replace("\"", string.Empty);
 
                 switch (setgc[1].Value)
                 {
@@ -676,6 +646,7 @@ namespace SabreTools.Library.DatFiles
                     System = filename,
                     SourceID = srcid,
                 };
+
                 blank.CopyMachineInformation(machine);
 
                 // Now process and add the rom
@@ -693,13 +664,13 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                Globals.Logger.User("Opening file for writing: {0}", outfile);
+                Globals.Logger.User($"Opening file for writing: {outfile}");
                 FileStream fs = Utilities.TryCreate(outfile);
 
                 // If we get back null for some reason, just log and return
                 if (fs == null)
                 {
-                    Globals.Logger.Warning("File '{0}' could not be created for writing! Please check to see if the file is writable", outfile);
+                    Globals.Logger.Warning($"File '{outfile}' could not be created for writing! Please check to see if the file is writable");
                     return false;
                 }
 
@@ -735,22 +706,18 @@ namespace SabreTools.Library.DatFiles
 
                         // If we have a different game and we're not at the start of the list, output the end of last item
                         if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                        {
                             WriteEndGame(sw, rom);
-                        }
 
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                        {
                             WriteStartGame(sw, rom);
-                        }
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (rom.ItemType == ItemType.Rom
                             && ((Rom)rom).Size == -1
                             && ((Rom)rom).CRC == "null")
                         {
-                            Globals.Logger.Verbose("Empty folder found: {0}", rom.MachineName);
+                            Globals.Logger.Verbose($"Empty folder found: {rom.MachineName}");
 
                             // If we're in a mode that doesn't allow for actual empty folders, add the blank info
                             rom.Name = (rom.Name == "null" ? "-" : rom.Name);
@@ -775,7 +742,7 @@ namespace SabreTools.Library.DatFiles
                 // Write the file footer out
                 WriteFooter(sw);
 
-                Globals.Logger.Verbose("File written!" + Environment.NewLine);
+                Globals.Logger.Verbose($"File written!{Environment.NewLine}");
                 sw.Dispose();
                 fs.Dispose();
             }
@@ -797,24 +764,48 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string header = "clrmamepro (\n" +
-                            "\tname \"" + Name + "\"\n" +
-                            "\tdescription \"" + Description + "\"\n" +
-                            (!String.IsNullOrWhiteSpace(Category) ? "\tcategory \"" + Category + "\"\n" : "") +
-                            "\tversion \"" + Version + "\"\n" +
-                            (!String.IsNullOrWhiteSpace(Date) ? "\tdate \"" + Date + "\"\n" : "") +
-                            "\tauthor \"" + Author + "\"\n" +
-                            (!String.IsNullOrWhiteSpace(Email) ? "\temail \"" + Email + "\"\n" : "") +
-                            (!String.IsNullOrWhiteSpace(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : "") +
-                            (!String.IsNullOrWhiteSpace(Url) ? "\turl \"" + Url + "\"\n" : "") +
-                            (!String.IsNullOrWhiteSpace(Comment) ? "\tcomment \"" + Comment + "\"\n" : "") +
-                            (ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
-                            (ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
-                            (ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
-                            (ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
-                            (ForceMerging == ForceMerging.Merged ? "\tforcemerging merged\n" : "") +
-                            (ForceMerging == ForceMerging.NonMerged ? "\tforcemerging nonmerged\n" : "") +
-                            ")\n";
+                string header = "clrmamepro (\n";
+                header += $"\tname \"{Name}\"\n";
+                header += $"\tdescription \"{Description}\"\n";
+                if (!string.IsNullOrWhiteSpace(Category))
+                    header += $"\tcategory \"{Category}\"\n";
+                header += $"\tversion \"{Version}\"\n";
+                if (!string.IsNullOrWhiteSpace(Date))
+                    header += $"\tdate \"{Date}\"\n";
+                header += $"\tauthor \"{Author}\"\n";
+                if (!string.IsNullOrWhiteSpace(Email))
+                    header += $"\temail \"{Email}\"\n";
+                if (!string.IsNullOrWhiteSpace(Homepage))
+                    header += $"\thomepage \"{Homepage}\"\n";
+                if (!string.IsNullOrWhiteSpace(Url))
+                    header += $"\turl \"{Url}\"\n";
+                if (!string.IsNullOrWhiteSpace(Comment))
+                    header += $"\tcomment \"{Comment}\"\n";
+                switch (ForcePacking)
+                {
+                    case ForcePacking.Unzip:
+                        header += "\tforcezipping no\n";
+                        break;
+                    case ForcePacking.Zip:
+                        header += "\tforcezipping yes\n";
+                        break;
+                }
+                switch (ForceMerging)
+                {
+                    case ForceMerging.Full:
+                        header += "\tforcemerging full\n";
+                        break;
+                    case ForceMerging.Split:
+                        header += "\tforcemerging split\n";
+                        break;
+                    case ForceMerging.Merged:
+                        header += "\tforcemerging merged\n";
+                        break;
+                    case ForceMerging.NonMerged:
+                        header += "\tforcemerging nonmerged\n";
+                        break;
+                }
+                header += ")\n";
 
                 // Write the header out
                 sw.Write(header);
@@ -833,25 +824,31 @@ namespace SabreTools.Library.DatFiles
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
         /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteStartGame(StreamWriter sw, DatItem rom)
+        private bool WriteStartGame(StreamWriter sw, DatItem datItem)
         {
             try
             {
                 // No game should start with a path separator
-                if (rom.MachineName.StartsWith(Path.DirectorySeparatorChar.ToString()))
-                {
-                    rom.MachineName = rom.MachineName.Substring(1);
-                }
+                datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
 
-                string state = (rom.MachineType == MachineType.Bios ? "resource" : "game") + " (\n\tname \"" + (!ExcludeFields[(int)Field.MachineName] ? rom.MachineName : "") + "\"\n" +
-                            (!ExcludeFields[(int)Field.RomOf] && String.IsNullOrWhiteSpace(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
-                            (!ExcludeFields[(int)Field.CloneOf] && String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
-                            (!ExcludeFields[(int)Field.SampleOf] && String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") +
-                            (!ExcludeFields[(int)Field.Description] ? "\tdescription \"" + (String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription) + "\"\n" : "") +
-                            (!ExcludeFields[(int)Field.Year] && String.IsNullOrWhiteSpace(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
-                            (!ExcludeFields[(int)Field.Manufacturer] && String.IsNullOrWhiteSpace(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
+                // Build the state based on excluded fields
+                string state = (datItem.MachineType == MachineType.Bios ? "resource" : "game");
+                state += $" (\n\tname \"{datItem.MachineName}\"\n";
+                    state += $"\tromof \"{datItem.RomOf}\"\n";
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
+                    state += $"\tcloneof \"{datItem.CloneOf}\"\n";
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
+                    state += $"\tsampleof \"{datItem.SampleOf}\"\n";
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
+                    state += $"\tdescription \"{datItem.MachineDescription}\"\n";
+                else if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
+                    state += $"\tdescription \"{datItem.MachineName}\"\n";
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Year, ExcludeFields)))
+                    state += $"\tyear \"{datItem.Year}\"\n";
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Manufacturer, ExcludeFields)))
+                    state += $"\tmanufacturer \"{datItem.Manufacturer}\"\n";
 
                 sw.Write(state);
                 sw.Flush();
@@ -869,13 +866,19 @@ namespace SabreTools.Library.DatFiles
         /// Write out Game end using the supplied StreamWriter
         /// </summary>
         /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteEndGame(StreamWriter sw, DatItem rom)
+        private bool WriteEndGame(StreamWriter sw, DatItem datItem)
         {
             try
             {
-                string state = (!ExcludeFields[(int)Field.SampleOf] && String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
+                string state = string.Empty;
+
+                // Build the state based on excluded fields
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
+                    state += $"\tsampleof \"{datItem.SampleOf}\"\n";
+
+                state += ")\n";
 
                 sw.Write(state);
                 sw.Flush();
@@ -894,78 +897,103 @@ namespace SabreTools.Library.DatFiles
         /// </summary>
         /// <param name="datFile">DatFile to write out from</param>
         /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
-            if (ignoreblanks
-                && (rom.ItemType == ItemType.Rom
-                && (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
-            {
+            if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
                 return true;
-            }
 
             try
             {
-                string state = "";
+                string state = string.Empty;
 
                 // Pre-process the item name
-                ProcessItemName(rom, true);
+                ProcessItemName(datItem, true);
 
-                switch (rom.ItemType)
+                // Build the state based on excluded fields
+                switch (datItem.ItemType)
                 {
                     case ItemType.Archive:
-                        state += "\tarchive ( name\"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + " )\n";
+                        state += $"\tarchive ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        state += " )\n";
                         break;
+
                     case ItemType.BiosSet:
-                        state += "\tbiosset ( name\"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + (!ExcludeFields[(int)Field.BiosDescription] && !String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Default] && ((BiosSet)rom).Default != null
-                                ? "default " + ((BiosSet)rom).Default.ToString().ToLowerInvariant()
-                                : "")
-                            + " )\n";
+                        var biosSet = datItem as BiosSet;
+                        state += $"\tbiosset ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.BiosDescription, ExcludeFields)))
+                            state += $" description \"{biosSet.Description}\"";
+                        if (!ExcludeFields[(int)Field.Default] && biosSet.Default != null)
+                            state += $" default \"{biosSet.Default.ToString().ToLowerInvariant()}\"";
+                        state += " )\n";
                         break;
+
                     case ItemType.Disk:
-                        state += "\tdisk ( name \"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + (!ExcludeFields[(int)Field.MD5] && !String.IsNullOrWhiteSpace(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.RIPEMD160] && !String.IsNullOrWhiteSpace(((Disk)rom).RIPEMD160) ? " ripemd160 " + ((Disk)rom).RIPEMD160.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA1] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA256] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA256) ? " sha256 " + ((Disk)rom).SHA256.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA384] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA384) ? " sha384 " + ((Disk)rom).SHA384.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA512] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA512) ? " sha512 " + ((Disk)rom).SHA512.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.Status] && ((Disk)rom).ItemStatus != ItemStatus.None ? " flags " + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() : "")
-                            + " )\n";
+                        var disk = datItem as Disk;
+                        state += $"\tdisk ( name \"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                            state += $" md5 \"{disk.MD5.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
+                            state += $" ripemd160 \"{disk.RIPEMD160.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
+                            state += $" sha1 \"{disk.SHA1.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
+                            state += $" sha256 \"{disk.SHA256.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
+                            state += $" sha384 \"{disk.SHA384.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
+                            state += $" sha512 \"{disk.SHA512.ToLowerInvariant()}\"";
+                        if (!ExcludeFields[(int)Field.Status] && disk.ItemStatus != ItemStatus.None)
+                            state += $" flags \"{disk.ItemStatus.ToString().ToLowerInvariant()}\"";
+                        state += " )\n";
                         break;
+
                     case ItemType.Release:
-                        state += "\trelease ( name\"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + (!ExcludeFields[(int)Field.Region] && !String.IsNullOrWhiteSpace(((Release)rom).Region) ? " region \"" + ((Release)rom).Region + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Language] && !String.IsNullOrWhiteSpace(((Release)rom).Language) ? " language \"" + ((Release)rom).Language + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Date] && !String.IsNullOrWhiteSpace(((Release)rom).Date) ? " date \"" + ((Release)rom).Date + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Default] && ((Release)rom).Default != null
-                                ? "default " + ((Release)rom).Default.ToString().ToLowerInvariant()
-                                : "")
-                            + " )\n";
+                        var release = datItem as Release;
+                        state += $"\trelease ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Region, ExcludeFields)))
+                            state += $" region \"{release.Region}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Language, ExcludeFields)))
+                            state += $" language \"{release.Language}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
+                            state += $" date \"{release.Date}\"";
+                        if (!ExcludeFields[(int)Field.Default] && release.Default != null)
+                            state += $" default \"{release.Default.ToString().ToLowerInvariant()}\"";
+                        state += " )\n";
                         break;
+
                     case ItemType.Rom:
-                        state += "\trom ( name \"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + (!ExcludeFields[(int)Field.Size] && ((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
-                            + (!ExcludeFields[(int)Field.CRC] && !String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.MD5] && !String.IsNullOrWhiteSpace(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.RIPEMD160] && !String.IsNullOrWhiteSpace(((Rom)rom).RIPEMD160) ? " ripemd160 " + ((Rom)rom).RIPEMD160.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA1] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA256] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA256) ? " sha256 " + ((Rom)rom).SHA256.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA384] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA384) ? " sha384 " + ((Rom)rom).SHA384.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.SHA512] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA512) ? " sha512 " + ((Rom)rom).SHA512.ToLowerInvariant() : "")
-                            + (!ExcludeFields[(int)Field.Date] && !String.IsNullOrWhiteSpace(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Status] && ((Rom)rom).ItemStatus != ItemStatus.None ? " flags " + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() : "")
-                            + " )\n";
+                        var rom = datItem as Rom;
+                        state += $"\trom ( name \"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
+                            state += $" size \"{rom.Size}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
+                            state += $" crc \"{rom.CRC.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                            state += $" md5 \"{rom.MD5.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
+                            state += $" ripemd160 \"{rom.RIPEMD160.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
+                            state += $" sha1 \"{rom.SHA1.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
+                            state += $" sha256 \"{rom.SHA256.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
+                            state += $" sha384 \"{rom.SHA384.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
+                            state += $" sha512 \"{rom.SHA512.ToLowerInvariant()}\"";
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
+                            state += $" date \"{rom.Date}\"";
+                        if (!ExcludeFields[(int)Field.Status] && rom.ItemStatus != ItemStatus.None)
+                            state += $" flags \"{rom.ItemStatus.ToString().ToLowerInvariant()}\"";
+                        state += " )\n";
                         break;
+
                     case ItemType.Sample:
-                        state += "\tsample ( name\"" + (!ExcludeFields[(int)Field.Name] ? rom.Name : "") + "\""
-                            + " )\n";
+                        state += $"\tsample ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        state += " )\n";
                         break;
                 }
 

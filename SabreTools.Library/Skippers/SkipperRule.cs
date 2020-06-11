@@ -1,19 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using BinaryReader = System.IO.BinaryReader;
-using BinaryWriter = System.IO.BinaryWriter;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-#endif
 
 namespace SabreTools.Library.Skippers
 {
@@ -61,14 +51,14 @@ namespace SabreTools.Library.Skippers
             // If the input file doesn't exist, fail
             if (!File.Exists(input))
             {
-                Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", input);
+                Globals.Logger.Error($"I'm sorry but '{input}' doesn't exist!");
                 return false;
             }
 
             // Create the output directory if it doesn't already
             Utilities.EnsureOutputDirectory(Path.GetDirectoryName(output));
 
-            Globals.Logger.User("Attempting to apply rule to '{0}'", input);
+            Globals.Logger.User($"Attempting to apply rule to '{input}'");
             success = TransformStream(Utilities.TryOpenRead(input), Utilities.TryCreate(output));
 
             // If the output file has size 0, delete it
@@ -114,21 +104,16 @@ namespace SabreTools.Library.Skippers
 
                 // Seek to the beginning offset
                 if (StartOffset == null)
-                {
                     success = false;
-                }
+
                 else if (Math.Abs((long)StartOffset) > input.Length)
-                {
                     success = false;
-                }
+
                 else if (StartOffset > 0)
-                {
                     input.Seek((long)StartOffset, SeekOrigin.Begin);
-                }
+
                 else if (StartOffset < 0)
-                {
                     input.Seek((long)StartOffset, SeekOrigin.End);
-                }
 
                 // Then read and apply the operation as you go
                 if (success)
@@ -154,6 +139,7 @@ namespace SabreTools.Library.Skippers
                                 r <<= s;
                                 buffer[pos] = (byte)r;
                                 break;
+
                             case HeaderSkipOperation.Byteswap:
                                 if (pos % 2 == 1)
                                 {
@@ -164,12 +150,15 @@ namespace SabreTools.Library.Skippers
                                     buffer[pos + 1] = b;
                                 }
                                 break;
+
                             case HeaderSkipOperation.Wordswap:
                                 buffer[3 - pos] = b;
                                 break;
+
                             case HeaderSkipOperation.WordByteswap:
                                 buffer[(pos + 2) % 4] = b;
                                 break;
+
                             case HeaderSkipOperation.None:
                             default:
                                 buffer[pos] = b;
@@ -187,6 +176,7 @@ namespace SabreTools.Library.Skippers
                             buffer = new byte[4];
                         }
                     }
+
                     // If there's anything more in the buffer, write only the left bits
                     for (int i = 0; i < pos; i++)
                     {
@@ -203,15 +193,11 @@ namespace SabreTools.Library.Skippers
             {
                 // If we're not keeping the read stream open, dispose of the binary reader
                 if (!keepReadOpen)
-                {
                     br?.Dispose();
-                }
 
                 // If we're not keeping the write stream open, dispose of the binary reader
                 if (!keepWriteOpen)
-                {
                     bw?.Dispose();
-                }
             }
 
             return success;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -17,26 +18,6 @@ using SabreTools.Library.FileTypes;
 using SabreTools.Library.Reports;
 using SabreTools.Library.Skippers;
 using Compress.ThreadReaders;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using BinaryReader = System.IO.BinaryReader;
-using BinaryWriter = System.IO.BinaryWriter;
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
-using FileShare = System.IO.FileShare;
-using FileStream = System.IO.FileStream;
-using IOException = System.IO.IOException;
-using MemoryStream = System.IO.MemoryStream;
-using PathTooLongException = System.IO.PathTooLongException;
-using SearchOption = System.IO.SearchOption;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-using StreamReader = System.IO.StreamReader;
-#endif
 using NaturalSort;
 
 namespace SabreTools.Library.Tools
@@ -228,8 +209,8 @@ namespace SabreTools.Library.Tools
         /// <returns>The cleaned name</returns>
         public static string CleanGameName(string[] game)
         {
-            game[game.Length - 1] = CleanGameName(game[game.Length - 1]);
-            string outgame = String.Join(Path.DirectorySeparatorChar.ToString(), game);
+            game[game.Length - 1] = CleanGameName(game.Last());
+            string outgame = string.Join(Path.DirectorySeparatorChar.ToString(), game);
             outgame = outgame.TrimStart().TrimEnd();
             return outgame;
         }
@@ -244,29 +225,22 @@ namespace SabreTools.Library.Tools
         {
             // If we have a known blank hash, return blank
             if (string.IsNullOrWhiteSpace(hash) || hash == "-" || hash == "_")
-            {
-                return "";
-            }
+                return string.Empty;
 
             // Check to see if it's a "hex" hash
-            hash = hash.Trim().Replace("0x", "");
+            hash = hash.Trim().Replace("0x", string.Empty);
 
             // If we have a blank hash now, return blank
             if (string.IsNullOrWhiteSpace(hash))
-            {
-                return "";
-            }
+                return string.Empty;
 
             // If the hash shorter than the required length, pad it
             if (hash.Length < padding)
-            {
                 hash = hash.PadLeft(padding, '0');
-            }
+
             // If the hash is longer than the required length, it's invalid
             else if (hash.Length > padding)
-            {
-                return "";
-            }
+                return string.Empty;
 
             // Now normalize the hash
             hash = hash.ToLowerInvariant();
@@ -276,7 +250,7 @@ namespace SabreTools.Library.Tools
             {
                 if ((hash[i] < '0' || hash[i] > '9') && (hash[i] < 'a' || hash[i] > 'f'))
                 {
-                    hash = "";
+                    hash = string.Empty;
                     break;
                 }
             }
@@ -292,13 +266,10 @@ namespace SabreTools.Library.Tools
         public static string CleanListromHashData(string hash)
         {
             if (hash.StartsWith("CRC"))
-            {
                 return hash.Substring(4, 8).ToLowerInvariant();
-            }
+
             else if (hash.StartsWith("SHA1"))
-            {
                 return hash.Substring(5, 40).ToLowerInvariant();
-            }
 
             return hash;
         }
@@ -369,14 +340,14 @@ namespace SabreTools.Library.Tools
                     { "Й", "J" }, { "К", "K" }, { "Л", "L" }, { "М", "M" }, { "Н", "N" },
                     { "О", "O" }, { "П", "P" }, { "Р", "R" }, { "С", "S" }, { "Т", "T" },
                     { "У", "U" }, { "Ф", "f" }, { "Х", "Kh" }, { "Ц", "Ts" }, { "Ч", "Ch" },
-                    { "Ш", "Sh" }, { "Щ", "Sch" }, { "Ъ", "" }, { "Ы", "y" }, { "Ь", "" },
+                    { "Ш", "Sh" }, { "Щ", "Sch" }, { "Ъ", string.Empty }, { "Ы", "y" }, { "Ь", string.Empty },
                     { "Э", "e" }, { "Ю", "yu" }, { "Я", "ya" }, { "а", "a" }, { "б", "b" },
                     { "в", "v" }, { "г", "g" }, { "д", "d" }, { "е", "e" }, { "ё", "yo" },
                     { "ж", "zh" }, { "з", "z" }, { "и", "i" }, { "й", "j" }, { "к", "k" },
                     { "л", "l" }, { "м", "m" }, { "н", "n" }, { "о", "o" }, { "п", "p" },
                     { "р", "r" }, { "с", "s" }, { "т", "t" }, { "у", "u" }, { "ф", "f" },
                     { "х", "kh" }, { "ц", "ts" }, { "ч", "ch" }, { "ш", "sh" }, { "щ", "sch" },
-                    { "ъ", "" }, { "ы", "y" }, { "ь", "" }, { "э", "e" }, { "ю", "yu" },
+                    { "ъ", string.Empty }, { "ы", "y" }, { "ь", string.Empty }, { "э", "e" }, { "ю", "yu" },
                     { "я", "ya" },
             };
 
@@ -450,29 +421,32 @@ namespace SabreTools.Library.Tools
 
             // If we got back null, then it's not an archive, so we we return
             if (at == null)
-            {
                 return archive;
-            }
 
             // Create the archive based on the type
-            Globals.Logger.Verbose("Found archive of type: {0}", at);
+            Globals.Logger.Verbose($"Found archive of type: {at}");
             switch (at)
             {
                 case FileType.GZipArchive:
                     archive = new GZipArchive(input);
                     break;
+
                 case FileType.RarArchive:
                     archive = new RarArchive(input);
                     break;
+
                 case FileType.SevenZipArchive:
                     archive = new SevenZipArchive(input);
                     break;
+
                 case FileType.TapeArchive:
                     archive = new TapeArchive(input);
                     break;
+
                 case FileType.ZipArchive:
                     archive = new ZipArchive(input);
                     break;
+
                 default:
                     // We ignore all other types for now
                     break;
@@ -492,14 +466,19 @@ namespace SabreTools.Library.Tools
             {
                 case FileType.GZipArchive:
                     return new GZipArchive();
+
                 case FileType.RarArchive:
                     return new RarArchive();
+
                 case FileType.SevenZipArchive:
                     return new SevenZipArchive();
+
                 case FileType.TapeArchive:
                     return new TapeArchive();
+
                 case FileType.ZipArchive:
                     return new ZipArchive();
+
                 default:
                     return null;
             }
@@ -516,26 +495,38 @@ namespace SabreTools.Library.Tools
             {
                 case OutputFormat.Folder:
                     return new Folder();
+
                 case OutputFormat.TapeArchive:
                     return new TapeArchive();
+
                 case OutputFormat.Torrent7Zip:
                     return new SevenZipArchive();
+
                 case OutputFormat.TorrentGzip:
+                case OutputFormat.TorrentGzipRomba:
                     return new GZipArchive();
+
                 case OutputFormat.TorrentLRZip:
                     return new LRZipArchive();
+
                 case OutputFormat.TorrentLZ4:
                     return new LZ4Archive();
+
                 case OutputFormat.TorrentRar:
                     return new RarArchive();
+
                 case OutputFormat.TorrentXZ:
                     return new XZArchive();
+
                 case OutputFormat.TorrentZip:
                     return new ZipArchive();
+
                 case OutputFormat.TorrentZPAQ:
                     return new ZPAQArchive();
+
                 case OutputFormat.TorrentZstd:
                     return new ZstdArchive();
+
                 default:
                     return null;
             }
@@ -555,12 +546,16 @@ namespace SabreTools.Library.Tools
             {
                 case StatReportFormat.Textfile:
                     return new Textfile(null, filename, baddumpCol, nodumpCol);
+
                 case StatReportFormat.CSV:
                     return new Reports.SeparatedValue(null, filename, ',', baddumpCol, nodumpCol);
+
                 case StatReportFormat.HTML:
                     return new Html(null, filename, baddumpCol, nodumpCol);
+
                 case StatReportFormat.SSV:
                     return new Reports.SeparatedValue(null, filename, ';', baddumpCol, nodumpCol);
+
                 case StatReportFormat.TSV:
                     return new Reports.SeparatedValue(null, filename, '\t', baddumpCol, nodumpCol);
             }
@@ -575,18 +570,13 @@ namespace SabreTools.Library.Tools
         /// <returns>Date as a string, if possible</returns>
         public static string GetDate(string input)
         {
-            string date = "";
+            string date = string.Empty;
             if (input != null)
             {
-                DateTime dateTime = DateTime.Now;
-                if (DateTime.TryParse(input, out dateTime))
-                {
+                if (DateTime.TryParse(input, out DateTime dateTime))
                     date = dateTime.ToString();
-                }
                 else
-                {
                     date = input;
-                }
             }
 
             return date;
@@ -616,50 +606,73 @@ namespace SabreTools.Library.Tools
             {
                 case DatFormat.AttractMode:
                     return new AttractMode(baseDat);
+
                 case DatFormat.ClrMamePro:
                     return new ClrMamePro(baseDat);
+
                 case DatFormat.CSV:
                     return new DatFiles.SeparatedValue(baseDat, ',');
+
                 case DatFormat.DOSCenter:
                     return new DosCenter(baseDat);
+
                 case DatFormat.EverdriveSMDB:
                     return new EverdriveSMDB(baseDat);
+
                 case DatFormat.Listrom:
                     return new Listrom(baseDat);
+
                 case DatFormat.Listxml:
                     return new Listxml(baseDat);
+
                 case DatFormat.Logiqx:
                     return new Logiqx(baseDat, false);
-                case DatFormat.LogiqxDepreciated:
+
+                case DatFormat.LogiqxDeprecated:
                     return new Logiqx(baseDat, true);
+
                 case DatFormat.MissFile:
                     return new Missfile(baseDat);
+
                 case DatFormat.OfflineList:
                     return new OfflineList(baseDat);
+
                 case DatFormat.OpenMSX:
                     return new OpenMSX(baseDat);
+
                 case DatFormat.RedumpMD5:
                     return new Hashfile(baseDat, Hash.MD5);
+
                 case DatFormat.RedumpRIPEMD160:
                     return new Hashfile(baseDat, Hash.RIPEMD160);
+
                 case DatFormat.RedumpSFV:
                     return new Hashfile(baseDat, Hash.CRC);
+
                 case DatFormat.RedumpSHA1:
                     return new Hashfile(baseDat, Hash.SHA1);
+
                 case DatFormat.RedumpSHA256:
                     return new Hashfile(baseDat, Hash.SHA256);
+
                 case DatFormat.RedumpSHA384:
                     return new Hashfile(baseDat, Hash.SHA384);
+
                 case DatFormat.RedumpSHA512:
                     return new Hashfile(baseDat, Hash.SHA512);
+
                 case DatFormat.RomCenter:
                     return new RomCenter(baseDat);
+
                 case DatFormat.SabreDat:
                     return new SabreDat(baseDat);
+
                 case DatFormat.SoftwareList:
                     return new SoftwareList(baseDat);
+
                 case DatFormat.SSV:
                     return new DatFiles.SeparatedValue(baseDat, ';');
+
                 case DatFormat.TSV:
                     return new DatFiles.SeparatedValue(baseDat, '\t');
             }
@@ -678,14 +691,19 @@ namespace SabreTools.Library.Tools
             {
                 case ItemType.Archive:
                     return new Archive();
+
                 case ItemType.BiosSet:
                     return new BiosSet();
+
                 case ItemType.Disk:
                     return new Disk();
+
                 case ItemType.Release:
                     return new Release();
+
                 case ItemType.Sample:
                     return new Sample();
+
                 case ItemType.Rom:
                 default:
                     return new Rom();
@@ -703,6 +721,7 @@ namespace SabreTools.Library.Tools
             {
                 case FileType.CHD:
                     return new Disk(baseFile);
+
                 case FileType.GZipArchive:
                 case FileType.LRZipArchive:
                 case FileType.LZ4Archive:
@@ -715,6 +734,7 @@ namespace SabreTools.Library.Tools
                 case FileType.ZPAQArchive:
                 case FileType.ZstdArchive:
                     return new Rom(baseFile);
+
                 case FileType.Folder:
                 default:
                     return null;
@@ -913,9 +933,6 @@ namespace SabreTools.Library.Tools
         {
             switch (forcemerge?.ToLowerInvariant())
             {
-                case "none":
-                default:
-                    return ForceMerging.None;
                 case "split":
                     return ForceMerging.Split;
                 case "merged":
@@ -924,6 +941,9 @@ namespace SabreTools.Library.Tools
                     return ForceMerging.NonMerged;
                 case "full":
                     return ForceMerging.Full;
+                case "none":
+                default:
+                    return ForceMerging.None;
             }
         }
 
@@ -936,15 +956,15 @@ namespace SabreTools.Library.Tools
         {
             switch (forcend?.ToLowerInvariant())
             {
-                case "none":
-                default:
-                    return ForceNodump.None;
                 case "obsolete":
                     return ForceNodump.Obsolete;
                 case "required":
                     return ForceNodump.Required;
                 case "ignore":
                     return ForceNodump.Ignore;
+                case "none":
+                default:
+                    return ForceNodump.None;
             }
         }
 
@@ -957,15 +977,15 @@ namespace SabreTools.Library.Tools
         {
             switch (forcepack?.ToLowerInvariant())
             {
-                case "none":
-                default:
-                    return ForcePacking.None;
                 case "yes":
                 case "zip":
                     return ForcePacking.Zip;
                 case "no":
                 case "unzip":
                     return ForcePacking.Unzip;
+                case "none":
+                default:
+                    return ForcePacking.None;
             }
         }
 
@@ -978,10 +998,6 @@ namespace SabreTools.Library.Tools
         {
             switch (status?.ToLowerInvariant())
             {
-                case "none":
-                case "no":
-                default:
-                    return ItemStatus.None;
                 case "good":
                     return ItemStatus.Good;
                 case "baddump":
@@ -991,6 +1007,10 @@ namespace SabreTools.Library.Tools
                     return ItemStatus.Nodump;
                 case "verified":
                     return ItemStatus.Verified;
+                case "none":
+                case "no":
+                default:
+                    return ItemStatus.None;
             }
         }
 
@@ -1029,9 +1049,6 @@ namespace SabreTools.Library.Tools
         {
             switch (gametype?.ToLowerInvariant())
             {
-                case "none":
-                default:
-                    return MachineType.None;
                 case "bios":
                     return MachineType.Bios;
                 case "dev":
@@ -1040,6 +1057,9 @@ namespace SabreTools.Library.Tools
                 case "mech":
                 case "mechanical":
                     return MachineType.Mechanical;
+                case "none":
+                default:
+                    return MachineType.None;
             }
         }
 
@@ -1078,13 +1098,10 @@ namespace SabreTools.Library.Tools
         {
             long size = -1;
             if (input != null && input.Contains("0x"))
-            {
                 size = Convert.ToInt64(input, 16);
-            }
+
             else if (input != null)
-            {
                 Int64.TryParse(input, out size);
-            }
 
             return size;
         }
@@ -1098,9 +1115,6 @@ namespace SabreTools.Library.Tools
         {
             switch (forceMerging)
             {
-                case ForceMerging.None:
-                default:
-                    return SplitType.None;
                 case ForceMerging.Split:
                     return SplitType.Split;
                 case ForceMerging.Merged:
@@ -1109,6 +1123,9 @@ namespace SabreTools.Library.Tools
                     return SplitType.NonMerged;
                 case ForceMerging.Full:
                     return SplitType.FullNonMerged;
+                case ForceMerging.None:
+                default:
+                    return SplitType.None;
             }
         }
 
@@ -1240,12 +1257,12 @@ namespace SabreTools.Library.Tools
             string ext = GetExtension(filename);
 
             // Read the input file, if possible
-            Globals.Logger.Verbose("Attempting to read file to get format: {0}", filename);
+            Globals.Logger.Verbose($"Attempting to read file to get format: {filename}");
 
             // Check if file exists
             if (!File.Exists(filename))
             {
-                Globals.Logger.Warning("File '{0}' could not read from!", filename);
+                Globals.Logger.Warning($"File '{filename}' could not read from!");
                 return 0;
             }
 
@@ -1280,11 +1297,11 @@ namespace SabreTools.Library.Tools
                 // Get the first two non-whitespace, non-comment lines to check
                 StreamReader sr = File.OpenText(filename);
                 string first = sr.ReadLine().ToLowerInvariant();
-                while (String.IsNullOrWhiteSpace(first) || first.StartsWith("<!--"))
+                while (string.IsNullOrWhiteSpace(first) || first.StartsWith("<!--"))
                     first = sr.ReadLine().ToLowerInvariant();
 
                 string second = sr.ReadLine().ToLowerInvariant();
-                while (String.IsNullOrWhiteSpace(second) || second.StartsWith("<!--"))
+                while (string.IsNullOrWhiteSpace(second) || second.StartsWith("<!--"))
                     second = sr.ReadLine().ToLowerInvariant();
 
                 sr.Dispose();
@@ -1362,15 +1379,11 @@ namespace SabreTools.Library.Tools
         {
             // Check if the root exists first
             if (!Directory.Exists(root))
-            {
                 return null;
-            }
 
             // If it does and it is empty, return a blank enumerable
             if (Directory.EnumerateFileSystemEntries(root, "*", SearchOption.AllDirectories).Count() == 0)
-            {
                 return new List<string>();
-            }
 
             // Otherwise, get the complete list
             return Directory.EnumerateDirectories(root, "*", SearchOption.AllDirectories)
@@ -1390,9 +1403,7 @@ namespace SabreTools.Library.Tools
         {
             // Add safeguard if file doesn't exist
             if (!File.Exists(input))
-            {
                 return null;
-            }
 
             // Get the information from the file stream
             BaseFile baseFile = new BaseFile();
@@ -1430,7 +1441,7 @@ namespace SabreTools.Library.Tools
 
             // Add unique data from the file
             baseFile.Filename = Path.GetFileName(input);
-            baseFile.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
+            baseFile.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : string.Empty);
 
             return baseFile;
         }
@@ -1446,15 +1457,11 @@ namespace SabreTools.Library.Tools
 
             // If the file is null, then we have no archive type
             if (input == null)
-            {
                 return outFileType;
-            }
 
             // First line of defense is going to be the extension, for better or worse
             if (!HasValidArchiveExtension(input))
-            {
                 return outFileType;
-            }
 
             // Read the first bytes of the file and get the magic number
             try
@@ -1631,6 +1638,7 @@ namespace SabreTools.Library.Tools
             {
                 bytesToAddToHeadArray[i / 2] = Convert.ToByte(bytesToAddToHead.Substring(i, 2), 16);
             }
+
             byte[] bytesToAddToTailArray = new byte[bytesToAddToTail.Length / 2];
             for (int i = 0; i < bytesToAddToTail.Length; i += 2)
             {
@@ -1651,9 +1659,7 @@ namespace SabreTools.Library.Tools
         {
             // If any of the inputs are invalid, skip
             if (!File.Exists(input))
-            {
                 return;
-            }
 
             FileStream fsr = TryOpenRead(input);
             FileStream fsw = TryOpenWrite(output);
@@ -1674,6 +1680,7 @@ namespace SabreTools.Library.Tools
             {
                 TryDeleteFile(file);
             }
+
             foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
             {
                 TryDeleteDirectory(dir);
@@ -1692,16 +1699,14 @@ namespace SabreTools.Library.Tools
             // Create the output directory if it doesn't exist
             EnsureOutputDirectory(outDir, create: true);
 
-            Globals.Logger.User("\nGetting skipper information for '{0}'", file);
+            Globals.Logger.User($"\nGetting skipper information for '{file}'");
 
             // Get the skipper rule that matches the file, if any
-            SkipperRule rule = Skipper.GetMatchingRule(file, "");
+            SkipperRule rule = Skipper.GetMatchingRule(file, string.Empty);
 
             // If we have an empty rule, return false
             if (rule.Tests == null || rule.Tests.Count == 0 || rule.Operation != HeaderSkipOperation.None)
-            {
                 return false;
-            }
 
             Globals.Logger.User("File has a valid copier header");
 
@@ -1715,14 +1720,12 @@ namespace SabreTools.Library.Tools
             br.Dispose();
 
             // Apply the rule to the file
-            string newfile = (String.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
+            string newfile = (string.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
             rule.TransformFile(file, newfile);
 
             // If the output file doesn't exist, return false
             if (!File.Exists(newfile))
-            {
                 return false;
-            }
 
             // Now add the information to the database if it's not already there
             if (!nostore)
@@ -1752,11 +1755,11 @@ namespace SabreTools.Library.Tools
                     {
                         try
                         {
-                            outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+                            outputs.Add(Path.GetFullPath(file) + (appendparent ? $"¬{Path.GetFullPath(input)}" : string.Empty));
                         }
                         catch (PathTooLongException)
                         {
-                            Globals.Logger.Warning("The path for '{0}' was too long", file);
+                            Globals.Logger.Warning($"The path for '{file}' was too long");
                         }
                         catch (Exception ex)
                         {
@@ -1768,11 +1771,11 @@ namespace SabreTools.Library.Tools
                 {
                     try
                     {
-                        outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+                        outputs.Add(Path.GetFullPath(input) + (appendparent ? $"¬{Path.GetFullPath(input)}" : string.Empty));
                     }
                     catch (PathTooLongException)
                     {
-                        Globals.Logger.Warning("The path for '{0}' was too long", input);
+                        Globals.Logger.Warning($"The path for '{input}' was too long");
                     }
                     catch (Exception ex)
                     {
@@ -1802,11 +1805,11 @@ namespace SabreTools.Library.Tools
                     {
                         try
                         {
-                            outputs.Add(Path.GetFullPath(dir) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+                            outputs.Add(Path.GetFullPath(dir) + (appendparent ? $"¬{Path.GetFullPath(input)}" : string.Empty));
                         }
                         catch (PathTooLongException)
                         {
-                            Globals.Logger.Warning("The path for '{0}' was too long", dir);
+                            Globals.Logger.Warning($"The path for '{dir}' was too long");
                         }
                         catch (Exception ex)
                         {
@@ -1826,12 +1829,12 @@ namespace SabreTools.Library.Tools
         /// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
         public static XmlReader GetXmlTextReader(string filename)
         {
-            Globals.Logger.Verbose("Attempting to read file: {0}", filename);
+            Globals.Logger.Verbose($"Attempting to read file: {filename}");
 
             // Check if file exists
             if (!File.Exists(filename))
             {
-                Globals.Logger.Warning("File '{0}' could not read from!", filename);
+                Globals.Logger.Warning($"File '{filename}' could not read from!");
                 return null;
             }
 
@@ -1844,6 +1847,7 @@ namespace SabreTools.Library.Tools
                 ValidationFlags = XmlSchemaValidationFlags.None,
                 ValidationType = ValidationType.None,
             });
+
             return xtr;
         }
 
@@ -1856,10 +1860,8 @@ namespace SabreTools.Library.Tools
         public static bool RestoreHeader(string file, string outDir)
         {
             // Create the output directory if it doesn't exist
-            if (!String.IsNullOrWhiteSpace(outDir) && !Directory.Exists(outDir))
-            {
+            if (!string.IsNullOrWhiteSpace(outDir) && !Directory.Exists(outDir))
                 Directory.CreateDirectory(outDir);
-            }
 
             // First, get the SHA-1 hash of the file
             BaseFile baseFile = GetFileInfo(file, chdsAsFiles: true);
@@ -1869,17 +1871,14 @@ namespace SabreTools.Library.Tools
 
             // If we have nothing retrieved, we return false
             if (headers.Count == 0)
-            {
                 return false;
-            }
 
             // Now loop through and create the reheadered files, if possible
             for (int i = 0; i < headers.Count; i++)
             {
-                Globals.Logger.User("Creating reheadered file: " +
-                        (String.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
-                AppendBytesToFile(file,
-                    (String.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
+                string outputFile = (string.IsNullOrWhiteSpace(outDir) ? $"{Path.GetFullPath(file)}.new" : Path.Combine(outDir, Path.GetFileName(file))) + i;
+                Globals.Logger.User($"Creating reheadered file: {outputFile}");
+                AppendBytesToFile(file, outputFile, headers[i], string.Empty);
                 Globals.Logger.User("Reheadered file created!");
             }
 
@@ -1902,13 +1901,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return null;
-                }
             }
         }
 
@@ -1929,13 +1924,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return false;
-                }
             }
         }
 
@@ -1949,9 +1940,7 @@ namespace SabreTools.Library.Tools
         {
             // Check if the directory exists first
             if (!Directory.Exists(file))
-            {
                 return true;
-            }
 
             // Now wrap deleting the directory
             try
@@ -1962,13 +1951,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return false;
-                }
             }
         }
 
@@ -1982,9 +1967,7 @@ namespace SabreTools.Library.Tools
         {
             // Check if the file exists first
             if (!File.Exists(file))
-            {
                 return true;
-            }
 
             // Now wrap deleting the file
             try
@@ -1995,13 +1978,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return false;
-                }
             }
         }
 
@@ -2015,9 +1994,7 @@ namespace SabreTools.Library.Tools
         {
             // Check if the file exists first
             if (!File.Exists(file))
-            {
                 return null;
-            }
 
             // Now wrap opening the file
             try
@@ -2027,13 +2004,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return null;
-                }
             }
         }
 
@@ -2047,9 +2020,7 @@ namespace SabreTools.Library.Tools
         {
             // Check if the file exists first
             if (!File.Exists(file))
-            {
                 return null;
-            }
 
             // Now wrap opening the file
             try
@@ -2059,13 +2030,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return null;
-                }
             }
         }
 
@@ -2079,9 +2046,7 @@ namespace SabreTools.Library.Tools
         {
             // Check if the file exists first
             if (!File.Exists(file))
-            {
                 return null;
-            }
 
             // Now wrap opening the file
             try
@@ -2091,13 +2056,9 @@ namespace SabreTools.Library.Tools
             catch (Exception ex)
             {
                 if (throwOnError)
-                {
                     throw ex;
-                }
                 else
-                {
                     return null;
-                }
             }
         }
 
@@ -2282,9 +2243,7 @@ namespace SabreTools.Library.Tools
             BinaryWriter bw = new BinaryWriter(output);
 
             if (bytesToAddToHead.Count() > 0)
-            {
                 bw.Write(bytesToAddToHead);
-            }
 
             int bufferSize = 1024;
 
@@ -2303,9 +2262,7 @@ namespace SabreTools.Library.Tools
             bw.Write(buffer);
 
             if (bytesToAddToTail.Count() > 0)
-            {
                 bw.Write(bytesToAddToTail);
-            }
         }
 
         /// <summary>
@@ -2358,19 +2315,13 @@ namespace SabreTools.Library.Tools
 
             // If the strings are the same exactly, return
             if (s1 == s2)
-            {
                 return s1orig.CompareTo(s2orig);
-            }
 
             // If one is null, then say that's less than
             if (s1 == null)
-            {
                 return -1;
-            }
             if (s2 == null)
-            {
                 return 1;
-            }
 
             // Now split into path parts after converting AltDirSeparator to DirSeparator
             s1 = s1.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
@@ -2383,20 +2334,14 @@ namespace SabreTools.Library.Tools
             {
                 int compared = CompareNumericPart(s1parts[j], s2parts[j]);
                 if (compared != 0)
-                {
                     return compared;
-                }
             }
 
             // If we got out here, then it looped through at least one of the strings
             if (s1parts.Length > s2parts.Length)
-            {
                 return 1;
-            }
             if (s1parts.Length < s2parts.Length)
-            {
                 return -1;
-            }
 
             return s1orig.CompareTo(s2orig);
         }
@@ -2417,30 +2362,20 @@ namespace SabreTools.Library.Tools
 
                 // If the characters are the same, continue
                 if (s1c == s2c)
-                {
                     continue;
-                }
 
                 // If they're different, check which one was larger
                 if (s1c > s2c)
-                {
                     return 1;
-                }
                 if (s1c < s2c)
-                {
                     return -1;
-                }
             }
 
             // If we got out here, then it looped through at least one of the strings
             if (s1.Length > s2.Length)
-            {
                 return 1;
-            }
             if (s1.Length < s2.Length)
-            {
                 return -1;
-            }
 
             return 0;
         }
@@ -2474,18 +2409,14 @@ namespace SabreTools.Library.Tools
         {
             // If the output directory is invalid
             if (string.IsNullOrWhiteSpace(outDir))
-            {
                 outDir = Environment.CurrentDirectory;
-            }
 
             // Get the full path for the output directory
             outDir = Path.GetFullPath(outDir);
 
             // If we're creating the output folder, do so
             if (create)
-            {
                 Directory.CreateDirectory(outDir);
-            }
 
             return outDir;
         }
@@ -2500,18 +2431,14 @@ namespace SabreTools.Library.Tools
         {
             // If the output directory is invalid
             if (string.IsNullOrWhiteSpace(tempDir))
-            {
                 tempDir = Path.GetTempPath();
-            }
 
             // Get the full path for the output directory
             tempDir = Path.GetFullPath(tempDir);
 
             // If we're creating the output folder, do so
             if (create)
-            {
                 Directory.CreateDirectory(tempDir);
-            }
 
             return tempDir;
         }
@@ -2524,25 +2451,18 @@ namespace SabreTools.Library.Tools
         public static string GetExtension(string path)
         {
             // Check null or empty first
-            if (String.IsNullOrWhiteSpace(path))
-            {
+            if (string.IsNullOrWhiteSpace(path))
                 return null;
-            }
 
             // Get the extension from the path, if possible
             string ext = Path.GetExtension(path)?.ToLowerInvariant();
 
             // Check if the extension is null or empty
-            if (String.IsNullOrWhiteSpace(ext))
-            {
+            if (string.IsNullOrWhiteSpace(ext))
                 return null;
-            }
 
             // Make sure that extensions are valid
-            if (ext.StartsWith("."))
-            {
-                ext = ext.Substring(1);
-            }
+            ext = ext.TrimStart('.');
 
             return ext;
         }
@@ -2558,7 +2478,11 @@ namespace SabreTools.Library.Tools
             // Check that we have a combined path first
             if (!path.Contains("¬"))
             {
-                return Path.GetFileName(path).Replace('/', '-').Replace('\\', '-');
+                string filename = Path.GetFileName(path);
+                if (sanitize)
+                    filename.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-');
+
+                return filename;
             }
 
             // First separate out the parts
@@ -2566,13 +2490,24 @@ namespace SabreTools.Library.Tools
             string parent = path.Split('¬')[1];
 
             // If the parts are the same, return the filename from the first part
-            if (child == parent)
+            if (string.Equals(child, parent, StringComparison.Ordinal))
             {
-                return Path.GetFileName(child).Replace('/', '-').Replace('\\', '-');
+                string filename = Path.GetFileName(child);
+                if (sanitize)
+                    filename.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-');
+
+                return filename;
             }
 
             // Otherwise, remove the parent from the child and return the remainder
-            return child.Remove(0, parent.Length + 1).Replace('/', '-').Replace('\\', '-');
+            else
+            {
+                string filename = child.Remove(0, parent.Length + 1);
+                if (sanitize)
+                    filename.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-');
+
+                return filename;
+            }
         }
 
         /// <summary>
@@ -2586,7 +2521,7 @@ namespace SabreTools.Library.Tools
         public static string GetKeyFromDatItem(DatItem item, SortedBy sortedBy, bool lower = true, bool norename = true)
         {
             // Set the output key as the default blank string
-            string key = "";
+            string key = string.Empty;
 
             // Now determine what the key should be based on the sortedBy value
             switch (sortedBy)
@@ -2594,25 +2529,24 @@ namespace SabreTools.Library.Tools
                 case SortedBy.CRC:
                     key = (item.ItemType == ItemType.Rom ? ((Rom)item).CRC : Constants.CRCZero);
                     break;
+
                 case SortedBy.Game:
-                    key = (norename ? ""
+                    key = (norename ? string.Empty
                         : item.SystemID.ToString().PadLeft(10, '0')
                             + "-"
                             + item.SourceID.ToString().PadLeft(10, '0') + "-")
-                    + (String.IsNullOrWhiteSpace(item.MachineName)
+                    + (string.IsNullOrWhiteSpace(item.MachineName)
                             ? "Default"
                             : item.MachineName);
                     if (lower)
-                    {
                         key = key.ToLowerInvariant();
-                    }
+
                     if (key == null)
-                    {
                         key = "null";
-                    }
 
                     key = WebUtility.HtmlEncode(key);
                     break;
+
                 case SortedBy.MD5:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).MD5
@@ -2620,6 +2554,7 @@ namespace SabreTools.Library.Tools
                             ? ((Disk)item).MD5
                             : Constants.MD5Zero));
                     break;
+
                 case SortedBy.RIPEMD160:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).RIPEMD160
@@ -2627,6 +2562,7 @@ namespace SabreTools.Library.Tools
                             ? ((Disk)item).RIPEMD160
                             : Constants.RIPEMD160Zero));
                     break;
+
                 case SortedBy.SHA1:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).SHA1
@@ -2634,6 +2570,7 @@ namespace SabreTools.Library.Tools
                             ? ((Disk)item).SHA1
                             : Constants.SHA1Zero));
                     break;
+
                 case SortedBy.SHA256:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).SHA256
@@ -2641,6 +2578,7 @@ namespace SabreTools.Library.Tools
                             ? ((Disk)item).SHA256
                             : Constants.SHA256Zero));
                     break;
+
                 case SortedBy.SHA384:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).SHA384
@@ -2648,6 +2586,7 @@ namespace SabreTools.Library.Tools
                             ? ((Disk)item).SHA384
                             : Constants.SHA384Zero));
                     break;
+
                 case SortedBy.SHA512:
                     key = (item.ItemType == ItemType.Rom
                         ? ((Rom)item).SHA512
@@ -2659,9 +2598,7 @@ namespace SabreTools.Library.Tools
 
             // Double and triple check the key for corner cases
             if (key == null)
-            {
-                key = "";
-            }
+                key = string.Empty;
 
             return key;
         }
@@ -2740,9 +2677,7 @@ namespace SabreTools.Library.Tools
         {
             // If the hash isn't the right size, then we return null
             if (hash.Length != Constants.SHA1Length) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
-            {
                 return null;
-            }
 
             return Path.Combine(hash.Substring(0, 2), hash.Substring(2, 2), hash.Substring(4, 2), hash.Substring(6, 2), hash + ".gz");
         }
@@ -2754,64 +2689,44 @@ namespace SabreTools.Library.Tools
         /// <returns>Tuple of multiplier to use on final size and fixed size string</returns>
         public static long GetSizeFromString(string sizestring)
         {
+            // If the string is null or empty, we return -1
+            if (string.IsNullOrWhiteSpace(sizestring))
+                return -1;
+
             // Make sure the string is in lower case
             sizestring = sizestring.ToLowerInvariant();
 
             // Get any trailing size identifiers
             long multiplier = 1;
             if (sizestring.EndsWith("k") || sizestring.EndsWith("kb"))
-            {
                 multiplier = Constants.KiloByte;
-            }
             else if (sizestring.EndsWith("ki") || sizestring.EndsWith("kib"))
-            {
                 multiplier = Constants.KibiByte;
-            }
             else if (sizestring.EndsWith("m") || sizestring.EndsWith("mb"))
-            {
                 multiplier = Constants.MegaByte;
-            }
             else if (sizestring.EndsWith("mi") || sizestring.EndsWith("mib"))
-            {
                 multiplier = Constants.MibiByte;
-            }
             else if (sizestring.EndsWith("g") || sizestring.EndsWith("gb"))
-            {
                 multiplier = Constants.GigaByte;
-            }
             else if (sizestring.EndsWith("gi") || sizestring.EndsWith("gib"))
-            {
                 multiplier = Constants.GibiByte;
-            }
             else if (sizestring.EndsWith("t") || sizestring.EndsWith("tb"))
-            {
                 multiplier = Constants.TeraByte;
-            }
             else if (sizestring.EndsWith("ti") || sizestring.EndsWith("tib"))
-            {
                 multiplier = Constants.TibiByte;
-            }
             else if (sizestring.EndsWith("p") || sizestring.EndsWith("pb"))
-            {
                 multiplier = Constants.PetaByte;
-            }
             else if (sizestring.EndsWith("pi") || sizestring.EndsWith("pib"))
-            {
                 multiplier = Constants.PibiByte;
-            }
 
             // Remove any trailing identifiers
             sizestring = sizestring.TrimEnd(new char[] { 'k', 'm', 'g', 't', 'p', 'i', 'b', ' ' });
 
             // Now try to get the size from the string
             if (!Int64.TryParse(sizestring, out long size))
-            {
                 size = -1;
-            }
             else
-            {
                 size *= multiplier;
-            }
 
             return size;
         }
@@ -2928,8 +2843,8 @@ namespace SabreTools.Library.Tools
 
             // Now we get each string, divided up as cleanly as possible
             string[] matches = Regex
-                //.Matches(s, @"([^\s]*""[^""]+""[^\s]*)|[^""]?\w+[^""]?")
-                .Matches(s, @"[^\s""]+|""[^""]*""")
+                //.Matches(s, @"([^\s]*string.Empty[^string.Empty]+string.Empty[^\s]*)|[^string.Empty]?\w+[^string.Empty]?")
+                .Matches(s, @"[^\sstring.Empty]+|string.Empty[^string.Empty]*string.Empty")
                 .Cast<Match>()
                 .Select(m => m.Groups[0].Value)
                 .ToArray();
@@ -2963,9 +2878,7 @@ namespace SabreTools.Library.Tools
             for (int i = 0; i < arr2.Length; i++)
             {
                 if (arr1[i] != arr2[i])
-                {
                     return false;
-                }
             }
 
             return true;
@@ -2982,6 +2895,7 @@ namespace SabreTools.Library.Tools
         {
             // Get absolute value
             long absolute_i = (input < 0 ? -input : input);
+
             // Determine the suffix and readable value
             string suffix;
             double readable;
@@ -3019,8 +2933,10 @@ namespace SabreTools.Library.Tools
             {
                 return input.ToString("0 B"); // Byte
             }
+
             // Divide by 1024 to get fractional value
-            readable = (readable / 1024);
+            readable /= 1024;
+
             // Return formatted number with suffix
             return readable.ToString("0.### ") + suffix;
         }
@@ -3035,9 +2951,7 @@ namespace SabreTools.Library.Tools
         {
             // If we get null in, we send null out
             if (bytes == null)
-            {
                 return null;
-            }
 
             try
             {
@@ -3060,16 +2974,17 @@ namespace SabreTools.Library.Tools
         {
             // If we get null in, we send null out
             if (hex == null)
-            {
                 return null;
-            }
 
             try
             {
                 int NumberChars = hex.Length;
                 byte[] bytes = new byte[NumberChars / 2];
                 for (int i = 0; i < NumberChars; i += 2)
+                {
                     bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+                }
+
                 return bytes;
             }
             catch
@@ -3088,14 +3003,10 @@ namespace SabreTools.Library.Tools
         {
             // If we get null in, we send null out
             if (hexString == null)
-            {
                 return null;
-            }
 
             if (hexString.Contains("-"))
-            {
-                hexString = hexString.Replace("-", "");
-            }
+                hexString = hexString.Replace("-", string.Empty);
 
             StringBuilder sb = new StringBuilder();
 
@@ -3118,19 +3029,16 @@ namespace SabreTools.Library.Tools
         {
             // If we get null in, we send null out
             if (asciiString == null)
-            {
                 return null;
-            }
 
-            string hexOutput = "";
+            string hexOutput = string.Empty;
             foreach (char _eachChar in asciiString.ToCharArray())
             {
                 // Get the integral value of the character.
                 int value = Convert.ToInt32(_eachChar);
+
                 // Convert the decimal value to a hexadecimal value in string form.
                 hexOutput += String.Format("{0:X2}", value).Remove(0, 2);
-                // to make output as your eg 
-                //  hexOutput +=" "+ String.Format("{0:X}", value);
             }
 
             return hexOutput;
@@ -3233,6 +3141,33 @@ namespace SabreTools.Library.Tools
         public static bool IsNullOrWhiteSpace(this Array array)
         {
             return (array == null || array.Length == 0);
+        }
+
+        /// <summary>
+        /// Get the field associated with each hash type
+        /// </summary>
+        public static Field GetFieldFromHash(Hash hash)
+        {
+            switch (hash)
+            {
+                case Hash.CRC:
+                    return Field.CRC;
+                case Hash.MD5:
+                    return Field.MD5;
+                case Hash.RIPEMD160:
+                    return Field.RIPEMD160;
+                case Hash.SHA1:
+                    return Field.SHA1;
+                case Hash.SHA256:
+                    return Field.SHA256;
+                case Hash.SHA384:
+                    return Field.SHA384;
+                case Hash.SHA512:
+                    return Field.SHA512;
+
+                default:
+                    return Field.NULL;
+            }
         }
 
         #endregion

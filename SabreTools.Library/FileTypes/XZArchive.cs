@@ -1,23 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using BinaryWriter = System.IO.BinaryWriter;
-using EndOfStreamException = System.IO.EndOfStreamException;
-using FileStream = System.IO.FileStream;
-using MemoryStream = System.IO.MemoryStream;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-#endif
 using Compress.ZipFile;
 using SevenZip;
 using SharpCompress.Archives;
@@ -247,7 +235,7 @@ namespace SabreTools.Library.FileTypes
         public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
         {
             bool success = false;
-            string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+            string tempFile = Path.Combine(outDir, $"tmp{Guid.NewGuid()}");
 
             // If either input is null or empty, return
             if (inputStream == null || rom == null || rom.Name == null)
@@ -265,7 +253,7 @@ namespace SabreTools.Library.FileTypes
             inputStream.Seek(0, SeekOrigin.Begin);
 
             // Get the output archive name from the first rebuild rom
-            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".xz") ? "" : ".xz"));
+            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".xz") ? string.Empty : ".xz"));
 
             // Set internal variables
             SevenZipBase.SetLibraryPath("7za.dll");
@@ -443,7 +431,7 @@ namespace SabreTools.Library.FileTypes
         public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
         {
             bool success = false;
-            string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+            string tempFile = Path.Combine(outDir, $"tmp{Guid.NewGuid()}");
 
             // If either list of roms is null or empty, return
             if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
@@ -467,7 +455,7 @@ namespace SabreTools.Library.FileTypes
             }
 
             // Get the output archive name from the first rebuild rom
-            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".xz") ? "" : ".xz"));
+            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".xz") ? string.Empty : ".xz"));
 
             // Set internal variables
             SevenZipBase.SetLibraryPath("7za.dll");

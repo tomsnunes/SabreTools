@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
+using System.IO;
 using System.Text;
 using System.Xml;
+
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using FileStream = System.IO.FileStream;
-using StreamWriter = System.IO.StreamWriter;
-#endif
 using NaturalSort;
 
 namespace SabreTools.Library.DatFiles
@@ -60,9 +52,7 @@ namespace SabreTools.Library.DatFiles
 
             // If we got a null reader, just return
             if (xtr == null)
-            {
                 return;
-            }
 
             // Otherwise, read the file to the end
             try
@@ -80,22 +70,20 @@ namespace SabreTools.Library.DatFiles
                     switch (xtr.Name)
                     {
                         case "softwarelist":
-                            Name = (String.IsNullOrWhiteSpace(Name) ? xtr.GetAttribute("name") ?? "" : Name);
-                            Description = (String.IsNullOrWhiteSpace(Description) ? xtr.GetAttribute("description") ?? "" : Description);
+                            Name = (string.IsNullOrWhiteSpace(Name) ? xtr.GetAttribute("name") ?? string.Empty : Name);
+                            Description = (string.IsNullOrWhiteSpace(Description) ? xtr.GetAttribute("description") ?? string.Empty : Description);
                             if (ForceMerging == ForceMerging.None)
-                            {
                                 ForceMerging = Utilities.GetForceMerging(xtr.GetAttribute("forcemerging"));
-                            }
+
                             if (ForceNodump == ForceNodump.None)
-                            {
                                 ForceNodump = Utilities.GetForceNodump(xtr.GetAttribute("forcenodump"));
-                            }
+
                             if (ForcePacking == ForcePacking.None)
-                            {
                                 ForcePacking = Utilities.GetForcePacking(xtr.GetAttribute("forcepacking"));
-                            }
+
                             xtr.Read();
                             break;
+
                         // We want to process the entire subtree of the machine
                         case "software":
                             ReadSoftware(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);
@@ -103,6 +91,7 @@ namespace SabreTools.Library.DatFiles
                             // Skip the software now that we've processed it
                             xtr.Skip();
                             break;
+
                         default:
                             xtr.Read();
                             break;
@@ -111,7 +100,7 @@ namespace SabreTools.Library.DatFiles
             }
             catch (Exception ex)
             {
-                Globals.Logger.Warning("Exception found while parsing '{0}': {1}", filename, ex);
+                Globals.Logger.Warning($"Exception found while parsing '{filename}': {ex}");
 
                 // For XML errors, just skip the affected node
                 xtr?.Read();
@@ -145,31 +134,25 @@ namespace SabreTools.Library.DatFiles
         {
             // If we have an empty software, skip it
             if (reader == null)
-            {
                 return;
-            }
 
             // Otherwise, add what is possible
             reader.MoveToContent();
 
-            string key = "";
+            string key = string.Empty;
             string temptype = reader.Name;
             bool containsItems = false;
 
             // Create a new machine
             MachineType machineType = MachineType.NULL;
             if (Utilities.GetYesNo(reader.GetAttribute("isbios")) == true)
-            {
                 machineType |= MachineType.Bios;
-            }
+
             if (Utilities.GetYesNo(reader.GetAttribute("isdevice")) == true)
-            {
                 machineType |= MachineType.Device;
-            }
+
             if (Utilities.GetYesNo(reader.GetAttribute("ismechanical")) == true)
-            {
                 machineType |= MachineType.Mechanical;
-            }
 
             Machine machine = new Machine
             {
@@ -177,7 +160,7 @@ namespace SabreTools.Library.DatFiles
                 Description = reader.GetAttribute("name"),
                 Supported = Utilities.GetYesNo(reader.GetAttribute("supported")), // (yes|partial|no) "yes"
 
-                CloneOf = reader.GetAttribute("cloneof") ?? "",
+                CloneOf = reader.GetAttribute("cloneof") ?? string.Empty,
                 Infos = new List<Tuple<string, string>>(),
 
                 MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
@@ -198,29 +181,33 @@ namespace SabreTools.Library.DatFiles
                     case "description":
                         machine.Description = reader.ReadElementContentAsString();
                         break;
+
                     case "year":
                         machine.Year = reader.ReadElementContentAsString();
                         break;
+
                     case "publisher":
                         machine.Publisher = reader.ReadElementContentAsString();
                         break;
+
                     case "info":
                         machine.Infos.Add(new Tuple<string, string>(reader.GetAttribute("name"), reader.GetAttribute("value")));
-
                         reader.Read();
                         break;
+
                     case "sharedfeat":
                         // string sharedfeat_name = reader.GetAttribute("name");
                         // string sharedfeat_value = reader.GetAttribute("value");
-
                         reader.Read();
                         break;
+
                     case "part": // Contains all rom and disk information
                         containsItems = ReadPart(reader.ReadSubtree(), machine, filename, sysid, srcid, keep, clean, remUnicode);
 
                         // Skip the part now that we've processed it
                         reader.Skip();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -268,7 +255,7 @@ namespace SabreTools.Library.DatFiles
             bool clean,
             bool remUnicode)
         {
-            string key = "", areaname = "", partname = "", partinterface = "";
+            string key = string.Empty, areaname = string.Empty, partname = string.Empty, partinterface = string.Empty;
             string temptype = reader.Name;
             long? areasize = null;
             List<Tuple<string, string>> features = new List<Tuple<string, string>>();
@@ -281,13 +268,14 @@ namespace SabreTools.Library.DatFiles
                 {
                     if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "part")
                     {
-                        partname = "";
-                        partinterface = "";
+                        partname = string.Empty;
+                        partinterface = string.Empty;
                         features = new List<Tuple<string, string>>();
                     }
+
                     if (reader.NodeType == XmlNodeType.EndElement && (reader.Name == "dataarea" || reader.Name == "diskarea"))
                     {
-                        areaname = "";
+                        areaname = string.Empty;
                         areasize = null;
                     }
 
@@ -301,23 +289,22 @@ namespace SabreTools.Library.DatFiles
                     case "part":
                         partname = reader.GetAttribute("name");
                         partinterface = reader.GetAttribute("interface");
-
                         reader.Read();
                         break;
+
                     case "feature":
                         features.Add(new Tuple<string, string>(reader.GetAttribute("name"), reader.GetAttribute("feature")));
-
                         reader.Read();
                         break;
+
                     case "dataarea":
                         areaname = reader.GetAttribute("name");
                         if (reader.GetAttribute("size") != null)
                         {
                             if (Int64.TryParse(reader.GetAttribute("size"), out long tempas))
-                            {
                                 areasize = tempas;
-                            }
                         }
+
                         // string dataarea_width = reader.GetAttribute("width"); // (8|16|32|64) "8"
                         // string dataarea_endianness = reader.GetAttribute("endianness"); // endianness (big|little) "little"
 
@@ -327,6 +314,7 @@ namespace SabreTools.Library.DatFiles
                         // Skip the dataarea now that we've processed it
                         reader.Skip();
                         break;
+
                     case "diskarea":
                         areaname = reader.GetAttribute("name");
 
@@ -336,6 +324,7 @@ namespace SabreTools.Library.DatFiles
                         // Skip the diskarea now that we've processed it
                         reader.Skip();
                         break;
+
                     case "dipswitch":
                         // string dipswitch_name = reader.GetAttribute("name");
                         // string dipswitch_tag = reader.GetAttribute("tag");
@@ -348,6 +337,7 @@ namespace SabreTools.Library.DatFiles
 
                         reader.Skip();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -392,7 +382,7 @@ namespace SabreTools.Library.DatFiles
             bool clean,
             bool remUnicode)
         {
-            string key = "";
+            string key = string.Empty;
             string temptype = reader.Name;
             bool containsItems = false;
 
@@ -460,6 +450,7 @@ namespace SabreTools.Library.DatFiles
 
                         reader.Read();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -504,7 +495,7 @@ namespace SabreTools.Library.DatFiles
             bool clean,
             bool remUnicode)
         {
-            string key = "";
+            string key = string.Empty;
             string temptype = reader.Name;
             bool containsItems = false;
 
@@ -553,6 +544,7 @@ namespace SabreTools.Library.DatFiles
 
                         reader.Read();
                         break;
+
                     default:
                         reader.Read();
                         break;
@@ -572,20 +564,21 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                Globals.Logger.User("Opening file for writing: {0}", outfile);
+                Globals.Logger.User($"Opening file for writing: {outfile}");
                 FileStream fs = Utilities.TryCreate(outfile);
 
                 // If we get back null for some reason, just log and return
                 if (fs == null)
                 {
-                    Globals.Logger.Warning("File '{0}' could not be created for writing! Please check to see if the file is writable", outfile);
+                    Globals.Logger.Warning($"File '{outfile}' could not be created for writing! Please check to see if the file is writable");
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                XmlTextWriter xtw = new XmlTextWriter(fs, new UTF8Encoding(false));
+                xtw.Formatting = Formatting.Indented;
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(xtw);
 
                 // Write out each of the machines and roms
                 string lastgame = null;
@@ -614,29 +607,25 @@ namespace SabreTools.Library.DatFiles
 
                         // If we have a different game and we're not at the start of the list, output the end of last item
                         if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                        {
-                            WriteEndGame(sw);
-                        }
+                            WriteEndGame(xtw);
 
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                        {
-                            WriteStartGame(sw, rom);
-                        }
+                            WriteStartGame(xtw, rom);
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (rom.ItemType == ItemType.Rom
                             && ((Rom)rom).Size == -1
                             && ((Rom)rom).CRC == "null")
                         {
-                            Globals.Logger.Verbose("Empty folder found: {0}", rom.MachineName);
+                            Globals.Logger.Verbose($"Empty folder found: {rom.MachineName}");
 
                             lastgame = rom.MachineName;
                             continue;
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(xtw, rom, ignoreblanks);
 
                         // Set the new data to compare against
                         lastgame = rom.MachineName;
@@ -644,10 +633,10 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Write the file footer out
-                WriteFooter(sw);
+                WriteFooter(xtw);
 
                 Globals.Logger.Verbose("File written!" + Environment.NewLine);
-                sw.Dispose();
+                xtw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -662,30 +651,59 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(XmlTextWriter xtw)
         {
             try
             {
-                string header = "<?xml version=\"1.0\"?>\n" +
-                            "<!DOCTYPE softwarelist SYSTEM \"softwarelist.dtd\">\n\n" +
-                            "<softwarelist name=\"" + WebUtility.HtmlEncode(Name) + "\"" +
-                                " description=\"" + WebUtility.HtmlEncode(Description) + "\"" +
-                                (ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
-                                (ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
-                                (ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
-                                (ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
-                                (ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
-                                (ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
-                                (ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
-                                (ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
-                                (ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
-                                ">\n\n";
+                xtw.WriteStartDocument();
+                xtw.WriteDocType("softwarelist", null, "softwarelist.dtd", null);
 
-                // Write the header out
-                sw.Write(header);
-                sw.Flush();
+                xtw.WriteStartElement("softwarelist");
+                xtw.WriteAttributeString("name", Name);
+                xtw.WriteAttributeString("description", Description);
+
+                switch (ForcePacking)
+                {
+                    case ForcePacking.Unzip:
+                        xtw.WriteAttributeString("forcepacking", "unzip");
+                        break;
+                    case ForcePacking.Zip:
+                        xtw.WriteAttributeString("forcepacking", "zip");
+                        break;
+                }
+
+                switch (ForceMerging)
+                {
+                    case ForceMerging.Full:
+                        xtw.WriteAttributeString("forcemerging", "full");
+                        break;
+                    case ForceMerging.Split:
+                        xtw.WriteAttributeString("forcemerging", "split");
+                        break;
+                    case ForceMerging.Merged:
+                        xtw.WriteAttributeString("forcemerging", "merged");
+                        break;
+                    case ForceMerging.NonMerged:
+                        xtw.WriteAttributeString("forcemerging", "nonmerged");
+                        break;
+                }
+
+                switch (ForceNodump)
+                {
+                    case ForceNodump.Ignore:
+                        xtw.WriteAttributeString("forcenodump", "ignore");
+                        break;
+                    case ForceNodump.Obsolete:
+                        xtw.WriteAttributeString("forcenodump", "obsolete");
+                        break;
+                    case ForceNodump.Required:
+                        xtw.WriteAttributeString("forcenodump", "required");
+                        break;
+                }
+
+                xtw.Flush();
             }
             catch (Exception ex)
             {
@@ -699,37 +717,52 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteStartGame(StreamWriter sw, DatItem rom)
+        private bool WriteStartGame(XmlTextWriter xtw, DatItem datItem)
         {
             try
             {
                 // No game should start with a path separator
-                if (rom.MachineName.StartsWith(Path.DirectorySeparatorChar.ToString()))
+                datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
+
+                // Build the state based on excluded fields
+                xtw.WriteStartElement("software");
+                xtw.WriteAttributeString("name", datItem.GetField(Field.MachineName, ExcludeFields));
+
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)) && !string.Equals(datItem.MachineName, datItem.CloneOf, StringComparison.OrdinalIgnoreCase))
+                    xtw.WriteAttributeString("cloneof", datItem.CloneOf);
+                
+                if (!ExcludeFields[(int)Field.Supported])
                 {
-                    rom.MachineName = rom.MachineName.Substring(1);
+                    if (datItem.Supported == true)
+                        xtw.WriteAttributeString("supported", "yes");
+                    else if (datItem.Supported == false)
+                        xtw.WriteAttributeString("supported", "no");
+                    else
+                        xtw.WriteAttributeString("supported", "partial");
                 }
 
-                string state = "\t<software name=\"" + (!ExcludeFields[(int)Field.MachineName] ? WebUtility.HtmlEncode(rom.MachineName) : "") + "\""
-                            + (!ExcludeFields[(int)Field.CloneOf] && !String.IsNullOrWhiteSpace(rom.CloneOf) && (rom.MachineName.ToLowerInvariant() != rom.CloneOf.ToLowerInvariant())
-                                ? " cloneof=\"" + WebUtility.HtmlEncode(rom.CloneOf) + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Supported] ? " supported=\"" + (rom.Supported == true ? "yes" : rom.Supported == false ? "no" : "partial") + "\">\n" : "")
-                            + (!ExcludeFields[(int)Field.Description] ? "\t\t<description>" + WebUtility.HtmlEncode(rom.MachineDescription) + "</description>\n" : "")
-                            + (!ExcludeFields[(int)Field.Year] && rom.Year != null ? "\t\t<year>" + WebUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
-                            + (!ExcludeFields[(int)Field.Publisher] && rom.Publisher != null ? "\t\t<publisher>" + WebUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
+                    xtw.WriteElementString("description", datItem.MachineDescription);
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Year, ExcludeFields)))
+                    xtw.WriteElementString("year", datItem.Year);
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Publisher, ExcludeFields)))
+                    xtw.WriteElementString("publisher", datItem.Publisher);
 
-                if (!ExcludeFields[(int)Field.Infos])
+                if (!ExcludeFields[(int)Field.Infos] && datItem.Infos != null && datItem.Infos.Count > 0)
                 {
-                    foreach (Tuple<string, string> kvp in rom.Infos)
+                    foreach (Tuple<string, string> kvp in datItem.Infos)
                     {
-                        state += "\t\t<info name=\"" + WebUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + WebUtility.HtmlEncode(kvp.Item2) + "\" />\n";
+                        xtw.WriteStartElement("info");
+                        xtw.WriteAttributeString("name", kvp.Item1);
+                        xtw.WriteAttributeString("value", kvp.Item2);
+                        xtw.WriteEndElement();
                     }
                 }
 
-                sw.Write(state);
-                sw.Flush();
+                xtw.Flush();
             }
             catch (Exception ex)
             {
@@ -743,16 +776,16 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteEndGame(StreamWriter sw)
+        private bool WriteEndGame(XmlTextWriter xtw)
         {
             try
             {
-                string state = "\t</software>\n\n";
+                // End software
+                xtw.WriteEndElement();
 
-                sw.Write(state);
-                sw.Flush();
+                xtw.Flush();
             }
             catch (Exception ex)
             {
@@ -766,80 +799,121 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+        private bool WriteDatItem(XmlTextWriter xtw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
-            if (ignoreblanks
-                && (rom.ItemType == ItemType.Rom
-                && (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
-            {
+            if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
                 return true;
-            }
 
             try
             {
-                string state = "";
-
                 // Pre-process the item name
-                ProcessItemName(rom, true);
+                ProcessItemName(datItem, true);
 
-                state += "\t\t<part name=\"" + (!ExcludeFields[(int)Field.PartName] ? rom.PartName : "") + "\" interface=\""
-                    + (!ExcludeFields[(int)Field.PartInterface] ? rom.PartInterface : "") + "\">\n";
+                // Build the state based on excluded fields
+                xtw.WriteStartElement("part");
+                xtw.WriteAttributeString("name", datItem.GetField(Field.PartName, ExcludeFields));
+                xtw.WriteAttributeString("interface", datItem.GetField(Field.PartInterface, ExcludeFields));
 
-                if (!ExcludeFields[(int)Field.Features])
+                if (!ExcludeFields[(int)Field.Features] && datItem.Features != null && datItem.Features.Count > 0)
                 {
-                    foreach (Tuple<string, string> kvp in rom.Features)
+                    foreach (Tuple<string, string> kvp in datItem.Features)
                     {
-                        state += "\t\t\t<feature name=\"" + WebUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + WebUtility.HtmlEncode(kvp.Item2) + "\"/>\n";
+                        xtw.WriteStartElement("feature");
+                        xtw.WriteAttributeString("name", kvp.Item1);
+                        xtw.WriteAttributeString("value", kvp.Item2);
+                        xtw.WriteEndElement();
                     }
                 }
 
-                switch (rom.ItemType)
+                string areaName = datItem.GetField(Field.AreaName, ExcludeFields);
+                switch (datItem.ItemType)
                 {
                     case ItemType.Disk:
-                        state += "\t\t\t<diskarea name=\"" + (!ExcludeFields[(int)Field.AreaName] ? (String.IsNullOrWhiteSpace(rom.AreaName) ? "cdrom" : rom.AreaName) : "") + "\""
-                                + (!ExcludeFields[(int)Field.AreaSize] && rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
-                            + "\t\t\t\t<disk name=\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
-                            + (!ExcludeFields[(int)Field.MD5] && !String.IsNullOrWhiteSpace(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.RIPEMD160] && !String.IsNullOrWhiteSpace(((Disk)rom).RIPEMD160) ? " ripemd160=\"" + ((Disk)rom).RIPEMD160.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA1] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA256] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA384] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA512] && !String.IsNullOrWhiteSpace(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Status] && ((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Writable] && ((Disk)rom).Writable != null ? " writable=\"" + (((Disk)rom).Writable == true ? "yes" : "no") + "\"" : "")
-                            + "/>\n"
-                            + "\t\t\t</diskarea>\n";
+                        var disk = datItem as Disk;
+                        if (!ExcludeFields[(int)Field.AreaName] && string.IsNullOrWhiteSpace(areaName))
+                            areaName = "cdrom";
+
+                        xtw.WriteStartElement("diskarea");
+                        xtw.WriteAttributeString("name", areaName);
+                        if (!ExcludeFields[(int)Field.AreaSize] && disk.AreaSize != null)
+                            xtw.WriteAttributeString("size", disk.AreaSize.ToString());
+
+                        xtw.WriteStartElement("disk");
+                        xtw.WriteAttributeString("name", disk.GetField(Field.Name, ExcludeFields));
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                            xtw.WriteAttributeString("md5", disk.MD5.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
+                            xtw.WriteAttributeString("ripemd160", disk.RIPEMD160.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
+                            xtw.WriteAttributeString("sha1", disk.SHA1.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
+                            xtw.WriteAttributeString("sha256", disk.SHA256.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
+                            xtw.WriteAttributeString("sha384", disk.SHA384.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
+                            xtw.WriteAttributeString("sha512", disk.SHA512.ToLowerInvariant());
+                        if (!ExcludeFields[(int)Field.Status] && disk.ItemStatus != ItemStatus.None)
+                            xtw.WriteAttributeString("status", disk.ItemStatus.ToString().ToLowerInvariant());
+                        if (!ExcludeFields[(int)Field.Writable] && disk.Writable != null)
+                            xtw.WriteAttributeString("writable", disk.Writable == true ? "yes" : "no");
+                        xtw.WriteEndElement();
+
+                        // End diskarea
+                        xtw.WriteEndElement();
                         break;
+
                     case ItemType.Rom:
-                        state += "\t\t\t<dataarea name=\"" + (!ExcludeFields[(int)Field.AreaName] ? (String.IsNullOrWhiteSpace(rom.AreaName) ? "rom" : rom.AreaName) : "") + "\""
-                                + (!ExcludeFields[(int)Field.AreaSize] && rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
-                            + "\t\t\t\t<rom name=\"" + (!ExcludeFields[(int)Field.Name] ? WebUtility.HtmlEncode(rom.Name) : "") + "\""
-                            + (!ExcludeFields[(int)Field.Size] && ((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
-                            + (!ExcludeFields[(int)Field.CRC] && !String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.MD5] && !String.IsNullOrWhiteSpace(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.RIPEMD160] && !String.IsNullOrWhiteSpace(((Rom)rom).RIPEMD160) ? " ripemd160=\"" + ((Rom)rom).RIPEMD160.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA1] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA256] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA384] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.SHA512] && !String.IsNullOrWhiteSpace(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Offset] && !String.IsNullOrWhiteSpace(((Rom)rom).Offset) ? " offset=\"" + ((Rom)rom).Offset + "\"" : "")
-                            // + (!ExcludeFields[(int)Field.Value] && !String.IsNullOrWhiteSpace(((Rom)rom).Value) ? " value=\"" + ((Rom)rom).Value + "\"" : "")
-                            + (!ExcludeFields[(int)Field.Status] && ((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
-                            // + (!ExcludeFields[(int)Field.Loadflag] && !String.IsNullOrWhiteSpace(((Rom)rom).Loadflag) ? " loadflag=\"" + ((Rom)rom).Loadflag + "\"" : "")
-                            + "/>\n"
-                            + "\t\t\t</dataarea>\n";
+                        var rom = datItem as Rom;
+                        if (!ExcludeFields[(int)Field.AreaName] && string.IsNullOrWhiteSpace(areaName))
+                            areaName = "rom";
+
+                        xtw.WriteStartElement("dataarea");
+                        xtw.WriteAttributeString("name", areaName);
+                        if (!ExcludeFields[(int)Field.AreaSize] && rom.AreaSize != null)
+                            xtw.WriteAttributeString("size", rom.AreaSize.ToString());
+
+                        xtw.WriteStartElement("rom");
+                        xtw.WriteAttributeString("name", rom.GetField(Field.Name, ExcludeFields));
+                        if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
+                            xtw.WriteAttributeString("size", rom.Size.ToString());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
+                            xtw.WriteAttributeString("crc", rom.CRC.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                            xtw.WriteAttributeString("md5", rom.MD5.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
+                            xtw.WriteAttributeString("ripemd160", rom.RIPEMD160.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
+                            xtw.WriteAttributeString("sha1", rom.SHA1.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
+                            xtw.WriteAttributeString("sha256", rom.SHA256.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
+                            xtw.WriteAttributeString("sha384", rom.SHA384.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
+                            xtw.WriteAttributeString("sha512", rom.SHA512.ToLowerInvariant());
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Offset, ExcludeFields)))
+                            xtw.WriteAttributeString("offset", rom.Offset);
+                        //if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Value, ExcludeFields)))
+                        //    xtw.WriteAttributeString("value", rom.Value);
+                        if (!ExcludeFields[(int)Field.Status] && rom.ItemStatus != ItemStatus.None)
+                            xtw.WriteAttributeString("status", rom.ItemStatus.ToString().ToLowerInvariant());
+                        //if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Loadflag, ExcludeFields)))
+                        //    xtw.WriteAttributeString("loadflag", rom.Loadflag);
+                        xtw.WriteEndElement();
+
+                        // End dataarea
+                        xtw.WriteEndElement();
                         break;
                 }
 
-                state += "\t\t</part>\n";
+                // End part
+                xtw.WriteEndElement();
 
-                sw.Write(state);
-                sw.Flush();
+                xtw.Flush();
             }
             catch (Exception ex)
             {
@@ -853,17 +927,19 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT footer using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="xtw">XmlTextWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteFooter(StreamWriter sw)
+        private bool WriteFooter(XmlTextWriter xtw)
         {
             try
             {
-                string footer = "\t</software>\n\n</softwarelist>\n";
+                // End software
+                xtw.WriteEndElement();
 
-                // Write the footer out
-                sw.Write(footer);
-                sw.Flush();
+                // End softwarelist
+                xtw.WriteEndElement();
+
+                xtw.Flush();
             }
             catch (Exception ex)
             {

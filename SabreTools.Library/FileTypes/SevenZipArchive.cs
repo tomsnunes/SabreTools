@@ -1,23 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using BinaryWriter = System.IO.BinaryWriter;
-using EndOfStreamException = System.IO.EndOfStreamException;
-using FileStream = System.IO.FileStream;
-using MemoryStream = System.IO.MemoryStream;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-#endif
 using Compress;
 using Compress.SevenZip;
 using Compress.ZipFile;
@@ -85,10 +73,8 @@ namespace SabreTools.Library.FileTypes
                     zr = zf.ZipFileOpenReadStream(i, out Stream readStream, out ulong streamsize);
 
                     // Create the rest of the path, if needed
-                    if (!String.IsNullOrWhiteSpace(Path.GetDirectoryName(zf.Filename(i))))
-                    {
+                    if (!string.IsNullOrWhiteSpace(Path.GetDirectoryName(zf.Filename(i))))
                         Directory.CreateDirectory(Path.Combine(outDir, Path.GetDirectoryName(zf.Filename(i))));
-                    }
 
                     // If the entry ends with a directory separator, continue to the next item, if any
                     if (zf.Filename(i).EndsWith(Path.DirectorySeparatorChar.ToString())
@@ -304,7 +290,7 @@ namespace SabreTools.Library.FileTypes
                     // If we get a read error, log it and continue
                     if (zr != ZipReturn.ZipGood)
                     {
-                        Globals.Logger.Warning("An error occurred while reading archive {0}: Zip Error - {1}", this.Filename, zr);
+                        Globals.Logger.Warning($"An error occurred while reading archive {this.Filename}: Zip Error - {zr}");
                         zr = zf.ZipFileCloseReadStream();
                         continue;
                     }
@@ -446,7 +432,7 @@ namespace SabreTools.Library.FileTypes
         public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
         {
             bool success = false;
-            string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+            string tempFile = Path.Combine(outDir, $"tmp{Guid.NewGuid()}");
 
             // If either input is null or empty, return
             if (inputStream == null || rom == null || rom.Name == null)
@@ -464,7 +450,7 @@ namespace SabreTools.Library.FileTypes
             inputStream.Seek(0, SeekOrigin.Begin);
 
             // Get the output archive name from the first rebuild rom
-            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".zip") ? "" : ".zip"));
+            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".zip") ? string.Empty : ".zip"));
 
             // Set internal variables
             Stream writeStream = null;
@@ -490,7 +476,7 @@ namespace SabreTools.Library.FileTypes
                     ulong istreamSize = (ulong)(inputStream.Length);
 
                     DateTime dt = DateTime.Now;
-                    if (date && !String.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
+                    if (date && !string.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
                     {
                         uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
                         zipFile.ZipFileOpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize, 0, msDosDateTime, out writeStream);
@@ -565,7 +551,7 @@ namespace SabreTools.Library.FileTypes
                             ulong istreamSize = (ulong)(inputStream.Length);
 
                             DateTime dt = DateTime.Now;
-                            if (date && !String.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
+                            if (date && !string.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
                             {
                                 uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
                                 zipFile.ZipFileOpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize, 0, msDosDateTime, out writeStream);
@@ -648,7 +634,7 @@ namespace SabreTools.Library.FileTypes
         public override bool Write(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false, bool romba = false)
         {
             bool success = false;
-            string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+            string tempFile = Path.Combine(outDir, $"tmp{Guid.NewGuid()}");
 
             // If either list of roms is null or empty, return
             if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
@@ -672,7 +658,7 @@ namespace SabreTools.Library.FileTypes
             }
 
             // Get the output archive name from the first rebuild rom
-            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".zip") ? "" : ".zip"));
+            string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".zip") ? string.Empty : ".zip"));
 
             // Set internal variables
             Stream writeStream = null;
@@ -715,7 +701,7 @@ namespace SabreTools.Library.FileTypes
                         ulong istreamSize = (ulong)(new FileInfo(inputFiles[index]).Length);
 
                         DateTime dt = DateTime.Now;
-                        if (date && !String.IsNullOrWhiteSpace(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
+                        if (date && !string.IsNullOrWhiteSpace(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
                         {
                             uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
                             zipFile.ZipFileOpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize, 0, msDosDateTime, out writeStream);
@@ -798,7 +784,7 @@ namespace SabreTools.Library.FileTypes
                             ulong istreamSize = (ulong)(new FileInfo(inputFiles[-index - 1]).Length);
 
                             DateTime dt = DateTime.Now;
-                            if (date && !String.IsNullOrWhiteSpace(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
+                            if (date && !string.IsNullOrWhiteSpace(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
                             {
                                 uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
                                 zipFile.ZipFileOpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, 0, msDosDateTime, out writeStream);

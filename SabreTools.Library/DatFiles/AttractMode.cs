@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
-
-#if MONO
-using System.IO;
-#else
-using Alphaleonis.Win32.Filesystem;
-
-using FileStream = System.IO.FileStream;
-using StreamReader = System.IO.StreamReader;
-using StreamWriter = System.IO.StreamWriter;
-#endif
 using NaturalSort;
 
 namespace SabreTools.Library.DatFiles
@@ -119,13 +111,13 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                Globals.Logger.User("Opening file for writing: {0}", outfile);
+                Globals.Logger.User($"Opening file for writing: {outfile}");
                 FileStream fs = Utilities.TryCreate(outfile);
 
                 // If we get back null for some reason, just log and return
                 if (fs == null)
                 {
-                    Globals.Logger.Warning("File '{0}' could not be created for writing! Please check to see if the file is writable", outfile);
+                    Globals.Logger.Warning($"File '{outfile}' could not be created for writing! Please check to see if the file is writable");
                     return false;
                 }
 
@@ -161,16 +153,14 @@ namespace SabreTools.Library.DatFiles
 
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != item.MachineName.ToLowerInvariant())
-                        {
                             WriteDatItem(sw, item, ignoreblanks);
-                        }
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (item.ItemType == ItemType.Rom
                             && ((Rom)item).Size == -1
                             && ((Rom)item).CRC == "null")
                         {
-                            Globals.Logger.Verbose("Empty folder found: {0}", item.MachineName);
+                            Globals.Logger.Verbose($"Empty folder found: {item.MachineName}");
 
                             item.Name = (item.Name == "null" ? "-" : item.Name);
                             ((Rom)item).Size = Constants.SizeZero;
@@ -181,7 +171,7 @@ namespace SabreTools.Library.DatFiles
                     }
                 }
 
-                Globals.Logger.Verbose("File written!" + Environment.NewLine);
+                Globals.Logger.Verbose($"File written!{Environment.NewLine}");
                 sw.Dispose();
                 fs.Dispose();
             }
@@ -222,44 +212,42 @@ namespace SabreTools.Library.DatFiles
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
         /// <param name="sw">StreamWriter to output to</param>
-        /// <param name="rom">DatItem object to be output</param>
+        /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
-            if (ignoreblanks
-                && (rom.ItemType == ItemType.Rom
-                && (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
-            {
+            if (ignoreblanks && (datItem.ItemType == ItemType.Rom && (((Rom)datItem).Size == 0 || ((Rom)datItem).Size == -1)))
                 return true;
-            }
 
             try
             {
                 // No game should start with a path separator
-                if (rom.MachineName.StartsWith(Path.DirectorySeparatorChar.ToString()))
-                {
-                    rom.MachineName = rom.MachineName.Substring(1);
-                }
+                datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
 
-                string state = (!ExcludeFields[(int)Field.MachineName] ? rom.MachineName : "") + ";"
-                            + (!ExcludeFields[(int)Field.Description] ? rom.MachineDescription : "") + ";"
-                            + FileName + ";"
-                            + (!ExcludeFields[(int)Field.CloneOf] ? rom.CloneOf : "") + ";"
-                            + (!ExcludeFields[(int)Field.Year] ? rom.Year : "") + ";"
-                            + (!ExcludeFields[(int)Field.Manufacturer] ? rom.Manufacturer : "") + ";"
-                            /* + rom.Category */ + ";"
-                            /* + rom.Players */ + ";"
-                            /* + rom.Rotation */ + ";"
-                            /* + rom.Control */ + ";"
-                            /* + rom.Status */ + ";"
-                            /* + rom.DisplayCount */ + ";"
-                            /* + rom.DisplayType */ + ";"
-                            /* + rom.AltRomname */ + ";"
-                            /* + rom.AltTitle */ + ";"
-                            + (!ExcludeFields[(int)Field.Comment] ? rom.Comment : "") + ";"
-                            /* + rom.Buttons */ + "\n";
+                // Pre-process the item name
+                ProcessItemName(datItem, true);
+
+                string state = string.Empty;
+
+                state += $"{datItem.GetField(Field.MachineName, ExcludeFields)};";
+                state += $"{datItem.GetField(Field.Description, ExcludeFields)};";
+                state += $"{FileName};";
+                state += $"{datItem.GetField(Field.CloneOf, ExcludeFields)};";
+                state += $"{datItem.GetField(Field.Year, ExcludeFields)};";
+                state += $"{datItem.GetField(Field.Manufacturer, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.Category, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.Players, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.Rotation, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.Control, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.Status, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.DisplayCount, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.DisplayType, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.AltRomname, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.AltTitle, ExcludeFields)};";
+                state += $"{datItem.GetField(Field.Comment, ExcludeFields)};";
+                state += ";"; // $"{datItem.GetField(Field.Buttons, ExcludeFields)};";
 
                 sw.Write(state);
                 sw.Flush();

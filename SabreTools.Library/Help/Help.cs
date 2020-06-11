@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SabreTools.Library.Help
 {
@@ -98,19 +99,7 @@ namespace SabreTools.Library.Help
         /// <returns>Feature name</returns>
         public string GetFeatureName(string name)
         {
-            string feature = "";
-
-            // Loop through the features
-            foreach (string featureName in _features.Keys)
-            {
-                if (_features[featureName].ValidateInput(name, exact: true, ignore: true))
-                {
-                    feature = featureName;
-                    break;
-                }
-            }
-
-            return feature;
+            return _features.Keys.FirstOrDefault(f => _features[f].ValidateInput(name, exact: true, ignore: true)) ?? string.Empty;
         }
 
         /// <summary>
@@ -132,7 +121,7 @@ namespace SabreTools.Library.Help
             }
 
             // And append the generic ending
-            output.Add("");
+            output.Add(string.Empty);
             output.Add("For information on available flags, put the option name after help");
 
             // Now write out everything in a staged manner
@@ -170,7 +159,7 @@ namespace SabreTools.Library.Help
             credits.Add(_barrier);
             credits.Add("Credits");
             credits.Add(_barrier);
-            credits.Add("");
+            credits.Add(string.Empty);
             credits.Add("Programmer / Lead:	Matt Nadareski (darksabre76)");
             credits.Add("Additional code:	emuLOAD, @tractivo, motoschifo");
             credits.Add("Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc");
@@ -218,14 +207,14 @@ namespace SabreTools.Library.Help
             // If we have a real name found, append all available subflags recursively
             if (realname != null)
             {
-                output.Add("Available options for " + realname + ":");
+                output.Add($"Available options for {realname}:");
                 output.AddRange(_features[realname].OutputRecursive(0, pre: 2, midpoint: 30, includeLongDescription: includeLongDescription));
             }
 
             // If no name was found but we have possible matches, show them
             else if (startsWith.Count > 0)
             {
-                output.Add("\"" + featurename + "\" not found. Did you mean:");
+                output.Add($"\"{featurename}\" not found. Did you mean:");
                 foreach (string possible in startsWith)
                 {
                     output.AddRange(_features[possible].Output(pre: 2, midpoint: 30, includeLongDescription: includeLongDescription));
@@ -243,19 +232,7 @@ namespace SabreTools.Library.Help
         /// <returns>True if the feature was found, false otherwise</returns>
         public bool TopLevelFlag(string flag)
         {
-            bool success = false;
-
-            // Loop through the features and check
-            foreach (string feature in _features.Keys)
-            {
-                if (_features[feature].ValidateInput(flag, exact: true))
-                {
-                    success = true;
-                    break;
-                }
-            }
-
-            return success;
+            return _features.Keys.Any(f => _features[f].ValidateInput(flag, exact: true));
         }
 
         /// <summary>
@@ -267,7 +244,7 @@ namespace SabreTools.Library.Help
             Dictionary<string, Feature> enabled = new Dictionary<string, Feature>();
 
             // Loop through the features
-            foreach(KeyValuePair<string, Feature> feature in _features)
+            foreach (KeyValuePair<string, Feature> feature in _features)
             {
                 Dictionary<string, Feature> temp = GetEnabledSubfeatures(feature.Key, feature.Value);
                 foreach (KeyValuePair<string, Feature> tempfeat in temp)
@@ -294,9 +271,7 @@ namespace SabreTools.Library.Help
 
             // First determine if the current feature is enabled
             if (feature.IsEnabled())
-            {
                 enabled.Add(key, feature);
-            }
 
             // Now loop through the subfeatures recursively
             foreach (KeyValuePair<string, Feature> sub in feature.Features)
@@ -305,9 +280,8 @@ namespace SabreTools.Library.Help
                 foreach (KeyValuePair<string, Feature> tempfeat in temp)
                 {
                     if (!enabled.ContainsKey(tempfeat.Key))
-                    {
                         enabled.Add(tempfeat.Key, null);
-                    }
+
                     enabled[tempfeat.Key] = tempfeat.Value;
                 }
             }
@@ -337,6 +311,7 @@ namespace SabreTools.Library.Help
                     Pause();
                 }
             }
+
             Pause();
         }
 
