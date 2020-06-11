@@ -8,11 +8,18 @@ namespace SabreTools.Library.Data
     public static class Build
     {
         /// <summary>
-        /// Returns true if running in a Mono environment
+        /// Returns true if running in a Mono or .NET Core environment
         /// </summary>
-        public static bool MonoEnvironment
+        public static bool MonoOrCoreEnvironment
         {
-            get { return (Type.GetType("Mono.Runtime") != null); }
+            get
+            {
+#if NET_FRAMEWORK
+                return Type.GetType("Mono.Runtime") != null;
+#else
+                return true;
+#endif
+            }
         }
 
         /// <summary>
@@ -33,7 +40,7 @@ namespace SabreTools.Library.Data
                 // Set the console to ready state
                 ConsoleColor formertext = ConsoleColor.White;
                 ConsoleColor formerback = ConsoleColor.Black;
-                if (!MonoEnvironment)
+                if (!MonoOrCoreEnvironment)
                 {
                     Console.SetBufferSize(Console.BufferWidth, 999);
                     formertext = Console.ForegroundColor;
@@ -51,7 +58,7 @@ namespace SabreTools.Library.Data
                 Console.WriteLine();
 
                 // Return the console to the original text and background colors
-                if (!MonoEnvironment)
+                if (!MonoOrCoreEnvironment)
                 {
                     Console.ForegroundColor = formertext;
                     Console.BackgroundColor = formerback;

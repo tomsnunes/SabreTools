@@ -8,6 +8,10 @@
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <DefineConstants>NET_FRAMEWORK</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Mono.Data.Sqlite.Portable" Version="1.0.3.5" />
   </ItemGroup>

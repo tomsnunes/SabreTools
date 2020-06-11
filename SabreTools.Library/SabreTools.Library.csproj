@@ -7,6 +7,10 @@
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <DefineConstants>NET_FRAMEWORK</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Skippers\a7800.xml" />
     <None Remove="Skippers\fds.xml" />
