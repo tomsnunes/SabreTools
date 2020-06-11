@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using SabreTools.Library.Data;
 
 namespace SabreTools.Library.DatItems

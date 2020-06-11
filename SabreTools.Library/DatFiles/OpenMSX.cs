@@ -629,14 +629,19 @@ namespace SabreTools.Library.DatFiles
                 xtw.WriteStartElement("softwaredb");
                 //xtw.WriteAttributeString("timestamp", timestamp);
 
-                // TODO: Figure out how to fix the issue with removed formatting after this point
-                //xtw.WriteComment("Credits");
-                //xtw.WriteCData(@"The softwaredb.xml file contains information about rom mapper types
+                //TODO: Figure out how to fix the issue with removed formatting after this point
+//                xtw.WriteComment("Credits");
+//                xtw.WriteCData(@"The softwaredb.xml file contains information about rom mapper types
 
-//Copyright 2003 Nicolas Beyaert (Initial Database)
-//Copyright 2004-2013 BlueMSX Team
-//Copyright 2005-2018 openMSX Team
-//Generation MSXIDs by www.generation-msx.nl");
+//-Copyright 2003 Nicolas Beyaert(Initial Database)
+//-Copyright 2004 - 2013 BlueMSX Team
+//-Copyright 2005 - 2020 openMSX Team
+//-Generation MSXIDs by www.generation - msx.nl
+
+//- Thanks go out to:
+//-Generation MSX / Sylvester for the incredible source of information
+//- p_gimeno and diedel for their help adding and valdiating ROM additions
+//- GDX for additional ROM info and validations and corrections");
 
                 xtw.Flush();
             }

@@ -1,14 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
-
-#if MONO
-using System.IO;
-#else
-using MemoryStream = System.IO.MemoryStream;
-using Stream = System.IO.Stream;
-#endif
 
 namespace SabreTools.Library.FileTypes
 {

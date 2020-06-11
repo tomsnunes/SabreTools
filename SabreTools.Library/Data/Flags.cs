@@ -274,7 +274,7 @@ namespace SabreTools.Library.Data
         SabreDat =              1 << 5,
 
         /// <summary>
-        /// OpenMSX Software List XML
+        /// openMSX Software List XML
         /// </summary>
         OpenMSX =               1 << 6,
 

@@ -1,13 +1,7 @@
-﻿using SabreTools.Library.Data;
-using SabreTools.Library.Tools;
+﻿using System.IO;
 
-#if MONO
-using System.IO;
-#else
-using BinaryReader = System.IO.BinaryReader;
-using SeekOrigin = System.IO.SeekOrigin;
-using Stream = System.IO.Stream;
-#endif
+using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
 namespace SabreTools.Library.FileTypes
 {

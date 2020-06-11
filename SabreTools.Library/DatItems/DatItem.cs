@@ -7,7 +7,6 @@ using SabreTools.Library.Data;
 using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
 using NaturalSort;
-using System.Runtime.CompilerServices;
 
 namespace SabreTools.Library.DatItems
 {
