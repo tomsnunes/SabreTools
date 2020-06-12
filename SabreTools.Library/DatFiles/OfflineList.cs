@@ -772,6 +772,8 @@ namespace SabreTools.Library.DatFiles
 
                 XmlTextWriter xtw = new XmlTextWriter(fs, new UTF8Encoding(false));
                 xtw.Formatting = Formatting.Indented;
+                xtw.IndentChar = '\t';
+                xtw.Indentation = 1;
 
                 // Write out the header
                 WriteHeader(xtw);
