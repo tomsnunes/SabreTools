@@ -12,26 +12,11 @@ namespace SabreTools.Library.Reports
     internal class Textfile : BaseReport
     {
         /// <summary>
-        /// Create a new report from the input DatFile and the filename
+        /// Constructor designed for casting a base BaseReport
         /// </summary>
-        /// <param name="datfile">DatFile to write out statistics for</param>
-        /// <param name="filename">Name of the file to write out to</param>
-        /// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
-        /// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-        public Textfile(DatFile datfile, string filename, bool baddumpCol = false, bool nodumpCol = false)
-            : base(datfile, filename, baddumpCol, nodumpCol)
-        {
-        }
-
-        /// <summary>
-        /// Create a new report from the input DatFile and the stream
-        /// </summary>
-        /// <param name="datfile">DatFile to write out statistics for</param>
-        /// <param name="stream">Output stream to write to</param>
-        /// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
-        /// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-        public Textfile(DatFile datfile, Stream stream, bool baddumpCol = false, bool nodumpCol = false)
-            : base(datfile, stream, baddumpCol, nodumpCol)
+        /// <param name="baseReport">BaseReport to pull information from</param>
+        public Textfile(BaseReport baseReport)
+            : base(baseReport)
         {
         }
 

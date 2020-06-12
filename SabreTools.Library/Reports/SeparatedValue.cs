@@ -13,29 +13,11 @@ namespace SabreTools.Library.Reports
         private char _separator;
 
         /// <summary>
-        /// Create a new report from the input DatFile and the filename
+        /// Constructor designed for casting a base BaseReport
         /// </summary>
-        /// <param name="datfile">DatFile to write out statistics for</param>
-        /// <param name="filename">Name of the file to write out to</param>
-        /// <param name="separator">Separator character to use in output</param>
-        /// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
-        /// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-        public SeparatedValue(DatFile datfile, string filename, char separator, bool baddumpCol = false, bool nodumpCol = false)
-            : base(datfile, filename, baddumpCol, nodumpCol)
-        {
-            _separator = separator;
-        }
-
-        /// <summary>
-        /// Create a new report from the input DatFile and the stream
-        /// </summary>
-        /// <param name="datfile">DatFile to write out statistics for</param>
-        /// <param name="stream">Output stream to write to</param>
-        /// <param name="separator">Separator character to use in output</param>
-        /// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
-        /// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-        public SeparatedValue(DatFile datfile, Stream stream, char separator, bool baddumpCol = false, bool nodumpCol = false)
-            : base(datfile, stream, baddumpCol, nodumpCol)
+        /// <param name="baseReport">BaseReport to pull information from</param>
+        public SeparatedValue(BaseReport baseReport, char separator)
+            : base(baseReport)
         {
             _separator = separator;
         }

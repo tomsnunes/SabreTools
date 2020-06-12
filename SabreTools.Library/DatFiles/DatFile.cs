@@ -5416,6 +5416,62 @@ namespace SabreTools.Library.DatFiles
         #region Statistics
 
         /// <summary>
+        /// Determine how statistics should be written out
+        /// </summary>
+        /// <param name="inputPaths">Names of the input files and/or folders</param>
+        /// <param name="outDir">Optional param for output directory</param>
+        /// <param name="fileName">Name of the output file (only when not individual)</param>
+        /// <param name="overwrite">True if the output files should overwrite in output folders</param>
+        /// <param name="statReportFormat">Stat report formats to write out to</param>
+        /// <param name="individual">Output each statistics file separately</param>
+        /// <param name="single">True if single DAT stats are output, false otherwise (only when not individual)</param>
+        /// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+        /// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+        public void DetermineStatistics(
+            List<string> inputPaths,
+            string fileName,
+            string outDir,
+            bool overwrite,
+            StatReportFormat statReportFormat,
+            bool individual,
+            bool single,
+            bool baddumpCol,
+            bool nodumpCol)
+        {
+            // Ensure we only have files in the inputs
+            List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+
+            // Order inputs by directory
+            inputFileNames = inputFileNames
+                .OrderBy(i => Path.GetDirectoryName(i))
+                .ThenBy(i => Path.GetFileName(i))
+                .ToList();
+
+            // If we're in individual mode
+            if (individual)
+            {
+                foreach (string inputFile in inputFileNames)
+                {
+                    DatFile datdata = new DatFile(this);
+                    Globals.Logger.User($"Processing '{Path.GetFileName(inputFile.Split('¬')[0])}'");
+                    datdata.Parse(inputFile, 0, 0, keep: true);
+
+                    // Get the correct output path
+                    string realOutDir = Utilities.GetOutputPath(outDir, inputFile, false);
+
+                    // Try to output the statistics
+                    //datdata.WriteStatistics(realOutDir, overwrite: overwrite);
+                }
+            }
+            else
+            {
+
+            }
+
+            return;
+        }
+
+        /// <summary>
         /// Output the stats for the Dat in a human-readable format
         /// </summary>
         /// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
@@ -6053,207 +6109,170 @@ namespace SabreTools.Library.DatFiles
         public static void OutputStats(List<string> inputs, string reportName, string outDir, bool single,
             bool baddumpCol, bool nodumpCol, StatReportFormat statDatFormat)
         {
-            // If there's no output format, set the default
-            if (statDatFormat == StatReportFormat.None)
-                statDatFormat = StatReportFormat.Textfile;
+            // TODO: Rewrite this to use the `individual` flag
+            // TODO: Rewrites this to be non-static
+            // TODO: Pattern this off of DAT writing
+            // TODO: How to bring multiple dats in without combining like in DatFile?
 
-            // Get the proper output file name
-            if (string.IsNullOrWhiteSpace(reportName))
-                reportName = "report";
+//            // If there's no output format, set the default
+//            if (statDatFormat == StatReportFormat.None)
+//                statDatFormat = StatReportFormat.Textfile;
 
-            // Get the proper output directory name
-            outDir = Utilities.EnsureOutputDirectory(outDir);
+//            // Get the proper output file name
+//            if (string.IsNullOrWhiteSpace(reportName))
+//                reportName = "report";
 
-            // Get the dictionary of desired output report names
-            Dictionary<StatReportFormat, string> outputs = CreateOutStatsNames(outDir, statDatFormat, reportName);
+//            // Get the proper output directory name
+//            outDir = Utilities.EnsureOutputDirectory(outDir);
 
-            // Make sure we have all files and then order them
-            List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
-            files = files
-                .OrderBy(i => Path.GetDirectoryName(i))
-                .ThenBy(i => Path.GetFileName(i))
-                .ToList();
+//            // Get the dictionary of desired output report names
+//            Dictionary<StatReportFormat, string> outputs = CreateOutStatsNames(outDir, statDatFormat, reportName);
 
-            // Get all of the writers that we need
-            List<BaseReport> reports = outputs.Select(kvp => Utilities.GetBaseReport(kvp.Key, kvp.Value, baddumpCol, nodumpCol)).ToList();
+//            try
+//            {
+//                // Write out all required formats
+//                Parallel.ForEach(outputs.Keys, Globals.ParallelOptions, datFormat =>
+//                {
+//                    string outfile = outputs[datFormat];
+//                    try
+//                    {
+//                        Utilities.GetBaseReport(datFormat, this, baddumpCol, nodumpCol)?.WriteToFile(outfile);
+//                    }
+//                    catch (Exception ex)
+//                    {
+//                        Globals.Logger.Error($"Statistics for {outfile} could not be written out: {ex}");
+//                    }
 
-            // Write the header, if any
-            reports.ForEach(report => report.WriteHeader());
+//                });
+//            }
+//            catch (Exception ex)
+//            {
+//                Globals.Logger.Error(ex.ToString());
+//                return false;
+//            }
 
-            // Init all total variables
-            DatStats totalStats = new DatStats();
+//            // Make sure we have all files and then order them
+//            List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
+//            files = files
+//                .OrderBy(i => Path.GetDirectoryName(i))
+//                .ThenBy(i => Path.GetFileName(i))
+//                .ToList();
 
-            // Init directory-level variables
-            string lastdir = null;
-            string basepath = null;
-            DatStats dirStats = new DatStats();
+//            // Get all of the writers that we need
+//            List<BaseReport> reports = outputs.Select(kvp => Utilities.GetBaseReport(kvp.Key, kvp.Value, baddumpCol, nodumpCol)).ToList();
 
-            // Now process each of the input files
-            foreach (string file in files)
-            {
-                // Get the directory for the current file
-                string thisdir = Path.GetDirectoryName(file);
-                basepath = Path.GetDirectoryName(Path.GetDirectoryName(file));
+//            // Write the header, if any
+//            reports.ForEach(report => report.WriteHeader());
 
-                // If we don't have the first file and the directory has changed, show the previous directory stats and reset
-                if (lastdir != null && thisdir != lastdir)
-                {
-                    // Output separator if needed
-                    reports.ForEach(report => report.WriteMidSeparator());
+//            // Init all total variables
+//            DatStats totalStats = new DatStats();
 
-                    DatFile lastdirdat = new DatFile
-                    {
-                        FileName = $"DIR: {WebUtility.HtmlEncode(lastdir)}",
-                        _datStats = dirStats,
-                    };
+//            // Init directory-level variables
+//            string lastdir = null;
+//            string basepath = null;
+//            DatStats dirStats = new DatStats();
 
-                    lastdirdat.WriteStatsToScreen(recalculate: false, game: dirStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
-                    reports.ForEach(report => report.ReplaceDatFile(lastdirdat));
-                    reports.ForEach(report => report.Write(game: dirStats.GameCount));
+//            // Now process each of the input files
+//            foreach (string file in files)
+//            {
+//                // Get the directory for the current file
+//                string thisdir = Path.GetDirectoryName(file);
+//                basepath = Path.GetDirectoryName(Path.GetDirectoryName(file));
 
-                    // Write the mid-footer, if any
-                    reports.ForEach(report => report.WriteFooterSeparator());
+//                // If we don't have the first file and the directory has changed, show the previous directory stats and reset
+//                if (lastdir != null && thisdir != lastdir)
+//                {
+//                    // Output separator if needed
+//                    reports.ForEach(report => report.WriteMidSeparator());
 
-                    // Write the header, if any
-                    reports.ForEach(report => report.WriteMidHeader());
+//                    DatFile lastdirdat = new DatFile
+//                    {
+//                        FileName = $"DIR: {WebUtility.HtmlEncode(lastdir)}",
+//                        _datStats = dirStats,
+//                    };
 
-                    // Reset the directory stats
-                    dirStats.Reset();
-                }
+//                    lastdirdat.WriteStatsToScreen(recalculate: false, game: dirStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+//                    reports.ForEach(report => report.ReplaceDatFile(lastdirdat));
+//                    reports.ForEach(report => report.Write(game: dirStats.GameCount));
 
-                Globals.Logger.Verbose($"Beginning stat collection for '{file}'", false);
-                List<string> games = new List<string>();
-                DatFile datdata = new DatFile();
-                datdata.Parse(file, 0, 0);
-                datdata.BucketBy(SortedBy.Game, DedupeType.None, norename: true);
+//                    // Write the mid-footer, if any
+//                    reports.ForEach(report => report.WriteFooterSeparator());
 
-                // Output single DAT stats (if asked)
-                Globals.Logger.User($"Adding stats for file '{file}'\n", false);
-                if (single)
-                {
-                    datdata.WriteStatsToScreen(recalculate: false, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
-                    reports.ForEach(report => report.ReplaceDatFile(datdata));
-                    reports.ForEach(report => report.Write());
-                }
+//                    // Write the header, if any
+//                    reports.ForEach(report => report.WriteMidHeader());
 
-                // Add single DAT stats to dir
-                dirStats.AddStats(datdata._datStats);
-                dirStats.GameCount += datdata.Keys.Count();
+//                    // Reset the directory stats
+//                    dirStats.Reset();
+//                }
 
-                // Add single DAT stats to totals
-                totalStats.AddStats(datdata._datStats);
-                totalStats.GameCount += datdata.Keys.Count();
+//                Globals.Logger.Verbose($"Beginning stat collection for '{file}'", false);
+//                List<string> games = new List<string>();
+//                DatFile datdata = new DatFile();
+//                datdata.Parse(file, 0, 0);
+//                datdata.BucketBy(SortedBy.Game, DedupeType.None, norename: true);
 
-                // Make sure to assign the new directory
-                lastdir = thisdir;
-            }
+//                // Output single DAT stats (if asked)
+//                Globals.Logger.User($"Adding stats for file '{file}'\n", false);
+//                if (single)
+//                {
+//                    datdata.WriteStatsToScreen(recalculate: false, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+//                    reports.ForEach(report => report.ReplaceDatFile(datdata));
+//                    reports.ForEach(report => report.Write());
+//                }
 
-            // Output the directory stats one last time
-            reports.ForEach(report => report.WriteMidSeparator());
+//                // Add single DAT stats to dir
+//                dirStats.AddStats(datdata._datStats);
+//                dirStats.GameCount += datdata.Keys.Count();
 
-            if (single)
-            {
-                DatFile dirdat = new DatFile
-                {
-                    FileName = $"DIR: {WebUtility.HtmlEncode(lastdir)}",
-                    _datStats = dirStats,
-                };
+//                // Add single DAT stats to totals
+//                totalStats.AddStats(datdata._datStats);
+//                totalStats.GameCount += datdata.Keys.Count();
 
-                dirdat.WriteStatsToScreen(recalculate: false, game: dirStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
-                reports.ForEach(report => report.ReplaceDatFile(dirdat));
-                reports.ForEach(report => report.Write(dirStats.GameCount));
-            }
+//                // Make sure to assign the new directory
+//                lastdir = thisdir;
+//            }
 
-            // Write the mid-footer, if any
-            reports.ForEach(report => report.WriteFooterSeparator());
+//            // Output the directory stats one last time
+//            reports.ForEach(report => report.WriteMidSeparator());
 
-            // Write the header, if any
-            reports.ForEach(report => report.WriteMidHeader());
+//            if (single)
+//            {
+//                DatFile dirdat = new DatFile
+//                {
+//                    FileName = $"DIR: {WebUtility.HtmlEncode(lastdir)}",
+//                    _datStats = dirStats,
+//                };
 
-            // Reset the directory stats
-            dirStats.Reset();
+//                dirdat.WriteStatsToScreen(recalculate: false, game: dirStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+//                reports.ForEach(report => report.ReplaceDatFile(dirdat));
+//                reports.ForEach(report => report.Write(dirStats.GameCount));
+//            }
 
-            // Output total DAT stats
-            DatFile totaldata = new DatFile
-            {
-                FileName = "DIR: All DATs",
-                _datStats = totalStats,
-            };
+//            // Write the mid-footer, if any
+//            reports.ForEach(report => report.WriteFooterSeparator());
 
-            totaldata.WriteStatsToScreen(recalculate: false, game: totalStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
-            reports.ForEach(report => report.ReplaceDatFile(totaldata));
-            reports.ForEach(report => report.Write(totalStats.GameCount));
+//            // Write the header, if any
+//            reports.ForEach(report => report.WriteMidHeader());
 
-            // Output footer if needed
-            reports.ForEach(report => report.WriteFooter());
+//            // Reset the directory stats
+//            dirStats.Reset();
 
-            Globals.Logger.User(@"
-Please check the log folder if the stats scrolled offscreen", false);
-        }
+//            // Output total DAT stats
+//            DatFile totaldata = new DatFile
+//            {
+//                FileName = "DIR: All DATs",
+//                _datStats = totalStats,
+//            };
 
-        /// <summary>
-        /// Get the proper extension for the stat output format
-        /// </summary>
-        /// <param name="outDir">Output path to use</param>
-        /// <param name="statDatFormat">StatDatFormat to get the extension for</param>
-        /// <param name="reportName">Name of the input file to use</param>
-        /// <returns>Dictionary of output formats mapped to file names</returns>
-        private static Dictionary<StatReportFormat, string> CreateOutStatsNames(string outDir, StatReportFormat statDatFormat, string reportName, bool overwrite = true)
-        {
-            Dictionary<StatReportFormat, string> output = new Dictionary<StatReportFormat, string>();
+//            totaldata.WriteStatsToScreen(recalculate: false, game: totalStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+//            reports.ForEach(report => report.ReplaceDatFile(totaldata));
+//            reports.ForEach(report => report.Write(totalStats.GameCount));
 
-            // First try to create the output directory if we need to
-            if (!Directory.Exists(outDir))
-                Directory.CreateDirectory(outDir);
+//            // Output footer if needed
+//            reports.ForEach(report => report.WriteFooter());
 
-            // Double check the outDir for the end delim
-            if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                outDir += Path.DirectorySeparatorChar;
-
-            // For each output format, get the appropriate stream writer
-            if ((statDatFormat & StatReportFormat.Textfile) != 0)
-                output.Add(StatReportFormat.Textfile, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
-
-            if ((statDatFormat & StatReportFormat.CSV) != 0)
-                output.Add(StatReportFormat.CSV, CreateOutStatsNamesHelper(outDir, ".csv", reportName, overwrite));
-
-            if ((statDatFormat & StatReportFormat.HTML) != 0)
-                output.Add(StatReportFormat.HTML, CreateOutStatsNamesHelper(outDir, ".html", reportName, overwrite));
-
-            if ((statDatFormat & StatReportFormat.SSV) != 0)
-                output.Add(StatReportFormat.SSV, CreateOutStatsNamesHelper(outDir, ".ssv", reportName, overwrite));
-
-            if ((statDatFormat & StatReportFormat.TSV) != 0)
-                output.Add(StatReportFormat.TSV, CreateOutStatsNamesHelper(outDir, ".tsv", reportName, overwrite));
-
-            return output;
-        }
-
-        /// <summary>
-        /// Help generating the outstats name
-        /// </summary>
-        /// <param name="outDir">Output directory</param>
-        /// <param name="extension">Extension to use for the file</param>
-        /// <param name="reportName">Name of the input file to use</param>
-        /// <param name="overwrite">True if we ignore existing files, false otherwise</param>
-        /// <returns>String containing the new filename</returns>
-        private static string CreateOutStatsNamesHelper(string outDir, string extension, string reportName, bool overwrite)
-        {
-            string outfile = outDir + reportName + extension;
-            outfile = outfile.Replace($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", Path.DirectorySeparatorChar.ToString());
-
-            if (!overwrite)
-            {
-                int i = 1;
-                while (File.Exists(outfile))
-                {
-                    outfile = $"{outDir}{reportName}_{i}{extension}";
-                    outfile = outfile.Replace($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", Path.DirectorySeparatorChar.ToString());
-                    i++;
-                }
-            }
-
-            return outfile;
+//            Globals.Logger.User(@"
+//Please check the log folder if the stats scrolled offscreen", false);
         }
 
         #endregion
