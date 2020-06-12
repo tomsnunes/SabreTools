@@ -456,8 +456,23 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                sw.Write(string.Format("\"File Name\"{0}\"Internal Name\"{0}\"Description\"{0}\"Game Name\"{0}\"Game Description\"{0}\"Type\"{0}\"" +
-                                "Rom Name\"{0}\"Disk Name\"{0}\"Size\"{0}\"CRC\"{0}\"MD5\"{0}\"SHA1\"{0}\"SHA256\"{0}\"Nodump\"\n", _delim));
+                sw.Write("\"File Name\"{_delim}");
+                sw.Write("\"Internal Name\"{_delim}");
+                sw.Write("\"Description\"{_delim}");
+                sw.Write("\"Game Name\"{_delim}");
+                sw.Write("\"Game Description\"{_delim}");
+                sw.Write("\"Type\"{_delim}\"");
+                sw.Write("\"Rom Name\"{_delim}");
+                sw.Write("\"Disk Name\"{_delim}");
+                sw.Write("\"Size\"{_delim}");
+                sw.Write("\"CRC\"{_delim}");
+                sw.Write("\"MD5\"{_delim}");
+                //sw.Write("\"RIPEMD160\"{_delim}");
+                sw.Write("\"SHA1\"{_delim}");
+                sw.Write("\"SHA256\"{_delim}");
+                //sw.Write("\"SHA384\"{_delim}");
+                //sw.Write("\"SHA512\"{_delim}");
+                sw.Write("\"Nodump\"\n");
 
                 sw.Flush();
             }

@@ -9,6 +9,7 @@ namespace SabreTools.Library.Reports
     /// <summary>
     /// Base class for a report output format
     /// </summary>
+    /// TODO: Can this be overhauled to have all types write like DatFiles?
     public abstract class BaseReport
     {
         protected DatFile _datFile;

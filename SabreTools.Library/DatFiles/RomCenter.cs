@@ -14,7 +14,6 @@ namespace SabreTools.Library.DatFiles
     /// <summary>
     /// Represents parsing and writing of a RomCenter DAT
     /// </summary>
-    /// TODO: Port over the INI parser from DICUI to make this flow a little better
     internal class RomCenter : DatFile
     {
         /// <summary>

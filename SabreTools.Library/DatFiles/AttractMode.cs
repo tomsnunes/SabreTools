@@ -193,7 +193,23 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                sw.Write("#Title;Name;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons\n");
+                sw.Write("#Title;");
+                sw.Write("Name;");
+                sw.Write("Emulator;");
+                sw.Write("CloneOf");
+                sw.Write("Year;");
+                sw.Write("Manufacturer;");
+                sw.Write("Category;");
+                sw.Write("Players;");
+                sw.Write("Rotation;");
+                sw.Write("Control;");
+                sw.Write("Status;");
+                sw.Write("DisplayCount;");
+                sw.Write("DisplayType;");
+                sw.Write("AltRomname;");
+                sw.Write("AltTitle;");
+                sw.Write("Extra;");
+                sw.Write("Buttons\n");
 
                 sw.Flush();
             }
