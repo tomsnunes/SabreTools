@@ -2843,8 +2843,8 @@ namespace SabreTools.Library.Tools
 
             // Now we get each string, divided up as cleanly as possible
             string[] matches = Regex
-                //.Matches(s, @"([^\s]*string.Empty[^string.Empty]+string.Empty[^\s]*)|[^string.Empty]?\w+[^string.Empty]?")
-                .Matches(s, @"[^\sstring.Empty]+|string.Empty[^string.Empty]*string.Empty")
+                //.Matches(s, @"([^\s]*""[^""]+""[^\s]*)|[^""]?\w+[^""]?")
+                .Matches(s, @"[^\s""]+|""[^""]*""")
                 .Cast<Match>()
                 .Select(m => m.Groups[0].Value)
                 .ToArray();

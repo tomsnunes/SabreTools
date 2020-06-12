@@ -64,7 +64,7 @@ namespace SabreTools.Library.DatFiles
                     if (normalizedValue == "doscenter")
                         ReadHeader(sr, keep);
 
-                    // If we have a known set type
+                    // If we have a game
                     else if (normalizedValue == "game" )
                         ReadGame(sr, filename, sysid, srcid, clean, remUnicode);
                 }
@@ -80,8 +80,6 @@ namespace SabreTools.Library.DatFiles
         /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
         private void ReadHeader(StreamReader reader, bool keep)
         {
-            bool superdat = false;
-
             // If there's no subtree to the header, skip it
             if (reader == null || reader.EndOfStream)
                 return;
@@ -97,12 +95,7 @@ namespace SabreTools.Library.DatFiles
                 // Some dats don't have the space between "Name:" and the dat name
                 if (line.Trim().StartsWith("Name:"))
                 {
-                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
-                    superdat = superdat || itemval.Contains(" - SuperDAT");
-
-                    if (keep && superdat)
-                        Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
-
+                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring(6).Trim() : Name);
                     line = reader.ReadLine();
                     continue;
                 }
@@ -111,11 +104,6 @@ namespace SabreTools.Library.DatFiles
                 {
                     case "Name:":
                         Name = (string.IsNullOrWhiteSpace(Name) ? itemval : Name);
-                        superdat = superdat || itemval.Contains(" - SuperDAT");
-
-                        if (keep && superdat)
-                            Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
-
                         break;
                     case "Description:":
                         Description = (string.IsNullOrWhiteSpace(Description) ? itemval : Description);
@@ -244,6 +232,18 @@ namespace SabreTools.Library.DatFiles
 
                     line = reader.ReadLine();
                     continue;
+                }
+
+                // Game-specific lines have a known pattern
+                GroupCollection setgc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
+                string itemval = setgc[2].Value.Replace("\"", string.Empty);
+
+                switch (setgc[1].Value)
+                {
+                    case "name":
+                        machine.Name = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
+                        machine.Description = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
+                        break;
                 }
 
                 line = reader.ReadLine();

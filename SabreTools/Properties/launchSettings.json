@@ -2,7 +2,7 @@
   "profiles": {
     "SabreTools": {
       "commandName": "Project",
-      "commandLineArgs": "--help update"
+      "commandLineArgs": "--update --output-dir=B:\\_TEMP --output-type=xml \"C:\\Users\\Matt\\Downloads\\DC_DAT.DAT\""
     }
   }
 }
