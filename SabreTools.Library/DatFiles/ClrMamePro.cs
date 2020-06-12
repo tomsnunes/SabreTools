@@ -66,8 +66,7 @@ namespace SabreTools.Library.DatFiles
 
                     // If we have a known header
                     if (normalizedValue == "clrmamepro"
-                        || normalizedValue == "romvault"
-                        || normalizedValue == "doscenter")
+                        || normalizedValue == "romvault")
                     {
                         ReadHeader(sr, keep);
                     }
@@ -116,22 +115,9 @@ namespace SabreTools.Library.DatFiles
                 GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
                 string itemval = gc[2].Value.Replace("\"", string.Empty);
 
-                if (line.Trim().StartsWith("Name:"))
-                {
-                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
-                    superdat = superdat || itemval.Contains(" - SuperDAT");
-
-                    if (keep && superdat)
-                        Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
-
-                    line = reader.ReadLine();
-                    continue;
-                }
-
                 switch (gc[1].Value)
                 {
                     case "name":
-                    case "Name:":
                         Name = (string.IsNullOrWhiteSpace(Name) ? itemval : Name);
                         superdat = superdat || itemval.Contains(" - SuperDAT");
 
@@ -140,51 +126,39 @@ namespace SabreTools.Library.DatFiles
 
                         break;
                     case "description":
-                    case "Description:":
                         Description = (string.IsNullOrWhiteSpace(Description) ? itemval : Description);
                         break;
                     case "rootdir":
-                    case "Rootdir:":
                         RootDir = (string.IsNullOrWhiteSpace(RootDir) ? itemval : RootDir);
                         break;
                     case "category":
-                    case "Category:":
                         Category = (string.IsNullOrWhiteSpace(Category) ? itemval : Category);
                         break;
                     case "version":
-                    case "Version:":
                         Version = (string.IsNullOrWhiteSpace(Version) ? itemval : Version);
                         break;
                     case "date":
-                    case "Date:":
                         Date = (string.IsNullOrWhiteSpace(Date) ? itemval : Date);
                         break;
                     case "author":
-                    case "Author:":
                         Author = (string.IsNullOrWhiteSpace(Author) ? itemval : Author);
                         break;
                     case "email":
-                    case "Email:":
                         Email = (string.IsNullOrWhiteSpace(Email) ? itemval : Email);
                         break;
                     case "homepage":
-                    case "Homepage:":
                         Homepage = (string.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
                         break;
                     case "url":
-                    case "Url:":
                         Url = (string.IsNullOrWhiteSpace(Url) ? itemval : Url);
                         break;
                     case "comment":
-                    case "Comment:":
                         Comment = (string.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
                         break;
                     case "header":
-                    case "Header:":
                         Header = (string.IsNullOrWhiteSpace(Header) ? itemval : Header);
                         break;
                     case "type":
-                    case "Type:":
                         Type = (string.IsNullOrWhiteSpace(Type) ? itemval : Type);
                         superdat = superdat || itemval.Contains("SuperDAT");
                         break;
@@ -259,7 +233,6 @@ namespace SabreTools.Library.DatFiles
                 if (trimmedline.StartsWith("archive (")
                     || trimmedline.StartsWith("biosset (")
                     || trimmedline.StartsWith("disk (")
-                    || trimmedline.StartsWith("file (") // This is a DOSCenter file, not a SabreDAT file
                     || trimmedline.StartsWith("release (")
                     || trimmedline.StartsWith("rom (")
                     || (trimmedline.StartsWith("sample") && !trimmedline.StartsWith("sampleof")))
@@ -270,8 +243,6 @@ namespace SabreTools.Library.DatFiles
                         temptype = ItemType.Rom;
                     else if (line.Trim().StartsWith("disk ("))
                         temptype = ItemType.Disk;
-                    else if (line.Trim().StartsWith("file ("))
-                        temptype = ItemType.Rom;
                     else if (line.Trim().StartsWith("sample"))
                         temptype = ItemType.Sample;
 
@@ -299,99 +270,6 @@ namespace SabreTools.Library.DatFiles
 
                     // Get the line split by spaces and quotes
                     string[] linegc = Utilities.SplitLineAsCMP(line);
-
-                    // Special cases for DOSCenter DATs only because of how the lines are arranged
-                    if (line.Trim().StartsWith("file ("))
-                    {
-                        // Loop over the specifics
-                        for (int i = 0; i < linegc.Length; i++)
-                        {
-                            // Names are not quoted, for some stupid reason
-                            if (linegc[i] == "name")
-                            {
-                                // Get the name in order until we find the next flag
-                                while (++i < linegc.Length && linegc[i] != "size"
-                                    && linegc[i] != "date"
-                                    && linegc[i] != "crc"
-                                    && linegc[i] != "md5"
-                                    && linegc[i] != "ripemd160"
-                                    && linegc[i] != "sha1"
-                                    && linegc[i] != "sha256"
-                                    && linegc[i] != "sha384"
-                                    && linegc[i] != "sha512")
-                                {
-                                    item.Name += $" {linegc[i]}";
-                                }
-
-                                // Perform correction
-                                item.Name = item.Name.TrimStart();
-                                i--;
-                            }
-
-                            // Get the size from the next part
-                            else if (linegc[i] == "size")
-                            {
-                                long tempsize = -1;
-                                if (!Int64.TryParse(linegc[++i], out tempsize))
-                                    tempsize = 0;
-
-                                ((Rom)item).Size = tempsize;
-                            }
-
-                            // Get the date from the next part
-                            else if (linegc[i] == "date")
-                            {
-                                ((Rom)item).Date = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
-                            }
-
-                            // Get the CRC from the next part
-                            else if (linegc[i] == "crc")
-                            {
-                                ((Rom)item).CRC = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-
-                            // Get the MD5 from the next part
-                            else if (linegc[i] == "md5")
-                            {
-                                ((Rom)item).MD5 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-
-                            // Get the RIPEMD160 from the next part
-                            else if (linegc[i] == "ripemd160")
-                            {
-                                ((Rom)item).RIPEMD160 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-
-                            // Get the SHA1 from the next part
-                            else if (linegc[i] == "sha1")
-                            {
-                                ((Rom)item).SHA1 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-
-                            // Get the SHA256 from the next part
-                            else if (linegc[i] == "sha256")
-                            {
-                                ((Rom)item).SHA256 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-
-                            // Get the SHA384 from the next part
-                            else if (linegc[i] == "sha384")
-                            {
-                                ((Rom)item).SHA384 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-
-                            // Get the SHA512 from the next part
-                            else if (linegc[i] == "sha512")
-                            {
-                                ((Rom)item).SHA512 = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
-                            }
-                        }
-
-                        // Now process and add the rom
-                        ParseAddHelper(item, clean, remUnicode);
-                        line = reader.ReadLine();
-                        continue;
-                    }
 
                     // Loop over all attributes normally and add them if possible
                     for (int i = 0; i < linegc.Length; i++)

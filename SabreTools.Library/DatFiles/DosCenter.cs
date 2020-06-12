@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
@@ -26,7 +27,7 @@ namespace SabreTools.Library.DatFiles
         }
 
         /// <summary>
-        /// Parse a DosCenter DAT and return all found games and roms within
+        /// Parse a DOSCenter DAT and return all found games and roms within
         /// </summary>
         /// <param name="filename">Name of the file to be parsed</param>
         /// <param name="sysid">System ID for the DAT</param>
@@ -34,7 +35,6 @@ namespace SabreTools.Library.DatFiles
         /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
         /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
         /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-        /// TODO: Pull parsing into this file instead of relying on CMP
         public override void ParseFile(
             // Standard Dat parsing
             string filename,
@@ -46,8 +46,224 @@ namespace SabreTools.Library.DatFiles
             bool clean,
             bool remUnicode)
         {
-            // ClrMamePro and DosCenter parsing are identical so it just calls one implementation
-            new ClrMamePro(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
+            // Open a file reader
+            Encoding enc = Utilities.GetEncoding(filename);
+            StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
+
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+
+                // If the line is the header or a game
+                if (Regex.IsMatch(line, Constants.HeaderPatternCMP))
+                {
+                    GroupCollection gc = Regex.Match(line, Constants.HeaderPatternCMP).Groups;
+                    string normalizedValue = gc[1].Value.ToLowerInvariant();
+
+                    // If we have a known header
+                    if (normalizedValue == "doscenter")
+                        ReadHeader(sr, keep);
+
+                    // If we have a known set type
+                    else if (normalizedValue == "game" )
+                        ReadGame(sr, filename, sysid, srcid, clean, remUnicode);
+                }
+            }
+
+            sr.Dispose();
+        }
+
+        /// <summary>
+        /// Read header information
+        /// </summary>
+        /// <param name="reader">StreamReader to use to parse the header</param>
+        /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+        private void ReadHeader(StreamReader reader, bool keep)
+        {
+            bool superdat = false;
+
+            // If there's no subtree to the header, skip it
+            if (reader == null || reader.EndOfStream)
+                return;
+
+            // Otherwise, add what is possible
+            string line = reader.ReadLine();
+            while (!Regex.IsMatch(line, Constants.EndPatternCMP))
+            {
+                // Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+                GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
+                string itemval = gc[2].Value.Replace("\"", string.Empty);
+
+                // Some dats don't have the space between "Name:" and the dat name
+                if (line.Trim().StartsWith("Name:"))
+                {
+                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
+                    superdat = superdat || itemval.Contains(" - SuperDAT");
+
+                    if (keep && superdat)
+                        Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+
+                    line = reader.ReadLine();
+                    continue;
+                }
+
+                switch (gc[1].Value)
+                {
+                    case "Name:":
+                        Name = (string.IsNullOrWhiteSpace(Name) ? itemval : Name);
+                        superdat = superdat || itemval.Contains(" - SuperDAT");
+
+                        if (keep && superdat)
+                            Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+
+                        break;
+                    case "Description:":
+                        Description = (string.IsNullOrWhiteSpace(Description) ? itemval : Description);
+                        break;
+                    case "Version:":
+                        Version = (string.IsNullOrWhiteSpace(Version) ? itemval : Version);
+                        break;
+                    case "Date:":
+                        Date = (string.IsNullOrWhiteSpace(Date) ? itemval : Date);
+                        break;
+                    case "Author:":
+                        Author = (string.IsNullOrWhiteSpace(Author) ? itemval : Author);
+                        break;
+                    case "Homepage:":
+                        Homepage = (string.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
+                        break;
+                    case "Comment:":
+                        Comment = (string.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
+                        break;
+                }
+
+                line = reader.ReadLine();
+            }
+        }
+
+        /// <summary>
+        /// Read set information
+        /// </summary>
+        /// <param name="reader">StreamReader to use to parse the header</param>
+        /// <param name="filename">Name of the file to be parsed</param>
+        /// <param name="sysid">System ID for the DAT</param>
+        /// <param name="srcid">Source ID for the DAT</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        private void ReadGame(
+            StreamReader reader,
+
+            // Standard Dat parsing
+            string filename,
+            int sysid,
+            int srcid,
+
+            // Miscellaneous
+            bool clean,
+            bool remUnicode)
+        {
+            // Prepare all internal variables
+            bool containsItems = false;
+            Machine machine = new Machine()
+            {
+                MachineType = MachineType.None,
+            };
+
+            // If there's no subtree to the header, skip it
+            if (reader == null || reader.EndOfStream)
+                return;
+
+            // Otherwise, add what is possible
+            string line = reader.ReadLine();
+            while (!Regex.IsMatch(line, Constants.EndPatternCMP))
+            {
+                // Item-specific lines have a known pattern
+                string trimmedline = line.Trim();
+                if (trimmedline.StartsWith("file ("))
+                {
+                    containsItems = true;
+                    ItemType temptype = ItemType.Rom;
+
+                    // Create the proper DatItem based on the type
+                    DatItem item = Utilities.GetDatItem(temptype);
+
+                    // Then populate it with information
+                    item.CopyMachineInformation(machine);
+
+                    item.SystemID = sysid;
+                    item.System = filename;
+                    item.SourceID = srcid;
+
+                    // Get the line split by spaces and quotes
+                    string[] linegc = Utilities.SplitLineAsCMP(line);
+
+                    // Loop over the specifics
+                    for (int i = 0; i < linegc.Length; i++)
+                    {
+                        // Names are not quoted, for some stupid reason
+                        if (linegc[i] == "name")
+                        {
+                            // Get the name in order until we find the next flag
+                            while (++i < linegc.Length
+                                && linegc[i] != "size"
+                                && linegc[i] != "date"
+                                && linegc[i] != "crc")
+                            {
+                                item.Name += $" {linegc[i]}";
+                            }
+
+                            // Perform correction
+                            item.Name = item.Name.TrimStart();
+                            i--;
+                        }
+
+                        // Get the size from the next part
+                        else if (linegc[i] == "size")
+                        {
+                            if (!Int64.TryParse(linegc[++i], out long tempsize))
+                                tempsize = 0;
+
+                            ((Rom)item).Size = tempsize;
+                        }
+
+                        // Get the date from the next part
+                        else if (linegc[i] == "date")
+                        {
+                            ((Rom)item).Date = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
+                        }
+
+                        // Get the CRC from the next part
+                        else if (linegc[i] == "crc")
+                        {
+                            ((Rom)item).CRC = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
+                        }
+                    }
+
+                    // Now process and add the rom
+                    ParseAddHelper(item, clean, remUnicode);
+
+                    line = reader.ReadLine();
+                    continue;
+                }
+
+                line = reader.ReadLine();
+            }
+
+            // If no items were found for this machine, add a Blank placeholder
+            if (!containsItems)
+            {
+                Blank blank = new Blank()
+                {
+                    SystemID = sysid,
+                    System = filename,
+                    SourceID = srcid,
+                };
+
+                blank.CopyMachineInformation(machine);
+
+                // Now process and add the rom
+                ParseAddHelper(blank, clean, remUnicode);
+            }
         }
 
 
@@ -198,7 +414,7 @@ namespace SabreTools.Library.DatFiles
 
                 // Build the state based on excluded fields
                 sw.Write("game (\n");
-                sw.Write($"\tname \"{datItem.GetField(Field.MachineName, ExcludeFields)}.zip\n");
+                sw.Write($"\tname \"{datItem.GetField(Field.MachineName, ExcludeFields)}.zip\"\n");
 
                 sw.Flush();
             }
@@ -265,7 +481,7 @@ namespace SabreTools.Library.DatFiles
                     case ItemType.Rom:
                         var rom = datItem as Rom;
                         sw.Write("\tfile (");
-                        sw.Write($" name \"{datItem.GetField(Field.Name, ExcludeFields)}\"");
+                        sw.Write($" name {datItem.GetField(Field.Name, ExcludeFields)}");
                         if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
                             sw.Write($" size \"{rom.Size}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
@@ -300,7 +516,6 @@ namespace SabreTools.Library.DatFiles
                 // End game
                 sw.Write(")\n");
 
-                // Write the footer out
                 sw.Flush();
             }
             catch (Exception ex)
