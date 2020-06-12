@@ -1025,7 +1025,7 @@ namespace SabreTools.Library.DatFiles
                         xtw.WriteAttributeString("name", rom.GetField(Field.Name, ExcludeFields));
                         if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
                             xtw.WriteAttributeString("size", rom.Size.ToString());
-                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
+                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
                             xtw.WriteAttributeString("crc", rom.CRC.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
                             xtw.WriteAttributeString("md5", rom.MD5.ToLowerInvariant());

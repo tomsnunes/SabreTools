@@ -12,7 +12,6 @@ using Mono.Data.Sqlite;
 
 namespace RombaSharp
 {
-    // TODO: Do same overhaul here as in SabreTools.Help.cs
     public partial class RombaSharp
     {
         #region Private Flag features

@@ -9,7 +9,6 @@ namespace SabreTools
     /// <summary>
     /// Entry class for the DATabase application
     /// </summary>
-    /// TODO: Look into async read/write to make things quicker. Ask edc for help?
     public partial class SabreTools
     {
         // Private required variables

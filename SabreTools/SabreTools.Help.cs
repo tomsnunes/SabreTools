@@ -875,7 +875,7 @@ namespace SabreTools
                 return new Feature(
                     SkipRipeMd160Value,
                     new List<string>() { "-nr160", "--skip-ripemd160" },
-                    "Include RIPEMD160 in output", // TODO: Invert this later
+                    "Include RIPEMD160 in output", // TODO: This needs to be inverted later
                     FeatureType.Flag,
                     longDescription: "This allows the user to skip calculating the RIPEMD160 for each of the files which will speed up the creation of the DAT.");
             }
@@ -903,7 +903,7 @@ namespace SabreTools
                 return new Feature(
                     SkipSha256Value,
                     new List<string>() { "-ns256", "--skip-sha256" },
-                    "Include SHA-256 in output", // TODO: Invert this later
+                    "Include SHA-256 in output", // TODO: This needs to be inverted later
                     FeatureType.Flag,
                     longDescription: "This allows the user to skip calculating the SHA-256 for each of the files which will speed up the creation of the DAT.");
             }
@@ -917,7 +917,7 @@ namespace SabreTools
                 return new Feature(
                     SkipSha384Value,
                     new List<string>() { "-ns384", "--skip-sha384" },
-                    "Include SHA-384 in output", // TODO: Invert this later
+                    "Include SHA-384 in output", // TODO: This needs to be inverted later
                     FeatureType.Flag,
                     longDescription: "This allows the user to skip calculating the SHA-384 for each of the files which will speed up the creation of the DAT.");
             }
@@ -931,7 +931,7 @@ namespace SabreTools
                 return new Feature(
                     SkipSha512Value,
                     new List<string>() { "-ns512", "--skip-sha512" },
-                    "Include SHA-512 in output", // TODO: Invert this later
+                    "Include SHA-512 in output", // TODO: This needs to be inverted later
                     FeatureType.Flag,
                     longDescription: "This allows the user to skip calculating the SHA-512 for each of the files which will speed up the creation of the DAT.");
             }

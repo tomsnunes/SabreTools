@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using SabreTools.Library.Data;
@@ -45,149 +46,87 @@ namespace SabreTools.Library.DatFiles
             bool clean,
             bool remUnicode)
         {
-            // Open a file reader
-            Encoding enc = Utilities.GetEncoding(filename);
-            StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
+            // Outsource the work of parsing the file to a helper
+            IniFile ini = new IniFile(filename);
 
-            string blocktype = string.Empty;
-            while (!sr.EndOfStream)
+            // CREDITS section
+            Author = string.IsNullOrWhiteSpace(Author) ? ini["CREDITS.author"] : Author;
+            Version = string.IsNullOrWhiteSpace(Version) ? ini["CREDITS.version"] : Version;
+            Email = string.IsNullOrWhiteSpace(Email) ? ini["CREDITS.email"] : Email;
+            Homepage = string.IsNullOrWhiteSpace(Homepage) ? ini["CREDITS.homepage"] : Homepage;
+            Url = string.IsNullOrWhiteSpace(Url) ? ini["CREDITS.url"] : Url;
+            Date = string.IsNullOrWhiteSpace(Date) ? ini["CREDITS.date"] : Date;
+
+            // DAT section
+            //RCVersion = string.IsNullOrWhiteSpace(RCVersion) ? ini["CREDITS.version"] : RCVersion;
+            //Plugin = string.IsNullOrWhiteSpace(Plugin) ? ini["CREDITS.plugin"] : Plugin;
+            if (ForceMerging == ForceMerging.None)
             {
-                string line = sr.ReadLine();
-
-                // If the line is the start of the credits section
-                if (line.ToLowerInvariant().StartsWith("[credits]"))
-                {
-                    blocktype = "credits";
-                }
-
-                // If the line is the start of the dat section
-                else if (line.ToLowerInvariant().StartsWith("[dat]"))
-                {
-                    blocktype = "dat";
-                }
-
-                // If the line is the start of the emulator section
-                else if (line.ToLowerInvariant().StartsWith("[emulator]"))
-                {
-                    blocktype = "emulator";
-                }
-
-                // If the line is the start of the game section
-                else if (line.ToLowerInvariant().StartsWith("[games]"))
-                {
-                    blocktype = "games";
-                }
-
-                // Otherwise, it's not a section and it's data, so get out all data
-                else
-                {
-                    // If we have an author
-                    if (line.ToLowerInvariant().StartsWith("author="))
-                    {
-                        Author = (string.IsNullOrWhiteSpace(Author) ? line.Split('=')[1] : Author);
-                    }
-
-                    // If we have one of the three version tags
-                    else if (line.ToLowerInvariant().StartsWith("version="))
-                    {
-                        switch (blocktype)
-                        {
-                            case "credits":
-                                Version = (string.IsNullOrWhiteSpace(Version) ? line.Split('=')[1] : Version);
-                                break;
-
-                            case "emulator":
-                                Description = (string.IsNullOrWhiteSpace(Description) ? line.Split('=')[1] : Description);
-                                break;
-                        }
-                    }
-
-                    // If we have a URL
-                    else if (line.ToLowerInvariant().StartsWith("url="))
-                    {
-                        Url = (string.IsNullOrWhiteSpace(Url) ? line.Split('=')[1] : Url);
-                    }
-
-                    // If we have a comment
-                    else if (line.ToLowerInvariant().StartsWith("comment="))
-                    {
-                        Comment = (string.IsNullOrWhiteSpace(Comment) ? line.Split('=')[1] : Comment);
-                    }
-
-                    // If we have the split flag
-                    else if (line.ToLowerInvariant().StartsWith("split="))
-                    {
-                        if (Int32.TryParse(line.Split('=')[1], out int split))
-                        {
-                            if (split == 1 && ForceMerging == ForceMerging.None)
-                                ForceMerging = ForceMerging.Split;
-                        }
-                    }
-
-                    // If we have the merge tag
-                    else if (line.ToLowerInvariant().StartsWith("merge="))
-                    {
-                        if (Int32.TryParse(line.Split('=')[1], out int merge))
-                        {
-                            if (merge == 1 && ForceMerging == ForceMerging.None)
-                                ForceMerging = ForceMerging.Full;
-                        }
-                    }
-
-                    // If we have the refname tag
-                    else if (line.ToLowerInvariant().StartsWith("refname="))
-                    {
-                        Name = (string.IsNullOrWhiteSpace(Name) ? line.Split('=')[1] : Name);
-                    }
-
-                    // If we have a rom
-                    else if (line.StartsWith("¬"))
-                    {
-                        // Some old RC DATs have this behavior
-                        if (line.Contains("¬N¬O"))
-                            line = line.Replace("¬N¬O", string.Empty) + "¬¬";
-
-                        /*
-                        The rominfo order is as follows:
-                        1 - parent name
-                        2 - parent description
-                        3 - game name
-                        4 - game description
-                        5 - rom name
-                        6 - rom crc
-                        7 - rom size
-                        8 - romof name
-                        9 - merge name
-                        */
-                        string[] rominfo = line.Split('¬');
-
-                        // Try getting the size separately
-                        if (!Int64.TryParse(rominfo[7], out long size))
-                            size = 0;
-
-                        Rom rom = new Rom
-                        {
-                            Name = rominfo[5],
-                            Size = size,
-                            CRC = Utilities.CleanHashData(rominfo[6], Constants.CRCLength),
-                            ItemStatus = ItemStatus.None,
-
-                            MachineName = rominfo[3],
-                            MachineDescription = rominfo[4],
-                            CloneOf = rominfo[1],
-                            RomOf = rominfo[8],
-
-                            SystemID = sysid,
-                            SourceID = srcid,
-                        };
-
-                        // Now process and add the rom
-                        ParseAddHelper(rom, clean, remUnicode);
-                    }
-                }
+                if (ini["DAT.split"] == "1")
+                    ForceMerging = ForceMerging.Split;
+                else if (ini["DAT.merge"] == "1")
+                    ForceMerging = ForceMerging.Merged;
             }
 
-            sr.Dispose();
+            // EMULATOR section
+            Name = string.IsNullOrWhiteSpace(Name) ? ini["EMULATOR.refname"] : Name;
+            Description = string.IsNullOrWhiteSpace(Description) ? ini["EMULATOR.version"] : Description;
+
+            // GAMES section
+            foreach (string game in ini.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key))
+            {
+                // Get the line into a separate variable so it can be manipulated
+                string line = game;
+
+                // Remove INI prefixing
+                if (line.StartsWith("GAMES"))
+                    line = line.Substring("GAMES.".Length);
+
+                // If we have a valid game
+                if (line.StartsWith("¬"))
+                {
+                    // Some old RC DATs have this behavior
+                    if (line.Contains("¬N¬O"))
+                        line = game.Replace("¬N¬O", string.Empty) + "¬¬";
+
+                    /*
+                    The rominfo order is as follows:
+                    1 - parent name
+                    2 - parent description
+                    3 - game name
+                    4 - game description
+                    5 - rom name
+                    6 - rom crc
+                    7 - rom size
+                    8 - romof name
+                    9 - merge name
+                    */
+                    string[] rominfo = line.Split('¬');
+
+                    // Try getting the size separately
+                    if (!Int64.TryParse(rominfo[7], out long size))
+                        size = 0;
+
+                    Rom rom = new Rom
+                    {
+                        Name = rominfo[5],
+                        Size = size,
+                        CRC = Utilities.CleanHashData(rominfo[6], Constants.CRCLength),
+                        ItemStatus = ItemStatus.None,
+
+                        MachineName = rominfo[3],
+                        MachineDescription = rominfo[4],
+                        CloneOf = rominfo[1],
+                        RomOf = rominfo[8],
+
+                        SystemID = sysid,
+                        SourceID = srcid,
+                    };
+
+                    // Now process and add the rom
+                    ParseAddHelper(rom, clean, remUnicode);
+                }
+            }
         }
 
         /// <summary>
