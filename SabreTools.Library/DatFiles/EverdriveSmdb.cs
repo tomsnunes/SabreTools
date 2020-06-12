@@ -177,32 +177,21 @@ namespace SabreTools.Library.DatFiles
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
-                string state = string.Empty;
-
                 // Build the state based on excluded fields
                 switch (datItem.ItemType)
                 {
-                    case ItemType.Archive:
-                    case ItemType.BiosSet:
-                    case ItemType.Disk:
-                    case ItemType.Release:
-                    case ItemType.Sample:
-                        // We don't output these at all for Everdrive SMDB
-                        break;
-
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        state += $"{rom.GetField(Field.SHA256, ExcludeFields)}\t";
-                        state += $"{rom.GetField(Field.MachineName, ExcludeFields)}/\t";
-                        state += $"{rom.GetField(Field.Name, ExcludeFields)}\t";
-                        state += $"{rom.GetField(Field.SHA1, ExcludeFields)}\t";
-                        state += $"{rom.GetField(Field.MD5, ExcludeFields)}\t";
-                        state += $"{rom.GetField(Field.CRC, ExcludeFields)}";
-                        state += "\n";
+                        sw.Write($"{rom.GetField(Field.SHA256, ExcludeFields)}\t");
+                        sw.Write($"{rom.GetField(Field.MachineName, ExcludeFields)}/\t");
+                        sw.Write($"{rom.GetField(Field.Name, ExcludeFields)}\t");
+                        sw.Write($"{rom.GetField(Field.SHA1, ExcludeFields)}\t");
+                        sw.Write($"{rom.GetField(Field.MD5, ExcludeFields)}\t");
+                        sw.Write($"{rom.GetField(Field.CRC, ExcludeFields)}");
+                        sw.Write("\n");
                         break;
                 }
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)

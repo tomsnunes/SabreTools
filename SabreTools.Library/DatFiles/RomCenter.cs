@@ -228,21 +228,19 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string header = "[CREDITS]\n";
-                header += $"author={Author}\n";
-                header += $"version={Version}\n";
-                header += $"comment={Comment}\n";
-                header += "[DAT]\n";
-                header += "version=2.50\n";
-                header += $"split={(ForceMerging == ForceMerging.Split ? "1" : "0")}\n";
-                header += $"merge={(ForceMerging == ForceMerging.Full || ForceMerging == ForceMerging.Merged ? "1" : "0")}\n";
-                header += "[EMULATOR]\n";
-                header += $"refname={Name}\n";
-                header += $"version={Description}\n";
-                header += "[GAMES]\n";
+                sw.Write("[CREDITS]\n");
+                sw.Write($"author={Author}\n");
+                sw.Write($"version={Version}\n");
+                sw.Write($"comment={Comment}\n");
+                sw.Write("[DAT]\n");
+                sw.Write("version=2.50\n");
+                sw.Write($"split={(ForceMerging == ForceMerging.Split ? "1" : "0")}\n");
+                sw.Write($"merge={(ForceMerging == ForceMerging.Full || ForceMerging == ForceMerging.Merged ? "1" : "0")}\n");
+                sw.Write("[EMULATOR]\n");
+                sw.Write($"refname={Name}\n");
+                sw.Write($"version={Description}\n");
+                sw.Write("[GAMES]\n");
 
-                // Write the header out
-                sw.Write(header);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -278,38 +276,38 @@ namespace SabreTools.Library.DatFiles
                 switch (datItem.ItemType)
                 {
                     case ItemType.Disk:
-                        state += "¬";
+                        sw.Write("¬");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            state += datItem.CloneOf;
-                        state += "¬";
+                            sw.Write(datItem.CloneOf);
+                        sw.Write("¬");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            state += datItem.CloneOf;
-                        state += $"¬{datItem.GetField(Field.MachineName, ExcludeFields)}";
+                            sw.Write(datItem.CloneOf);
+                        sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
                         if (string.IsNullOrWhiteSpace(datItem.MachineDescription))
-                            state += $"¬{datItem.GetField(Field.MachineName, ExcludeFields)}";
+                            sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
                         else
-                            state += $"¬{datItem.GetField(Field.Description, ExcludeFields)}";
-                        state += $"¬{datItem.GetField(Field.Name, ExcludeFields)}";
-                        state += "¬¬¬¬¬\n";
+                            sw.Write($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
+                        sw.Write($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
+                        sw.Write("¬¬¬¬¬\n");
                         break;
 
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        state += "¬";
+                        sw.Write("¬");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            state += datItem.CloneOf;
-                        state += "¬";
+                            sw.Write(datItem.CloneOf);
+                        sw.Write("¬");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            state += datItem.CloneOf;
-                        state += $"¬{datItem.GetField(Field.MachineName, ExcludeFields)}";
+                            sw.Write(datItem.CloneOf);
+                        sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
                         if (string.IsNullOrWhiteSpace(datItem.MachineDescription))
-                            state += $"¬{datItem.GetField(Field.MachineName, ExcludeFields)}";
+                            sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
                         else
-                            state += $"¬{datItem.GetField(Field.Description, ExcludeFields)}";
-                        state += $"¬{datItem.GetField(Field.Name, ExcludeFields)}";
-                        state += $"¬{datItem.GetField(Field.CRC, ExcludeFields)}";
-                        state += $"¬{datItem.GetField(Field.Size, ExcludeFields)}";
-                        state += "¬¬¬\n";
+                            sw.Write($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
+                        sw.Write($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
+                        sw.Write($"¬{datItem.GetField(Field.CRC, ExcludeFields)}");
+                        sw.Write($"¬{datItem.GetField(Field.Size, ExcludeFields)}");
+                        sw.Write("¬¬¬\n");
                         break;
                 }
 

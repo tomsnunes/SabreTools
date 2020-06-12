@@ -456,11 +456,9 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string header = string.Format("\"File Name\"{0}\"Internal Name\"{0}\"Description\"{0}\"Game Name\"{0}\"Game Description\"{0}\"Type\"{0}\"" +
-                                "Rom Name\"{0}\"Disk Name\"{0}\"Size\"{0}\"CRC\"{0}\"MD5\"{0}\"SHA1\"{0}\"SHA256\"{0}\"Nodump\"\n", _delim);
+                sw.Write(string.Format("\"File Name\"{0}\"Internal Name\"{0}\"Description\"{0}\"Game Name\"{0}\"Game Description\"{0}\"Type\"{0}\"" +
+                                "Rom Name\"{0}\"Disk Name\"{0}\"Size\"{0}\"CRC\"{0}\"MD5\"{0}\"SHA1\"{0}\"SHA256\"{0}\"Nodump\"\n", _delim));
 
-                // Write the header out
-                sw.Write(header);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -485,84 +483,57 @@ namespace SabreTools.Library.DatFiles
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
                 return true;
 
-            // TODO: Clean up this mess and make it more like the other DatFile types
-            // TODO: Specifically, make it so that each ItemType has its own block, if possible
             try
             {
-                // Initialize all strings
-                string state = string.Empty,
-                    pre = string.Empty,
-                    post = string.Empty,
-                    type = string.Empty,
-                    romname = string.Empty,
-                    diskname = string.Empty,
-                    size = string.Empty,
-                    crc = string.Empty,
-                    md5 = string.Empty,
-                    ripemd160 = string.Empty,
-                    sha1 = string.Empty,
-                    sha256 = string.Empty,
-                    sha384 = string.Empty,
-                    sha512 = string.Empty,
-                    status = string.Empty;
-
                 // Separated values should only output Rom and Disk
                 if (datItem.ItemType != ItemType.Disk && datItem.ItemType != ItemType.Rom)
                     return true;
 
-                if (datItem.ItemType == ItemType.Disk)
+                sw.Write(CreatePrefixPostfix(datItem, true));
+
+                sw.Write($"\"{FileName}\"{_delim}");
+                sw.Write($"\"{Name}\"{_delim}");
+                sw.Write($"\"{Description}\"{_delim}");
+                sw.Write($"\"{datItem.GetField(Field.MachineName, ExcludeFields)}\"{_delim}");
+                sw.Write($"\"{datItem.GetField(Field.Description, ExcludeFields)}\"{_delim}");
+
+                switch (datItem.ItemType)
                 {
-                    var disk = datItem as Disk;
-                    type = "disk";
-                    diskname = datItem.Name;
-                    md5 = disk.MD5;
-                    ripemd160 = disk.RIPEMD160;
-                    sha1 = disk.SHA1;
-                    sha256 = disk.SHA256;
-                    sha384 = disk.SHA384;
-                    sha512 = disk.SHA512;
-                    status = (disk.ItemStatus != ItemStatus.None ? $"\"{disk.ItemStatus}\"" : "\"\"");
+                    case ItemType.Disk:
+                        var disk = datItem as Disk;
+                        sw.Write($"\"disk\"{_delim}");
+                        sw.Write($"\"\"{_delim}");
+                        sw.Write($"\"{disk.GetField(Field.Name, ExcludeFields)}\"{_delim}");
+                        sw.Write($"\"\"{_delim}");
+                        sw.Write($"\"\"{_delim}");
+                        sw.Write($"\"{disk.GetField(Field.MD5, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        //sw.Write($"\"{disk.GetField(Field.RIPEMD160, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{disk.GetField(Field.SHA1, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{disk.GetField(Field.SHA256, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        //sw.Write($"\"{disk.GetField(Field.SHA384, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        //sw.Write($"\"{disk.GetField(Field.SHA512, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{disk.GetField(Field.Status, ExcludeFields)}\"{_delim}");
+                        break;
+
+                    case ItemType.Rom:
+                        var rom = datItem as Rom;
+                        sw.Write($"\"rom\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.Name, ExcludeFields)}\"{_delim}");
+                        sw.Write($"\"\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.Size, ExcludeFields)}\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.CRC, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.MD5, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        //sw.Write($"\"{rom.GetField(Field.RIPEMD160, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.SHA1, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.SHA256, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        //sw.Write($"\"{rom.GetField(Field.SHA384, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        //sw.Write($"\"{rom.GetField(Field.SHA512, ExcludeFields).ToLowerInvariant()}\"{_delim}");
+                        sw.Write($"\"{rom.GetField(Field.Status, ExcludeFields)}\"{_delim}");
+                        break;
                 }
-                else if (datItem.ItemType == ItemType.Rom)
-                {
-                    var rom = datItem as Rom;
-                    type = "rom";
-                    romname = datItem.Name;
-                    size = rom.Size.ToString();
-                    crc = rom.CRC;
-                    md5 = rom.MD5;
-                    ripemd160 = rom.RIPEMD160;
-                    sha1 = rom.SHA1;
-                    sha256 = rom.SHA256;
-                    sha384 = rom.SHA384;
-                    sha512 = rom.SHA512;
-                    status = (rom.ItemStatus != ItemStatus.None ? $"\"{rom.ItemStatus}\"" : "\"\"");
-                }
 
-                pre = CreatePrefixPostfix(datItem, true);
-                post = CreatePrefixPostfix(datItem, false);
-                string inline = string.Format($"\"{FileName}\""
-                        + $"{0}\"{Name}\""
-                        + $"{0}\"{Description}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.MachineName] ? datItem.MachineName : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.Description] ? datItem.MachineDescription : string.Empty)}\""
-                        + $"{0}\"{type}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.Name] ? romname : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.Name] ? diskname : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.Size] ? size : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.CRC] ? crc : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.MD5] ? md5 : string.Empty)}\""
-                        // + $"{0}\"{(!ExcludeFields[(int)Field.RIPEMD160] ? ripemd160 : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.SHA1] ? sha1 : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.SHA256] ? sha256 : string.Empty)}\""
-                        // + $"{0}\"{(!ExcludeFields[(int)Field.SHA384] ? sha384 : string.Empty)}\""
-                        // + $"{0}\"{(!ExcludeFields[(int)Field.SHA512] ? sha512 : string.Empty)}\""
-                        + $"{0}\"{(!ExcludeFields[(int)Field.Status] ? status : string.Empty)}\"",
-                    _delim);
+                sw.Write(CreatePrefixPostfix(datItem, false));
 
-                state += $"{pre}{inline}{post}\n";
-
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)

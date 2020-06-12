@@ -14,7 +14,7 @@ namespace SabreTools.Library.DatFiles
     /// <summary>
     /// Represents parsing and writing of a ClrMamePro DAT
     /// </summary>
-    /// TODO: Verify that all write for this DatFile type is correct
+    /// TODO: Can there be a writer like XmlTextWriter for this? Or too inconsistent?
     internal class ClrMamePro : DatFile
     {
         /// <summary>
@@ -764,51 +764,53 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string header = "clrmamepro (\n";
-                header += $"\tname \"{Name}\"\n";
-                header += $"\tdescription \"{Description}\"\n";
+                sw.Write("clrmamepro (\n");
+                sw.Write($"\tname \"{Name}\"\n");
+                sw.Write($"\tdescription \"{Description}\"\n");
                 if (!string.IsNullOrWhiteSpace(Category))
-                    header += $"\tcategory \"{Category}\"\n";
-                header += $"\tversion \"{Version}\"\n";
+                    sw.Write($"\tcategory \"{Category}\"\n");
+                sw.Write($"\tversion \"{Version}\"\n");
                 if (!string.IsNullOrWhiteSpace(Date))
-                    header += $"\tdate \"{Date}\"\n";
-                header += $"\tauthor \"{Author}\"\n";
+                    sw.Write($"\tdate \"{Date}\"\n");
+                sw.Write($"\tauthor \"{Author}\"\n");
                 if (!string.IsNullOrWhiteSpace(Email))
-                    header += $"\temail \"{Email}\"\n";
+                    sw.Write($"\temail \"{Email}\"\n");
                 if (!string.IsNullOrWhiteSpace(Homepage))
-                    header += $"\thomepage \"{Homepage}\"\n";
+                    sw.Write($"\thomepage \"{Homepage}\"\n");
                 if (!string.IsNullOrWhiteSpace(Url))
-                    header += $"\turl \"{Url}\"\n";
+                    sw.Write($"\turl \"{Url}\"\n");
                 if (!string.IsNullOrWhiteSpace(Comment))
-                    header += $"\tcomment \"{Comment}\"\n";
+                    sw.Write($"\tcomment \"{Comment}\"\n");
+                
                 switch (ForcePacking)
                 {
                     case ForcePacking.Unzip:
-                        header += "\tforcezipping no\n";
+                        sw.Write($"\tforcezipping no\n");
                         break;
                     case ForcePacking.Zip:
-                        header += "\tforcezipping yes\n";
+                        sw.Write($"\tforcezipping yes\n");
                         break;
                 }
+
                 switch (ForceMerging)
                 {
                     case ForceMerging.Full:
-                        header += "\tforcemerging full\n";
+                        sw.Write($"\tforcemerging full\n");
                         break;
                     case ForceMerging.Split:
-                        header += "\tforcemerging split\n";
+                        sw.Write($"\tforcemerging split\n");
                         break;
                     case ForceMerging.Merged:
-                        header += "\tforcemerging merged\n";
+                        sw.Write($"\tforcemerging merged\n");
                         break;
                     case ForceMerging.NonMerged:
-                        header += "\tforcemerging nonmerged\n";
+                        sw.Write($"\tforcemerging nonmerged\n");
                         break;
                 }
-                header += ")\n";
 
-                // Write the header out
-                sw.Write(header);
+                // End clrmamepro
+                sw.Write(")\n");
+
                 sw.Flush();
             }
             catch (Exception ex)
@@ -834,23 +836,23 @@ namespace SabreTools.Library.DatFiles
                 datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
 
                 // Build the state based on excluded fields
-                string state = (datItem.MachineType == MachineType.Bios ? "resource" : "game");
-                state += $" (\n\tname \"{datItem.MachineName}\"\n";
-                    state += $"\tromof \"{datItem.RomOf}\"\n";
+                sw.Write($"{(datItem.MachineType == MachineType.Bios ? "resource" : "game")} (\n");
+                sw.Write($"\tname \"{datItem.MachineName}\"\n");
+                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RomOf, ExcludeFields)))
+                    sw.Write($"\tromof \"{datItem.RomOf}\"\n");
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                    state += $"\tcloneof \"{datItem.CloneOf}\"\n";
+                    sw.Write($"\tcloneof \"{datItem.CloneOf}\"\n");
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
-                    state += $"\tsampleof \"{datItem.SampleOf}\"\n";
+                    sw.Write($"\tsampleof \"{datItem.SampleOf}\"\n");
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
-                    state += $"\tdescription \"{datItem.MachineDescription}\"\n";
+                    sw.Write($"\tdescription \"{datItem.MachineDescription}\"\n");
                 else if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
-                    state += $"\tdescription \"{datItem.MachineName}\"\n";
+                    sw.Write($"\tdescription \"{datItem.MachineName}\"\n");
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Year, ExcludeFields)))
-                    state += $"\tyear \"{datItem.Year}\"\n";
+                    sw.Write($"\tyear \"{datItem.Year}\"\n");
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Manufacturer, ExcludeFields)))
-                    state += $"\tmanufacturer \"{datItem.Manufacturer}\"\n";
+                    sw.Write($"\tmanufacturer \"{datItem.Manufacturer}\"\n");
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -876,11 +878,11 @@ namespace SabreTools.Library.DatFiles
 
                 // Build the state based on excluded fields
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
-                    state += $"\tsampleof \"{datItem.SampleOf}\"\n";
+                    sw.Write($"\tsampleof \"{datItem.SampleOf}\"\n");
 
-                state += ")\n";
+                // End game
+                sw.Write(")\n");
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -917,83 +919,89 @@ namespace SabreTools.Library.DatFiles
                 switch (datItem.ItemType)
                 {
                     case ItemType.Archive:
-                        state += $"\tarchive ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
-                        state += " )\n";
+                        sw.Write("\tarchive (");
+                        sw.Write($" name\"{datItem.GetField(Field.Name, ExcludeFields)}\"");
+                        sw.Write(" )\n");
                         break;
 
                     case ItemType.BiosSet:
                         var biosSet = datItem as BiosSet;
-                        state += $"\tbiosset ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        sw.Write("\tbiosset (");
+                        sw.Write($" name\"{biosSet.GetField(Field.Name, ExcludeFields)}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.BiosDescription, ExcludeFields)))
-                            state += $" description \"{biosSet.Description}\"";
+                            sw.Write($" description \"{biosSet.Description}\"");
                         if (!ExcludeFields[(int)Field.Default] && biosSet.Default != null)
-                            state += $" default \"{biosSet.Default.ToString().ToLowerInvariant()}\"";
-                        state += " )\n";
+                            sw.Write($" default \"{biosSet.Default.ToString().ToLowerInvariant()}\"");
+                        sw.Write(" )\n");
                         break;
 
                     case ItemType.Disk:
                         var disk = datItem as Disk;
-                        state += $"\tdisk ( name \"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        sw.Write("\tdisk (");
+                        sw.Write($" name\"{disk.GetField(Field.Name, ExcludeFields)}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
-                            state += $" md5 \"{disk.MD5.ToLowerInvariant()}\"";
+                            sw.Write($" md5 \"{disk.MD5.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
-                            state += $" ripemd160 \"{disk.RIPEMD160.ToLowerInvariant()}\"";
+                            sw.Write($" ripemd160 \"{disk.RIPEMD160.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
-                            state += $" sha1 \"{disk.SHA1.ToLowerInvariant()}\"";
+                            sw.Write($" sha1 \"{disk.SHA1.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
-                            state += $" sha256 \"{disk.SHA256.ToLowerInvariant()}\"";
+                            sw.Write($" sha256 \"{disk.SHA256.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
-                            state += $" sha384 \"{disk.SHA384.ToLowerInvariant()}\"";
+                            sw.Write($" sha384 \"{disk.SHA384.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
-                            state += $" sha512 \"{disk.SHA512.ToLowerInvariant()}\"";
+                            sw.Write($" sha512 \"{disk.SHA512.ToLowerInvariant()}\"");
                         if (!ExcludeFields[(int)Field.Status] && disk.ItemStatus != ItemStatus.None)
-                            state += $" flags \"{disk.ItemStatus.ToString().ToLowerInvariant()}\"";
-                        state += " )\n";
+                            sw.Write($" flags \"{disk.ItemStatus.ToString().ToLowerInvariant()}\"");
+                        sw.Write(" )\n");
                         break;
 
                     case ItemType.Release:
                         var release = datItem as Release;
-                        state += $"\trelease ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        sw.Write("\trelease (");
+                        sw.Write($" name\"{release.GetField(Field.Name, ExcludeFields)}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Region, ExcludeFields)))
-                            state += $" region \"{release.Region}\"";
+                            sw.Write($" region \"{release.Region}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Language, ExcludeFields)))
-                            state += $" language \"{release.Language}\"";
+                            sw.Write($" language \"{release.Language}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
-                            state += $" date \"{release.Date}\"";
+                            sw.Write($" date \"{release.Date}\"");
                         if (!ExcludeFields[(int)Field.Default] && release.Default != null)
-                            state += $" default \"{release.Default.ToString().ToLowerInvariant()}\"";
-                        state += " )\n";
+                            sw.Write($" default \"{release.Default.ToString().ToLowerInvariant()}\"");
+                        sw.Write(" )\n");
                         break;
 
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        state += $"\trom ( name \"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        sw.Write("\trom (");
+                        sw.Write($" name\"{rom.GetField(Field.Name, ExcludeFields)}\"");
                         if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
-                            state += $" size \"{rom.Size}\"";
+                            sw.Write($" size \"{rom.Size}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
-                            state += $" crc \"{rom.CRC.ToLowerInvariant()}\"";
+                            sw.Write($" crc \"{rom.CRC.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
-                            state += $" md5 \"{rom.MD5.ToLowerInvariant()}\"";
+                            sw.Write($" md5 \"{rom.MD5.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
-                            state += $" ripemd160 \"{rom.RIPEMD160.ToLowerInvariant()}\"";
+                            sw.Write($" ripemd160 \"{rom.RIPEMD160.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
-                            state += $" sha1 \"{rom.SHA1.ToLowerInvariant()}\"";
+                            sw.Write($" sha1 \"{rom.SHA1.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
-                            state += $" sha256 \"{rom.SHA256.ToLowerInvariant()}\"";
+                            sw.Write($" sha256 \"{rom.SHA256.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
-                            state += $" sha384 \"{rom.SHA384.ToLowerInvariant()}\"";
+                            sw.Write($" sha384 \"{rom.SHA384.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
-                            state += $" sha512 \"{rom.SHA512.ToLowerInvariant()}\"";
+                            sw.Write($" sha512 \"{rom.SHA512.ToLowerInvariant()}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
-                            state += $" date \"{rom.Date}\"";
+                            sw.Write($" date \"{rom.Date}\"");
                         if (!ExcludeFields[(int)Field.Status] && rom.ItemStatus != ItemStatus.None)
-                            state += $" flags \"{rom.ItemStatus.ToString().ToLowerInvariant()}\"";
-                        state += " )\n";
+                            sw.Write($" flags \"{rom.ItemStatus.ToString().ToLowerInvariant()}\"");
+                        sw.Write(" )\n");
                         break;
 
                     case ItemType.Sample:
-                        state += $"\tsample ( name\"{datItem.GetField(Field.Name, ExcludeFields)}\"";
-                        state += " )\n";
+                        sw.Write("\tsample (");
+                        sw.Write($" name\"{datItem.GetField(Field.Name, ExcludeFields)}\"");
+                        sw.Write(" )\n");
                         break;
                 }
 
@@ -1018,10 +1026,9 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string footer = footer = ")\n";
+                // End game
+                sw.Write(")\n");
 
-                // Write the footer out
-                sw.Write(footer);
                 sw.Flush();
             }
             catch (Exception ex)

@@ -162,18 +162,16 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string header = "DOSCenter (\n";
-                header += $"\tName: {Name}\n";
-                header += $"\tDescription: {Description}\n";
-                header += $"\tVersion: {Version}\n";
-                header += $"\tDate: {Date}\n";
-                header += $"\tAuthor: {Author}\n";
-                header += $"\tHomepage: {Homepage}\n";
-                header += $"\tComment: {Comment}\n";
-                header += ")\n";
+                sw.Write("DOSCenter (\n");
+                sw.Write($"\tName: {Name}\n");
+                sw.Write($"\tDescription: {Description}\n");
+                sw.Write($"\tVersion: {Version}\n");
+                sw.Write($"\tDate: {Date}\n");
+                sw.Write($"\tAuthor: {Author}\n");
+                sw.Write($"\tHomepage: {Homepage}\n");
+                sw.Write($"\tComment: {Comment}\n");
+                sw.Write(")\n");
 
-                // Write the header out
-                sw.Write(header);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -199,9 +197,9 @@ namespace SabreTools.Library.DatFiles
                 datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
 
                 // Build the state based on excluded fields
-                string state = $"game (\n\tname \"{datItem.GetField(Field.MachineName, ExcludeFields)}.zip\n";
+                sw.Write("game (\n");
+                sw.Write($"\tname \"{datItem.GetField(Field.MachineName, ExcludeFields)}.zip\n");
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -223,15 +221,13 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string state = string.Empty;
-
                 // Build the state based on excluded fields
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
-                    state += $"\tsampleof \"{datItem.SampleOf}\"\n";
+                    sw.Write($"\tsampleof \"{datItem.SampleOf}\"\n");
 
-                state += ")\n";
+                // End game
+                sw.Write(")\n");
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -266,23 +262,17 @@ namespace SabreTools.Library.DatFiles
                 // Build the state based on excluded fields
                 switch (datItem.ItemType)
                 {
-                    case ItemType.Archive:
-                    case ItemType.BiosSet:
-                    case ItemType.Disk:
-                    case ItemType.Release:
-                    case ItemType.Sample:
-                        // We don't output these at all for DosCenter
-                        break;
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        state += $"\file ( name \"{datItem.GetField(Field.Name, ExcludeFields)}\"";
+                        sw.Write("\tfile (");
+                        sw.Write($" name \"{datItem.GetField(Field.Name, ExcludeFields)}\"");
                         if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
-                            state += $" size \"{rom.Size}\"";
+                            sw.Write($" size \"{rom.Size}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
-                            state += $" date \"{rom.Date}\"";
+                            sw.Write($" date \"{rom.Date}\"");
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
-                            state += $" crc \"{rom.CRC.ToLowerInvariant()}\"";
-                        state += " )\n";
+                            sw.Write($" crc \"{rom.CRC.ToLowerInvariant()}\"");
+                        sw.Write(" )\n");
                         break;
                 }
 
@@ -307,10 +297,10 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string footer = ")\n";
+                // End game
+                sw.Write(")\n");
 
                 // Write the footer out
-                sw.Write(footer);
                 sw.Flush();
             }
             catch (Exception ex)

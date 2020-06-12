@@ -193,10 +193,8 @@ namespace SabreTools.Library.DatFiles
         {
             try
             {
-                string header = "#Title;Name;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons\n";
+                sw.Write("#Title;Name;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons\n");
 
-                // Write the header out
-                sw.Write(header);
                 sw.Flush();
             }
             catch (Exception ex)
@@ -229,27 +227,24 @@ namespace SabreTools.Library.DatFiles
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
-                string state = string.Empty;
+                sw.Write($"{datItem.GetField(Field.MachineName, ExcludeFields)};");
+                sw.Write($"{datItem.GetField(Field.Description, ExcludeFields)};");
+                sw.Write($"{FileName};");
+                sw.Write($"{datItem.GetField(Field.CloneOf, ExcludeFields)};");
+                sw.Write($"{datItem.GetField(Field.Year, ExcludeFields)};");
+                sw.Write($"{datItem.GetField(Field.Manufacturer, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.Category, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.Players, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.Rotation, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.Control, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.Status, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.DisplayCount, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.DisplayType, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.AltRomname, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.AltTitle, ExcludeFields)};");
+                sw.Write($"{datItem.GetField(Field.Comment, ExcludeFields)};");
+                sw.Write(";"); // $"{datItem.GetField(Field.Buttons, ExcludeFields)};");
 
-                state += $"{datItem.GetField(Field.MachineName, ExcludeFields)};";
-                state += $"{datItem.GetField(Field.Description, ExcludeFields)};";
-                state += $"{FileName};";
-                state += $"{datItem.GetField(Field.CloneOf, ExcludeFields)};";
-                state += $"{datItem.GetField(Field.Year, ExcludeFields)};";
-                state += $"{datItem.GetField(Field.Manufacturer, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.Category, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.Players, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.Rotation, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.Control, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.Status, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.DisplayCount, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.DisplayType, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.AltRomname, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.AltTitle, ExcludeFields)};";
-                state += $"{datItem.GetField(Field.Comment, ExcludeFields)};";
-                state += ";"; // $"{datItem.GetField(Field.Buttons, ExcludeFields)};";
-
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)

@@ -195,14 +195,16 @@ namespace SabreTools.Library.DatFiles
                 switch (_hash)
                 {
                     case Hash.CRC:
-                        if (datItem.ItemType == ItemType.Rom)
+                        switch (datItem.ItemType)
                         {
-                            var rom = datItem as Rom;
-                            if (GameName)
-                                state += $"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}";
-                            state += $"{rom.GetField(Field.Name, ExcludeFields)}";
-                            state += $"{rom.GetField(Field.CRC, ExcludeFields)}";
-                            state += "\n";
+                            case ItemType.Rom:
+                                var rom = datItem as Rom;
+                                if (GameName)
+                                    sw.Write($"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}");
+                                sw.Write($"{rom.GetField(Field.Name, ExcludeFields)}");
+                                sw.Write($"{rom.GetField(Field.CRC, ExcludeFields)}");
+                                sw.Write("\n");
+                                break;
                         }
                         break;
 
@@ -213,23 +215,26 @@ namespace SabreTools.Library.DatFiles
                     case Hash.SHA384:
                     case Hash.SHA512:
                         Field hashField = Utilities.GetFieldFromHash(_hash);
-                        if (datItem.ItemType == ItemType.Rom)
+
+                        switch (datItem.ItemType)
                         {
-                            var rom = datItem as Rom;
-                            state += $"{rom.GetField(hashField, ExcludeFields)}";
-                            if (GameName)
-                                state += $"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}";
-                            state += $"{rom.GetField(Field.Name, ExcludeFields)}";
-                            state += "\n";
-                        }
-                        else if (datItem.ItemType == ItemType.Disk)
-                        {
-                            var disk = datItem as Disk;
-                            state += $"{disk.GetField(hashField, ExcludeFields)}";
-                            if (GameName)
-                                state += $"{disk.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}";
-                            state += $"{disk.GetField(Field.Name, ExcludeFields)}";
-                            state += "\n";
+                            case ItemType.Disk:
+                                var disk = datItem as Disk;
+                                sw.Write($"{disk.GetField(hashField, ExcludeFields)}");
+                                if (GameName)
+                                    sw.Write($"{disk.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}");
+                                sw.Write($"{disk.GetField(Field.Name, ExcludeFields)}");
+                                sw.Write("\n");
+                                break;
+
+                            case ItemType.Rom:
+                                var rom = datItem as Rom;
+                                sw.Write($"{rom.GetField(hashField, ExcludeFields)}");
+                                if (GameName)
+                                    sw.Write($"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}");
+                                sw.Write($"{rom.GetField(Field.Name, ExcludeFields)}");
+                                sw.Write("\n");
+                                break;
                         }
                         break;
                 }

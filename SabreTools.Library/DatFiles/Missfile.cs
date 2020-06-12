@@ -150,19 +150,19 @@ namespace SabreTools.Library.DatFiles
                 // If we're in Romba mode, the state is consistent
                 if (Romba)
                 {
-                    state += $"{datItem.GetField(Field.SHA1, ExcludeFields)}\n";
+                    sw.Write($"{datItem.GetField(Field.SHA1, ExcludeFields)}\n");
                 }
                 // Otherwise, use any flags
                 else
                 {
                     if (!UseRomName && datItem.MachineName != lastgame)
                     {
-                        state += $"{datItem.GetField(Field.MachineName, ExcludeFields)}\n";
+                        sw.Write($"{datItem.GetField(Field.MachineName, ExcludeFields)}\n");
                         lastgame = datItem.MachineName;
                     }
                     else if (UseRomName)
                     {
-                        state += $"{datItem.GetField(Field.Name, ExcludeFields)}\n";
+                        sw.Write($"{datItem.GetField(Field.Name, ExcludeFields)}\n");
                     }
                 }
 
