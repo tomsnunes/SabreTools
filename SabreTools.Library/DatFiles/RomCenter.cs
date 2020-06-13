@@ -266,8 +266,6 @@ namespace SabreTools.Library.DatFiles
 
             try
             {
-                string state = string.Empty;
-
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
@@ -310,7 +308,6 @@ namespace SabreTools.Library.DatFiles
                         break;
                 }
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)

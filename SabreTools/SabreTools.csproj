@@ -16,4 +16,8 @@
     <ProjectReference Include="..\SabreTools.Library\SabreTools.Library.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>

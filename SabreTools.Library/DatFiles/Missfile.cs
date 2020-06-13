@@ -142,8 +142,6 @@ namespace SabreTools.Library.DatFiles
 
             try
             {
-                string state = string.Empty;
-
                 // Process the item name
                 ProcessItemName(datItem, false, forceRomName: false);
 
@@ -166,7 +164,6 @@ namespace SabreTools.Library.DatFiles
                     }
                 }
 
-                sw.Write(state);
                 sw.Flush();
             }
             catch (Exception ex)

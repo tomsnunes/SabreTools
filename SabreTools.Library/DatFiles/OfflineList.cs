@@ -1041,8 +1041,6 @@ namespace SabreTools.Library.DatFiles
 
             try
             {
-                string state = string.Empty;
-
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 

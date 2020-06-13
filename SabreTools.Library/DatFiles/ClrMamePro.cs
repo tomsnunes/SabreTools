@@ -552,10 +552,11 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                ClrMameProWriter cmpw = new ClrMameProWriter(fs, new UTF8Encoding(false));
+                cmpw.Quotes = true;
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(cmpw);
 
                 // Write out each of the machines and roms
                 string lastgame = null;
@@ -584,11 +585,11 @@ namespace SabreTools.Library.DatFiles
 
                         // If we have a different game and we're not at the start of the list, output the end of last item
                         if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                            WriteEndGame(sw, rom);
+                            WriteEndGame(cmpw, rom);
 
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                            WriteStartGame(sw, rom);
+                            WriteStartGame(cmpw, rom);
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (rom.ItemType == ItemType.Rom
@@ -610,7 +611,7 @@ namespace SabreTools.Library.DatFiles
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(cmpw, rom, ignoreblanks);
 
                         // Set the new data to compare against
                         lastgame = rom.MachineName;
@@ -618,10 +619,10 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Write the file footer out
-                WriteFooter(sw);
+                WriteFooter(cmpw);
 
                 Globals.Logger.Verbose($"File written!{Environment.NewLine}");
-                sw.Dispose();
+                cmpw.Close();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -636,60 +637,61 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(ClrMameProWriter cmpw)
         {
             try
             {
-                sw.Write("clrmamepro (\n");
-                sw.Write($"\tname \"{Name}\"\n");
-                sw.Write($"\tdescription \"{Description}\"\n");
+                cmpw.WriteStartElement("clrmamepro");
+
+                cmpw.WriteStandalone("name", Name);
+                cmpw.WriteStandalone("description", Description);
                 if (!string.IsNullOrWhiteSpace(Category))
-                    sw.Write($"\tcategory \"{Category}\"\n");
-                sw.Write($"\tversion \"{Version}\"\n");
+                    cmpw.WriteStandalone("category", Category);
+                cmpw.WriteStandalone("version", Version);
                 if (!string.IsNullOrWhiteSpace(Date))
-                    sw.Write($"\tdate \"{Date}\"\n");
-                sw.Write($"\tauthor \"{Author}\"\n");
+                    cmpw.WriteStandalone("date", Date);
+                cmpw.WriteStandalone("author", Author);
                 if (!string.IsNullOrWhiteSpace(Email))
-                    sw.Write($"\temail \"{Email}\"\n");
+                    cmpw.WriteStandalone("email", Email);
                 if (!string.IsNullOrWhiteSpace(Homepage))
-                    sw.Write($"\thomepage \"{Homepage}\"\n");
+                    cmpw.WriteStandalone("homepage", Homepage);
                 if (!string.IsNullOrWhiteSpace(Url))
-                    sw.Write($"\turl \"{Url}\"\n");
+                    cmpw.WriteStandalone("url", Url);
                 if (!string.IsNullOrWhiteSpace(Comment))
-                    sw.Write($"\tcomment \"{Comment}\"\n");
+                    cmpw.WriteStandalone("comment", Comment);
                 
                 switch (ForcePacking)
                 {
                     case ForcePacking.Unzip:
-                        sw.Write($"\tforcezipping no\n");
+                        cmpw.WriteStandalone("forcezipping", "no", false);
                         break;
                     case ForcePacking.Zip:
-                        sw.Write($"\tforcezipping yes\n");
+                        cmpw.WriteStandalone("forcezipping", "yes", false);
                         break;
                 }
 
                 switch (ForceMerging)
                 {
                     case ForceMerging.Full:
-                        sw.Write($"\tforcemerging full\n");
+                        cmpw.WriteStandalone("forcemerging", "full", false);
                         break;
                     case ForceMerging.Split:
-                        sw.Write($"\tforcemerging split\n");
+                        cmpw.WriteStandalone("forcemerging", "split", false);
                         break;
                     case ForceMerging.Merged:
-                        sw.Write($"\tforcemerging merged\n");
+                        cmpw.WriteStandalone("forcemerging", "merged", false);
                         break;
                     case ForceMerging.NonMerged:
-                        sw.Write($"\tforcemerging nonmerged\n");
+                        cmpw.WriteStandalone("forcemerging", "nonmerged", false);
                         break;
                 }
 
                 // End clrmamepro
-                sw.Write(")\n");
+                cmpw.WriteEndElement();
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -703,10 +705,10 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteStartGame(StreamWriter sw, DatItem datItem)
+        private bool WriteStartGame(ClrMameProWriter cmpw, DatItem datItem)
         {
             try
             {
@@ -714,24 +716,24 @@ namespace SabreTools.Library.DatFiles
                 datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
 
                 // Build the state based on excluded fields
-                sw.Write($"{(datItem.MachineType == MachineType.Bios ? "resource" : "game")} (\n");
-                sw.Write($"\tname \"{datItem.MachineName}\"\n");
+                cmpw.WriteStartElement(datItem.MachineType == MachineType.Bios ? "resource" : "game");
+                cmpw.WriteStandalone("name", datItem.GetField(Field.MachineName, ExcludeFields));
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RomOf, ExcludeFields)))
-                    sw.Write($"\tromof \"{datItem.RomOf}\"\n");
+                    cmpw.WriteStandalone("romof", datItem.RomOf);
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                    sw.Write($"\tcloneof \"{datItem.CloneOf}\"\n");
+                    cmpw.WriteStandalone("cloneof", datItem.CloneOf);
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
-                    sw.Write($"\tsampleof \"{datItem.SampleOf}\"\n");
+                    cmpw.WriteStandalone("sampleof", datItem.SampleOf);
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
-                    sw.Write($"\tdescription \"{datItem.MachineDescription}\"\n");
+                    cmpw.WriteStandalone("description", datItem.MachineDescription);
                 else if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Description, ExcludeFields)))
-                    sw.Write($"\tdescription \"{datItem.MachineName}\"\n");
+                    cmpw.WriteStandalone("description", datItem.MachineName);
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Year, ExcludeFields)))
-                    sw.Write($"\tyear \"{datItem.Year}\"\n");
+                    cmpw.WriteStandalone("year", datItem.Year);
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Manufacturer, ExcludeFields)))
-                    sw.Write($"\tmanufacturer \"{datItem.Manufacturer}\"\n");
+                    cmpw.WriteStandalone("manufacturer", datItem.Manufacturer);
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -745,23 +747,21 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game end using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteEndGame(StreamWriter sw, DatItem datItem)
+        private bool WriteEndGame(ClrMameProWriter cmpw, DatItem datItem)
         {
             try
             {
-                string state = string.Empty;
-
                 // Build the state based on excluded fields
                 if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
-                    sw.Write($"\tsampleof \"{datItem.SampleOf}\"\n");
+                    cmpw.WriteStandalone("sampleof", datItem.SampleOf);
 
                 // End game
-                sw.Write(")\n");
+                cmpw.WriteEndElement();
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -776,11 +776,11 @@ namespace SabreTools.Library.DatFiles
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
         /// <param name="datFile">DatFile to write out from</param>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(ClrMameProWriter cmpw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
@@ -788,8 +788,6 @@ namespace SabreTools.Library.DatFiles
 
             try
             {
-                string state = string.Empty;
-
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
@@ -797,94 +795,93 @@ namespace SabreTools.Library.DatFiles
                 switch (datItem.ItemType)
                 {
                     case ItemType.Archive:
-                        sw.Write("\tarchive (");
-                        sw.Write($" name\"{datItem.GetField(Field.Name, ExcludeFields)}\"");
-                        sw.Write(" )\n");
+                        cmpw.WriteStartElement("archive");
+                        cmpw.WriteAttributeString("name", datItem.GetField(Field.Name, ExcludeFields));
+                        cmpw.WriteEndElement();
                         break;
 
                     case ItemType.BiosSet:
                         var biosSet = datItem as BiosSet;
-                        sw.Write("\tbiosset (");
-                        sw.Write($" name\"{biosSet.GetField(Field.Name, ExcludeFields)}\"");
-                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.BiosDescription, ExcludeFields)))
-                            sw.Write($" description \"{biosSet.Description}\"");
+                        cmpw.WriteStartElement("biosset");
+                        cmpw.WriteAttributeString("name", biosSet.GetField(Field.Name, ExcludeFields));
+                        if (!string.IsNullOrWhiteSpace(biosSet.GetField(Field.BiosDescription, ExcludeFields)))
+                            cmpw.WriteAttributeString("description", biosSet.Description);
                         if (!ExcludeFields[(int)Field.Default] && biosSet.Default != null)
-                            sw.Write($" default \"{biosSet.Default.ToString().ToLowerInvariant()}\"");
-                        sw.Write(" )\n");
+                            cmpw.WriteAttributeString("default", biosSet.Default.ToString().ToLowerInvariant());
+                        cmpw.WriteEndElement();
                         break;
 
                     case ItemType.Disk:
                         var disk = datItem as Disk;
-                        sw.Write("\tdisk (");
-                        sw.Write($" name\"{disk.GetField(Field.Name, ExcludeFields)}\"");
+                        cmpw.WriteStartElement("disk");
+                        cmpw.WriteAttributeString("name", disk.GetField(Field.Name, ExcludeFields));
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
-                            sw.Write($" md5 \"{disk.MD5.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("md5", disk.MD5.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
-                            sw.Write($" ripemd160 \"{disk.RIPEMD160.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("ripemd160", disk.RIPEMD160.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
-                            sw.Write($" sha1 \"{disk.SHA1.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha1", disk.SHA1.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
-                            sw.Write($" sha256 \"{disk.SHA256.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha256", disk.SHA256.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
-                            sw.Write($" sha384 \"{disk.SHA384.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha384", disk.SHA384.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
-                            sw.Write($" sha512 \"{disk.SHA512.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha512", disk.SHA512.ToLowerInvariant());
                         if (!ExcludeFields[(int)Field.Status] && disk.ItemStatus != ItemStatus.None)
-                            sw.Write($" flags \"{disk.ItemStatus.ToString().ToLowerInvariant()}\"");
-                        sw.Write(" )\n");
+                            cmpw.WriteAttributeString("flags", disk.ItemStatus.ToString().ToLowerInvariant());
+                        cmpw.WriteEndElement();
                         break;
 
                     case ItemType.Release:
                         var release = datItem as Release;
-                        sw.Write("\trelease (");
-                        sw.Write($" name\"{release.GetField(Field.Name, ExcludeFields)}\"");
+                        cmpw.WriteStartElement("release");
+                        cmpw.WriteAttributeString("name", release.GetField(Field.Name, ExcludeFields));
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Region, ExcludeFields)))
-                            sw.Write($" region \"{release.Region}\"");
+                            cmpw.WriteAttributeString("region", release.Region);
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Language, ExcludeFields)))
-                            sw.Write($" language \"{release.Language}\"");
+                            cmpw.WriteAttributeString("language", release.Language);
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
-                            sw.Write($" date \"{release.Date}\"");
+                            cmpw.WriteAttributeString("date", release.Date);
                         if (!ExcludeFields[(int)Field.Default] && release.Default != null)
-                            sw.Write($" default \"{release.Default.ToString().ToLowerInvariant()}\"");
-                        sw.Write(" )\n");
+                            cmpw.WriteAttributeString("default", release.Default.ToString().ToLowerInvariant());
+                        cmpw.WriteEndElement();
                         break;
 
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        sw.Write("\trom (");
-                        sw.Write($" name\"{rom.GetField(Field.Name, ExcludeFields)}\"");
+                        cmpw.WriteStartElement("rom");
+                        cmpw.WriteAttributeString("name", rom.GetField(Field.Name, ExcludeFields));
                         if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
-                            sw.Write($" size \"{rom.Size}\"");
+                            cmpw.WriteAttributeString("size", rom.Size.ToString());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
-                            sw.Write($" crc \"{rom.CRC.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("crc", rom.CRC.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.MD5, ExcludeFields)))
-                            sw.Write($" md5 \"{rom.MD5.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("md5", rom.MD5.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.RIPEMD160, ExcludeFields)))
-                            sw.Write($" ripemd160 \"{rom.RIPEMD160.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("ripemd160", rom.RIPEMD160.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA1, ExcludeFields)))
-                            sw.Write($" sha1 \"{rom.SHA1.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha1", rom.SHA1.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA256, ExcludeFields)))
-                            sw.Write($" sha256 \"{rom.SHA256.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha256", rom.SHA256.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA384, ExcludeFields)))
-                            sw.Write($" sha384 \"{rom.SHA384.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha384", rom.SHA384.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SHA512, ExcludeFields)))
-                            sw.Write($" sha512 \"{rom.SHA512.ToLowerInvariant()}\"");
+                            cmpw.WriteAttributeString("sha512", rom.SHA512.ToLowerInvariant());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
-                            sw.Write($" date \"{rom.Date}\"");
+                            cmpw.WriteAttributeString("date", rom.Date);
                         if (!ExcludeFields[(int)Field.Status] && rom.ItemStatus != ItemStatus.None)
-                            sw.Write($" flags \"{rom.ItemStatus.ToString().ToLowerInvariant()}\"");
-                        sw.Write(" )\n");
+                            cmpw.WriteAttributeString("flags", rom.ItemStatus.ToString().ToLowerInvariant());
+                        cmpw.WriteEndElement();
                         break;
 
                     case ItemType.Sample:
-                        sw.Write("\tsample (");
-                        sw.Write($" name\"{datItem.GetField(Field.Name, ExcludeFields)}\"");
-                        sw.Write(" )\n");
+                        cmpw.WriteStartElement("sample");
+                        cmpw.WriteAttributeString("name", datItem.GetField(Field.Name, ExcludeFields));
+                        cmpw.WriteEndElement();
                         break;
                 }
 
-                sw.Write(state);
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -898,16 +895,16 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT footer using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteFooter(StreamWriter sw)
+        private bool WriteFooter(ClrMameProWriter cmpw)
         {
             try
             {
                 // End game
-                sw.Write(")\n");
+                cmpw.WriteEndElement();
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {

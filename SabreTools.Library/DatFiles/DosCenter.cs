@@ -197,7 +197,7 @@ namespace SabreTools.Library.DatFiles
                                 && linegc[i] != "date"
                                 && linegc[i] != "crc")
                             {
-                                item.Name += $" {linegc[i]}";
+                                item.Name += "{linegc[i]}";
                             }
 
                             // Perform correction
@@ -287,10 +287,11 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                ClrMameProWriter cmpw = new ClrMameProWriter(fs, new UTF8Encoding(false));
+                cmpw.Quotes = false;
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(cmpw);
 
                 // Write out each of the machines and roms
                 string lastgame = null;
@@ -321,11 +322,11 @@ namespace SabreTools.Library.DatFiles
 
                         // If we have a different game and we're not at the start of the list, output the end of last item
                         if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                             WriteEndGame(sw, rom);
+                             WriteEndGame(cmpw, rom);
 
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
-                            WriteStartGame(sw, rom);
+                            WriteStartGame(cmpw, rom);
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (rom.ItemType == ItemType.Rom
@@ -346,7 +347,7 @@ namespace SabreTools.Library.DatFiles
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(cmpw, rom, ignoreblanks);
 
                         // Set the new data to compare against
                         lastgame = rom.MachineName;
@@ -354,10 +355,10 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 // Write the file footer out
-                WriteFooter(sw);
+                WriteFooter(cmpw);
 
                 Globals.Logger.Verbose($"File written!{Environment.NewLine}");
-                sw.Dispose();
+                cmpw.Close();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -372,23 +373,23 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(ClrMameProWriter cmpw)
         {
             try
             {
-                sw.Write("DOSCenter (\n");
-                sw.Write($"\tName: {Name}\n");
-                sw.Write($"\tDescription: {Description}\n");
-                sw.Write($"\tVersion: {Version}\n");
-                sw.Write($"\tDate: {Date}\n");
-                sw.Write($"\tAuthor: {Author}\n");
-                sw.Write($"\tHomepage: {Homepage}\n");
-                sw.Write($"\tComment: {Comment}\n");
-                sw.Write(")\n");
+                cmpw.WriteStartElement("DOSCenter");
+                cmpw.WriteStandalone("Name:", Name, false);
+                cmpw.WriteStandalone("Description:", Description, false);
+                cmpw.WriteStandalone("Version:", Version, false);
+                cmpw.WriteStandalone("Date:", Date, false);
+                cmpw.WriteStandalone("Author:", Author, false);
+                cmpw.WriteStandalone("Homepage:", Homepage, false);
+                cmpw.WriteStandalone("Comment:", Comment, false);
+                cmpw.WriteEndElement();
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -402,10 +403,10 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteStartGame(StreamWriter sw, DatItem datItem)
+        private bool WriteStartGame(ClrMameProWriter cmpw, DatItem datItem)
         {
             try
             {
@@ -413,10 +414,10 @@ namespace SabreTools.Library.DatFiles
                 datItem.MachineName = datItem.MachineName.TrimStart(Path.DirectorySeparatorChar);
 
                 // Build the state based on excluded fields
-                sw.Write("game (\n");
-                sw.Write($"\tname \"{datItem.GetField(Field.MachineName, ExcludeFields)}.zip\"\n");
+                cmpw.WriteStartElement("game");
+                cmpw.WriteStandalone("name", $"{datItem.GetField(Field.MachineName, ExcludeFields)}.zip", true);
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -430,21 +431,17 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game end using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteEndGame(StreamWriter sw, DatItem datItem)
+        private bool WriteEndGame(ClrMameProWriter cmpw, DatItem datItem)
         {
             try
             {
-                // Build the state based on excluded fields
-                if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.SampleOf, ExcludeFields)))
-                    sw.Write($"\tsampleof \"{datItem.SampleOf}\"\n");
-
                 // End game
-                sw.Write(")\n");
+                cmpw.WriteEndElement();
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -458,11 +455,11 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(ClrMameProWriter cmpw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
@@ -470,8 +467,6 @@ namespace SabreTools.Library.DatFiles
 
             try
             {
-                string state = string.Empty;
-
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
@@ -480,20 +475,19 @@ namespace SabreTools.Library.DatFiles
                 {
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        sw.Write("\tfile (");
-                        sw.Write($" name {datItem.GetField(Field.Name, ExcludeFields)}");
+                        cmpw.WriteStartElement("file");
+                        cmpw.WriteAttributeString("name", datItem.GetField(Field.Name, ExcludeFields));
                         if (!ExcludeFields[(int)Field.Size] && rom.Size != -1)
-                            sw.Write($" size \"{rom.Size}\"");
+                            cmpw.WriteAttributeString("size", rom.Size.ToString());
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.Date, ExcludeFields)))
-                            sw.Write($" date \"{rom.Date}\"");
+                            cmpw.WriteAttributeString("date", rom.Date);
                         if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CRC, ExcludeFields)))
-                            sw.Write($" crc \"{rom.CRC.ToLowerInvariant()}\"");
-                        sw.Write(" )\n");
+                            cmpw.WriteAttributeString("crc", rom.CRC.ToLowerInvariant());
+                        cmpw.WriteEndElement();
                         break;
                 }
 
-                sw.Write(state);
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
@@ -507,16 +501,16 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT footer using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="cmpw">ClrMameProWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteFooter(StreamWriter sw)
+        private bool WriteFooter(ClrMameProWriter cmpw)
         {
             try
             {
                 // End game
-                sw.Write(")\n");
+                cmpw.WriteEndElement();
 
-                sw.Flush();
+                cmpw.Flush();
             }
             catch (Exception ex)
             {
