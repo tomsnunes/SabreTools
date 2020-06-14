@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
+using SabreTools.Library.Readers;
 using SabreTools.Library.Tools;
 using NaturalSort;
 
@@ -45,86 +45,325 @@ namespace SabreTools.Library.DatFiles
             bool clean,
             bool remUnicode)
         {
-            // Outsource the work of parsing the file to a helper
-            IniFile ini = new IniFile(filename);
+            // Prepare all intenral variables
+            Encoding enc = Utilities.GetEncoding(filename);
+            IniReader ir = Utilities.GetIniReader(filename, false);
 
-            // CREDITS section
-            Author = string.IsNullOrWhiteSpace(Author) ? ini["CREDITS.author"] : Author;
-            Version = string.IsNullOrWhiteSpace(Version) ? ini["CREDITS.version"] : Version;
-            Email = string.IsNullOrWhiteSpace(Email) ? ini["CREDITS.email"] : Email;
-            Homepage = string.IsNullOrWhiteSpace(Homepage) ? ini["CREDITS.homepage"] : Homepage;
-            Url = string.IsNullOrWhiteSpace(Url) ? ini["CREDITS.url"] : Url;
-            Date = string.IsNullOrWhiteSpace(Date) ? ini["CREDITS.date"] : Date;
+            // If we got a null reader, just return
+            if (ir == null)
+                return;
 
-            // DAT section
-            //RCVersion = string.IsNullOrWhiteSpace(RCVersion) ? ini["CREDITS.version"] : RCVersion;
-            //Plugin = string.IsNullOrWhiteSpace(Plugin) ? ini["CREDITS.plugin"] : Plugin;
-            if (ForceMerging == ForceMerging.None)
+            // Otherwise, read teh file to the end
+            try
             {
-                if (ini["DAT.split"] == "1")
-                    ForceMerging = ForceMerging.Split;
-                else if (ini["DAT.merge"] == "1")
-                    ForceMerging = ForceMerging.Merged;
+                ir.ReadNextLine();
+                while (!ir.EndOfStream)
+                {
+                    // We don't care about whitespace or comments
+                    if (ir.RowType == IniRowType.None || ir.RowType == IniRowType.Comment)
+                    {
+                        ir.ReadNextLine();
+                        continue;
+                    }
+
+                    // If we have a section
+                    if (ir.RowType == IniRowType.SectionHeader)
+                    {
+                        switch (ir.Section.ToLowerInvariant())
+                        {
+                            case "credits":
+                                ReadCreditsSection(ir);
+                                break;
+
+                            case "dat":
+                                ReadDatSection(ir);
+                                break;
+
+                            case "emulator":
+                                ReadEmulatorSection(ir);
+                                break;
+
+                            case "games":
+                                ReadGamesSection(ir, sysid, srcid, clean, remUnicode);
+                                break;
+
+                            // Unknown section so we ignore it
+                            default:
+                                ir.ReadNextLine();
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Globals.Logger.Warning($"Exception found while parsing '{filename}': {ex}");
             }
 
-            // EMULATOR section
-            Name = string.IsNullOrWhiteSpace(Name) ? ini["EMULATOR.refname"] : Name;
-            Description = string.IsNullOrWhiteSpace(Description) ? ini["EMULATOR.version"] : Description;
+            ir.Dispose();
+        }
 
-            // GAMES section
-            foreach (string game in ini.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key))
+        /// <summary>
+        /// Read credits information
+        /// </summary>
+        /// <param name="reader">IniReader to use to parse the credits</param>
+        private void ReadCreditsSection(IniReader reader)
+        {
+            // If the reader is somehow null, skip it
+            if (reader == null)
+                return;
+
+            reader.ReadNextLine();
+            while (!reader.EndOfStream && reader.Section.ToLowerInvariant() == "credits")
             {
-                // Get the line into a separate variable so it can be manipulated
-                string line = game;
-
-                // Remove INI prefixing
-                if (line.StartsWith("GAMES"))
-                    line = line.Substring("GAMES.".Length);
-
-                // If we have a valid game
-                if (line.StartsWith("¬"))
+                // We don't care about whitespace, comments, or invalid
+                if (reader.RowType != IniRowType.KeyValue)
                 {
-                    // Some old RC DATs have this behavior
-                    if (line.Contains("¬N¬O"))
-                        line = game.Replace("¬N¬O", string.Empty) + "¬¬";
-
-                    /*
-                    The rominfo order is as follows:
-                    1 - parent name
-                    2 - parent description
-                    3 - game name
-                    4 - game description
-                    5 - rom name
-                    6 - rom crc
-                    7 - rom size
-                    8 - romof name
-                    9 - merge name
-                    */
-                    string[] rominfo = line.Split('¬');
-
-                    // Try getting the size separately
-                    if (!Int64.TryParse(rominfo[7], out long size))
-                        size = 0;
-
-                    Rom rom = new Rom
-                    {
-                        Name = rominfo[5],
-                        Size = size,
-                        CRC = Utilities.CleanHashData(rominfo[6], Constants.CRCLength),
-                        ItemStatus = ItemStatus.None,
-
-                        MachineName = rominfo[3],
-                        MachineDescription = rominfo[4],
-                        CloneOf = rominfo[1],
-                        RomOf = rominfo[8],
-
-                        SystemID = sysid,
-                        SourceID = srcid,
-                    };
-
-                    // Now process and add the rom
-                    ParseAddHelper(rom, clean, remUnicode);
+                    reader.ReadNextLine();
+                    continue;
                 }
+
+                var kvp = reader.KeyValuePair;
+
+                // If the KeyValuePair is invalid, skip it
+                if (kvp == null)
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                // Get all credits items (ONLY OVERWRITE IF THERE'S NO DATA)
+                switch (kvp?.Key.ToLowerInvariant())
+                {
+                    case "author":
+                        Author = string.IsNullOrWhiteSpace(Author) ? kvp?.Value : Author;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "version":
+                        Version = string.IsNullOrWhiteSpace(Version) ? kvp?.Value : Version;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "email":
+                        Email = string.IsNullOrWhiteSpace(Email) ? kvp?.Value : Email;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "homepage":
+                        Homepage = string.IsNullOrWhiteSpace(Homepage) ? kvp?.Value : Homepage;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "url":
+                        Url = string.IsNullOrWhiteSpace(Url) ? kvp?.Value : Url;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "date":
+                        Date = string.IsNullOrWhiteSpace(Date) ? kvp?.Value : Date;
+                        reader.ReadNextLine();
+                        break;
+
+                    // Unknown value, just skip
+                    default:
+                        reader.ReadNextLine();
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read dat information
+        /// </summary>
+        /// <param name="reader">IniReader to use to parse the credits</param>
+        private void ReadDatSection(IniReader reader)
+        {
+            // If the reader is somehow null, skip it
+            if (reader == null)
+                return;
+
+            reader.ReadNextLine();
+            while (!reader.EndOfStream && reader.Section.ToLowerInvariant() == "dat")
+            {
+                // We don't care about whitespace, comments, or invalid
+                if (reader.RowType != IniRowType.KeyValue)
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                var kvp = reader.KeyValuePair;
+
+                // If the KeyValuePair is invalid, skip it
+                if (kvp == null)
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                // Get all dat items (ONLY OVERWRITE IF THERE'S NO DATA)
+                switch (kvp?.Key.ToLowerInvariant())
+                {
+                    case "version":
+                        string rcVersion = kvp?.Value;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "plugin":
+                        string plugin = kvp?.Value;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "split":
+                        if (ForceMerging == ForceMerging.None && kvp?.Value == "1")
+                            ForceMerging = ForceMerging.Split;
+
+                        reader.ReadNextLine();
+                        break;
+
+                    case "merge":
+                        if (ForceMerging == ForceMerging.None && kvp?.Value == "1")
+                            ForceMerging = ForceMerging.Merged;
+
+                        reader.ReadNextLine();
+                        break;
+
+                    // Unknown value, just skip
+                    default:
+                        reader.ReadNextLine();
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read emulator information
+        /// </summary>
+        /// <param name="reader">IniReader to use to parse the credits</param>
+        private void ReadEmulatorSection(IniReader reader)
+        {
+            // If the reader is somehow null, skip it
+            if (reader == null)
+                return;
+
+            reader.ReadNextLine();
+            while (!reader.EndOfStream && reader.Section.ToLowerInvariant() == "emulator")
+            {
+                // We don't care about whitespace, comments, or invalid
+                if (reader.RowType != IniRowType.KeyValue)
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                var kvp = reader.KeyValuePair;
+
+                // If the KeyValuePair is invalid, skip it
+                if (kvp == null)
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                // Get all emulator items (ONLY OVERWRITE IF THERE'S NO DATA)
+                switch (kvp?.Key.ToLowerInvariant())
+                {
+                    case "refname":
+                        Name = string.IsNullOrWhiteSpace(Name) ? kvp?.Value : Name;
+                        reader.ReadNextLine();
+                        break;
+
+                    case "version":
+                        Description = string.IsNullOrWhiteSpace(Description) ? kvp?.Value : Description;
+                        reader.ReadNextLine();
+                        break;
+
+                    // Unknown value, just skip
+                    default:
+                        reader.ReadNextLine();
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read games information
+        /// </summary>
+        /// <param name="reader">IniReader to use to parse the credits</param>
+        /// <param name="sysid">System ID for the DAT</param>
+        /// <param name="srcid">Source ID for the DAT</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        private void ReadGamesSection(IniReader reader, int sysid, int srcid, bool clean, bool remUnicode)
+        {
+            // If the reader is somehow null, skip it
+            if (reader == null)
+                return;
+
+            reader.ReadNextLine();
+            while (!reader.EndOfStream && reader.Section.ToLowerInvariant() == "games")
+            {
+                // We don't care about whitespace or comments
+                // We're keeping keyvalue in case a file has '=' in the row
+                if (reader.RowType != IniRowType.Invalid && reader.RowType != IniRowType.KeyValue)
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                // Roms are not valid row formats, usually
+                string line = reader.Line;
+
+                // If we don't have a valid game, keep reading
+                if (!line.StartsWith("¬"))
+                {
+                    reader.ReadNextLine();
+                    continue;
+                }
+
+                // Some old RC DATs have this behavior
+                if (line.Contains("¬N¬O"))
+                    line = line.Replace("¬N¬O", string.Empty) + "¬¬";
+
+                /*
+                The rominfo order is as follows:
+                1 - parent name
+                2 - parent description
+                3 - game name
+                4 - game description
+                5 - rom name
+                6 - rom crc
+                7 - rom size
+                8 - romof name
+                9 - merge name
+                */
+                string[] rominfo = line.Split('¬');
+
+                // Try getting the size separately
+                if (!Int64.TryParse(rominfo[7], out long size))
+                    size = 0;
+
+                Rom rom = new Rom
+                {
+                    Name = rominfo[5],
+                    Size = size,
+                    CRC = Utilities.CleanHashData(rominfo[6], Constants.CRCLength),
+                    ItemStatus = ItemStatus.None,
+
+                    MachineName = rominfo[3],
+                    MachineDescription = rominfo[4],
+                    CloneOf = rominfo[1],
+                    RomOf = rominfo[8],
+
+                    SystemID = sysid,
+                    SourceID = srcid,
+                };
+
+                // Now process and add the rom
+                ParseAddHelper(rom, clean, remUnicode);
+
+                reader.ReadNextLine();
             }
         }
 
@@ -264,49 +503,38 @@ namespace SabreTools.Library.DatFiles
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
                 return true;
 
+            /*
+            The rominfo order is as follows:
+            1 - parent name
+            2 - parent description
+            3 - game name
+            4 - game description
+            5 - rom name
+            6 - rom crc
+            7 - rom size
+            8 - romof name
+            9 - merge name
+            */
+
             try
             {
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
                 // Build the state based on excluded fields
-                switch (datItem.ItemType)
-                {
-                    case ItemType.Disk:
-                        sw.Write("¬");
-                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            sw.Write(datItem.CloneOf);
-                        sw.Write("¬");
-                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            sw.Write(datItem.CloneOf);
-                        sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
-                        if (string.IsNullOrWhiteSpace(datItem.MachineDescription))
-                            sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
-                        else
-                            sw.Write($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
-                        sw.Write($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
-                        sw.Write("¬¬¬¬¬\n");
-                        break;
-
-                    case ItemType.Rom:
-                        var rom = datItem as Rom;
-                        sw.Write("¬");
-                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            sw.Write(datItem.CloneOf);
-                        sw.Write("¬");
-                        if (!string.IsNullOrWhiteSpace(datItem.GetField(Field.CloneOf, ExcludeFields)))
-                            sw.Write(datItem.CloneOf);
-                        sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
-                        if (string.IsNullOrWhiteSpace(datItem.MachineDescription))
-                            sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
-                        else
-                            sw.Write($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
-                        sw.Write($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
-                        sw.Write($"¬{datItem.GetField(Field.CRC, ExcludeFields)}");
-                        sw.Write($"¬{datItem.GetField(Field.Size, ExcludeFields)}");
-                        sw.Write("¬¬¬\n");
-                        break;
-                }
+                sw.Write($"¬{datItem.GetField(Field.CloneOf, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.CloneOf, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
+                if (string.IsNullOrWhiteSpace(datItem.MachineDescription))
+                    sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
+                else
+                    sw.Write($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.CRC, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.Size, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.RomOf, ExcludeFields)}");
+                sw.Write($"¬{datItem.GetField(Field.Merge, ExcludeFields)}");
+                sw.Write("¬\n");
 
                 sw.Flush();
             }

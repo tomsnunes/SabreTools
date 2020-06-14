@@ -438,6 +438,22 @@
 
     #endregion
 
+    #region Reader related
+
+    /// <summary>
+    /// Different types of INI rows being parsed
+    /// </summary>
+    public enum IniRowType
+    {
+        None,
+        SectionHeader,
+        KeyValue,
+        Comment,
+        Invalid,
+    }
+
+    #endregion
+
     #region Skippers and Mappers
 
     /// <summary>

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ using SabreTools.Library.Data;
 using SabreTools.Library.DatFiles;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.FileTypes;
+using SabreTools.Library.Readers;
 using SabreTools.Library.Reports;
 using SabreTools.Library.Skippers;
 using Compress.ThreadReaders;
@@ -1735,6 +1735,28 @@ namespace SabreTools.Library.Tools
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Get the IniReader associated with a file, if possible
+        /// </summary>
+        /// <param name="filename">Name of the file to be parsed</param>
+        /// <param name="validateRows">True if rows should be in a proper format, false if invalid is okay</param>
+        /// <returns>The IniReader representing the (possibly converted) file, null otherwise</returns>
+        public static IniReader GetIniReader(string filename, bool validateRows)
+        {
+            Globals.Logger.Verbose($"Attempting to read file: {filename}");
+
+            // Check if file exists
+            if (!File.Exists(filename))
+            {
+                Globals.Logger.Warning($"File '{filename}' could not read from!");
+                return null;
+            }
+
+            IniReader ir = new IniReader(filename);
+            ir.ValidateRows = validateRows;
+            return ir;
         }
 
         /// <summary>
