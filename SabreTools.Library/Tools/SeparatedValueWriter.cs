@@ -72,7 +72,7 @@ namespace SabreTools.Library.Tools
         /// <summary>
         /// Write a value row
         /// </summary>
-        public void WriteValues(object[] values)
+        public void WriteValues(object[] values, bool newline = true)
         {
             // If the writer can't be used, we error
             if (sw == null || !sw.BaseStream.CanWrite)
@@ -106,7 +106,7 @@ namespace SabreTools.Library.Tools
 
                 if (Quotes)
                     sw.Write("\"");
-                sw.Write(value.ToString());
+                sw.Write(value?.ToString() ?? string.Empty);
                 if (Quotes)
                     sw.Write("\"");
 
@@ -125,10 +125,35 @@ namespace SabreTools.Library.Tools
                 }
             }
 
-            // Add a newline
-            sw.WriteLine();
+            // Add a newline, if needed
+            if (newline)
+                sw.WriteLine();
+        }
 
-            // Flush the buffer
+        /// <summary>
+        /// Write a generic string
+        /// </summary>
+        public void WriteString(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return;
+
+            sw.Write(value);
+        }
+
+        /// <summary>
+        /// Write a newline
+        /// </summary>
+        public void WriteLine()
+        {
+            sw.WriteLine();
+        }
+
+        /// <summary>
+        /// Flush the underlying writer
+        /// </summary>
+        public void Flush()
+        {
             sw.Flush();
         }
 

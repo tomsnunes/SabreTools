@@ -572,166 +572,191 @@ namespace SabreTools.Library.DatItems
             if (excludeFields[(int)field])
                 return string.Empty;
 
+            string fieldValue = null;
             switch (field)
             {
                 case Field.Name:
-                    return this.Name;
+                    fieldValue = this.Name;
+                    break;
                 case Field.PartName:
-                    return this.PartName;
+                    fieldValue = this.PartName;
+                    break;
                 case Field.PartInterface:
-                    return this.PartInterface;
+                    fieldValue = this.PartInterface;
+                    break;
                 case Field.Features:
-                    return string.Join(", ", this.Features.Select(f => $"{f.Item1}={f.Item2}"));
+                    fieldValue = string.Join(", ", (this.Features ?? new List<Tuple<string, string>>()).Select(f => $"{f.Item1}={f.Item2}"));
+                    break;
                 case Field.AreaName:
-                    return this.AreaName;
+                    fieldValue = this.AreaName;
+                    break;
                 case Field.AreaSize:
-                    return this.AreaSize?.ToString() ?? string.Empty;
+                    fieldValue = this.AreaSize?.ToString();
+                    break;
 
                 case Field.MachineName:
-                    return this.MachineName;
+                    fieldValue = this.MachineName;
+                    break;
                 case Field.Comment:
-                    return this.Comment;
+                    fieldValue = this.Comment;
+                    break;
                 case Field.Description:
-                    return this.MachineDescription;
+                    fieldValue = this.MachineDescription;
+                    break;
                 case Field.Year:
-                    return this.Year;
+                    fieldValue = this.Year;
+                    break;
                 case Field.Manufacturer:
-                    return this.Manufacturer;
+                    fieldValue = this.Manufacturer;
+                    break;
                 case Field.Publisher:
-                    return this.Publisher;
+                    fieldValue = this.Publisher;
+                    break;
                 case Field.RomOf:
-                    return this.RomOf;
+                    fieldValue = this.RomOf;
+                    break;
                 case Field.CloneOf:
-                    return this.CloneOf;
+                    fieldValue = this.CloneOf;
+                    break;
                 case Field.SampleOf:
-                    return this.SampleOf;
+                    fieldValue = this.SampleOf;
+                    break;
                 case Field.Supported:
-                    return this.Supported?.ToString() ?? string.Empty;
+                    fieldValue = this.Supported?.ToString();
+                    break;
                 case Field.SourceFile:
-                    return this.SourceFile;
+                    fieldValue = this.SourceFile;
+                    break;
                 case Field.Runnable:
-                    return this.Runnable?.ToString() ?? string.Empty;
+                    fieldValue = this.Runnable?.ToString();
+                    break;
                 case Field.Board:
-                    return this.Board;
+                    fieldValue = this.Board;
+                    break;
                 case Field.RebuildTo:
-                    return this.RebuildTo;
+                    fieldValue = this.RebuildTo;
+                    break;
                 case Field.Devices:
-                    return string.Join(", ", this.Devices);
+                    fieldValue = string.Join(", ", this.Devices ?? new List<string>());
+                    break;
                 case Field.SlotOptions:
-                    return string.Join(", ", this.SlotOptions);
+                    fieldValue = string.Join(", ", this.SlotOptions ?? new List<string>());
+                    break;
                 case Field.Infos:
-                    return string.Join(", ", this.Infos.Select(i => $"{i.Item1}={i.Item2}"));
+                    fieldValue = string.Join(", ", (this.Infos ?? new List<Tuple<string, string>>()).Select(i => $"{i.Item1}={i.Item2}"));
+                    break;
                 case Field.MachineType:
-                    return this.MachineType.ToString();
+                    fieldValue = this.MachineType.ToString();
+                    break;
 
                 case Field.Default:
                     if (ItemType == ItemType.BiosSet)
-                        return (this as BiosSet).Default?.ToString() ?? string.Empty;
+                        fieldValue = (this as BiosSet).Default?.ToString();
                     else if (ItemType == ItemType.Release)
-                        return (this as Release).Default?.ToString() ?? string.Empty;
+                        fieldValue = (this as Release).Default?.ToString();
                     break;
                 case Field.BiosDescription:
                     if (ItemType == ItemType.BiosSet)
-                        return (this as BiosSet).Description;
+                        fieldValue = (this as BiosSet).Description;
                     break;
 
                 case Field.MD5:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).MD5;
+                        fieldValue = (this as Disk).MD5;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).MD5;
+                        fieldValue = (this as Rom).MD5;
                     break;
                 case Field.RIPEMD160:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).RIPEMD160;
+                        fieldValue = (this as Disk).RIPEMD160;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).RIPEMD160;
+                        fieldValue = (this as Rom).RIPEMD160;
                     break;
                 case Field.SHA1:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).SHA1;
+                        fieldValue = (this as Disk).SHA1;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).SHA1;
+                        fieldValue = (this as Rom).SHA1;
                     break;
                 case Field.SHA256:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).SHA256;
+                        fieldValue = (this as Disk).SHA256;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).SHA256;
+                        fieldValue = (this as Rom).SHA256;
                     break;
                 case Field.SHA384:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).SHA384;
+                        fieldValue = (this as Disk).SHA384;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).SHA384;
+                        fieldValue = (this as Rom).SHA384;
                     break;
                 case Field.SHA512:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).SHA512;
+                        fieldValue = (this as Disk).SHA512;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).SHA512;
+                        fieldValue = (this as Rom).SHA512;
                     break;
                 case Field.Merge:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).MergeTag;
+                        fieldValue = (this as Disk).MergeTag;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).MergeTag;
+                        fieldValue = (this as Rom).MergeTag;
                     break;
                 case Field.Region:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).Region;
+                        fieldValue = (this as Disk).Region;
                     else if (ItemType == ItemType.Release)
-                        return (this as Release).Region;
+                        fieldValue = (this as Release).Region;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).Region;
+                        fieldValue = (this as Rom).Region;
                     break;
                 case Field.Index:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).Index;
+                        fieldValue = (this as Disk).Index;
                     break;
                 case Field.Writable:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).Writable?.ToString() ?? string.Empty;
+                        fieldValue = (this as Disk).Writable?.ToString();
                     break;
                 case Field.Optional:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).Optional?.ToString() ?? string.Empty;
+                        fieldValue = (this as Disk).Optional?.ToString();
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).Optional?.ToString() ?? string.Empty;
+                        fieldValue = (this as Rom).Optional?.ToString();
                     break;
                 case Field.Status:
                     if (ItemType == ItemType.Disk)
-                        return (this as Disk).ItemStatus.ToString();
+                        fieldValue = (this as Disk).ItemStatus.ToString();
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).ItemStatus.ToString();
+                        fieldValue = (this as Rom).ItemStatus.ToString();
                     break;
 
                 case Field.Language:
                     if (ItemType == ItemType.Release)
-                        return (this as Release).Language;
+                        fieldValue = (this as Release).Language;
                     break;
                 case Field.Date:
                     if (ItemType == ItemType.Release)
-                        return (this as Release).Date;
+                        fieldValue = (this as Release).Date;
                     else if (ItemType == ItemType.Rom)
-                        return (this as Rom).Date;
+                        fieldValue = (this as Rom).Date;
                     break;
 
                 case Field.Bios:
                     if (ItemType == ItemType.Rom)
-                        return (this as Rom).Bios;
+                        fieldValue = (this as Rom).Bios;
                     break;
                 case Field.Size:
                     if (ItemType == ItemType.Rom)
-                        return (this as Rom).Size.ToString();
+                        fieldValue = (this as Rom).Size.ToString();
                     break;
                 case Field.CRC:
                     if (ItemType == ItemType.Rom)
-                        return (this as Rom).CRC;
+                        fieldValue = (this as Rom).CRC;
                     break;
                 case Field.Offset:
                     if (ItemType == ItemType.Rom)
-                        return (this as Rom).Offset;
+                        fieldValue = (this as Rom).Offset;
                     break;
 
                 case Field.NULL:
@@ -739,7 +764,11 @@ namespace SabreTools.Library.DatItems
                     return string.Empty;
             }
 
-            return string.Empty;
+            // Make sure we don't return null
+            if (string.IsNullOrEmpty(fieldValue))
+                fieldValue = string.Empty;
+
+            return fieldValue;
         }
 
         #endregion

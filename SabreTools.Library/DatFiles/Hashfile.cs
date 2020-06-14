@@ -121,7 +121,10 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                SeparatedValueWriter svw = new SeparatedValueWriter(fs, new UTF8Encoding(false));
+                svw.Quotes = false;
+                svw.Separator = "  ";
+                svw.VerifyFieldCount = true;
 
                 // Get a properly sorted set of keys
                 List<string> keys = Keys;
@@ -154,12 +157,12 @@ namespace SabreTools.Library.DatFiles
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(svw, rom, ignoreblanks);
                     }
                 }
 
                 Globals.Logger.Verbose($"File written!{Environment.NewLine}");
-                sw.Dispose();
+                svw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -174,11 +177,11 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="svw">SeparatedValueWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(SeparatedValueWriter svw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
@@ -186,10 +189,8 @@ namespace SabreTools.Library.DatFiles
 
             try
             {
-                // Pre-process the item name
-                ProcessItemName(datItem, true);
-
                 // Build the state based on excluded fields
+                string[] fields = new string[2];
                 switch (_hash)
                 {
                     case Hash.CRC:
@@ -197,11 +198,11 @@ namespace SabreTools.Library.DatFiles
                         {
                             case ItemType.Rom:
                                 var rom = datItem as Rom;
+                                fields[0] = string.Empty;
                                 if (GameName)
-                                    sw.Write($"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}");
-                                sw.Write($"{rom.GetField(Field.Name, ExcludeFields)}");
-                                sw.Write($"{rom.GetField(Field.CRC, ExcludeFields)}");
-                                sw.Write("\n");
+                                    fields[0] = $"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}";
+                                fields[0] += rom.GetField(Field.Name, ExcludeFields);
+                                fields[1] = rom.GetField(Field.CRC, ExcludeFields);
                                 break;
                         }
                         break;
@@ -218,26 +219,30 @@ namespace SabreTools.Library.DatFiles
                         {
                             case ItemType.Disk:
                                 var disk = datItem as Disk;
-                                sw.Write($"{disk.GetField(hashField, ExcludeFields)}");
+                                fields[0] = disk.GetField(hashField, ExcludeFields);
+                                fields[1] = string.Empty;
                                 if (GameName)
-                                    sw.Write($"{disk.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}");
-                                sw.Write($"{disk.GetField(Field.Name, ExcludeFields)}");
-                                sw.Write("\n");
+                                    fields[1] = $"{disk.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}";
+                                fields[1] += disk.GetField(Field.Name, ExcludeFields);
                                 break;
 
                             case ItemType.Rom:
                                 var rom = datItem as Rom;
-                                sw.Write($"{rom.GetField(hashField, ExcludeFields)}");
+                                fields[0] = rom.GetField(hashField, ExcludeFields);
+                                fields[1] = string.Empty;
                                 if (GameName)
-                                    sw.Write($"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}");
-                                sw.Write($"{rom.GetField(Field.Name, ExcludeFields)}");
-                                sw.Write("\n");
+                                    fields[1] = $"{rom.GetField(Field.MachineName, ExcludeFields)}{Path.DirectorySeparatorChar}";
+                                fields[1] += rom.GetField(Field.Name, ExcludeFields);
                                 break;
                         }
                         break;
                 }
 
-                sw.Flush();
+                // If we had at least one field filled in
+                if (!string.IsNullOrEmpty(fields[0]) || !string.IsNullOrEmpty(fields[1]))
+                    svw.WriteValues(fields);
+
+                svw.Flush();
             }
             catch (Exception ex)
             {

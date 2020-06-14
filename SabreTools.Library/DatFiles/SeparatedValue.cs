@@ -394,10 +394,13 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                SeparatedValueWriter svw = new SeparatedValueWriter(fs, new UTF8Encoding(false));
+                svw.Quotes = true;
+                svw.Separator = this._delim.ToString();
+                svw.VerifyFieldCount = true;
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(svw);
 
                 // Get a properly sorted set of keys
                 List<string> keys = Keys;
@@ -430,12 +433,12 @@ namespace SabreTools.Library.DatFiles
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(svw, rom, ignoreblanks);
                     }
                 }
 
                 Globals.Logger.Verbose("File written!" + Environment.NewLine);
-                sw.Dispose();
+                svw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -450,31 +453,36 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="svw">SeparatedValueWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(SeparatedValueWriter svw)
         {
             try
             {
-                sw.Write("\"File Name\"{_delim}");
-                sw.Write("\"Internal Name\"{_delim}");
-                sw.Write("\"Description\"{_delim}");
-                sw.Write("\"Game Name\"{_delim}");
-                sw.Write("\"Game Description\"{_delim}");
-                sw.Write("\"Type\"{_delim}\"");
-                sw.Write("\"Rom Name\"{_delim}");
-                sw.Write("\"Disk Name\"{_delim}");
-                sw.Write("\"Size\"{_delim}");
-                sw.Write("\"CRC\"{_delim}");
-                sw.Write("\"MD5\"{_delim}");
-                //sw.Write("\"RIPEMD160\"{_delim}");
-                sw.Write("\"SHA1\"{_delim}");
-                sw.Write("\"SHA256\"{_delim}");
-                //sw.Write("\"SHA384\"{_delim}");
-                //sw.Write("\"SHA512\"{_delim}");
-                sw.Write("\"Nodump\"\n");
+                string[] headers = new string[]
+                {
+                    "File Name",
+                    "Internal Name",
+                    "Description",
+                    "Game Name",
+                    "Game Description",
+                    "Type",
+                    "Rom Name",
+                    "Disk Name",
+                    "Size",
+                    "CRC",
+                    "MD5",
+                    //"RIPEMD160",
+                    "SHA1",
+                    "SHA256",
+                    //"SHA384",
+                    //"SHA512",
+                    "Nodump",
+                };
 
-                sw.Flush();
+                svw.WriteHeader(headers);
+
+                svw.Flush();
             }
             catch (Exception ex)
             {
@@ -488,11 +496,11 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="svw">SeparatedValueWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(SeparatedValueWriter svw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
@@ -504,52 +512,55 @@ namespace SabreTools.Library.DatFiles
                 if (datItem.ItemType != ItemType.Disk && datItem.ItemType != ItemType.Rom)
                     return true;
 
-                sw.Write(CreatePrefixPostfix(datItem, true));
-
-                sw.Write($"\"{FileName}\"{_delim}");
-                sw.Write($"\"{Name}\"{_delim}");
-                sw.Write($"\"{Description}\"{_delim}");
-                sw.Write($"\"{datItem.GetField(Field.MachineName, ExcludeFields)}\"{_delim}");
-                sw.Write($"\"{datItem.GetField(Field.Description, ExcludeFields)}\"{_delim}");
+                // Build the state based on excluded fields
+                string[] fields = new string[14]; // 17;
+                fields[0] = FileName;
+                fields[1] = Name;
+                fields[2] = Description;
+                fields[3] = datItem.GetField(Field.MachineName, ExcludeFields);
+                fields[4] = datItem.GetField(Field.Description, ExcludeFields);
 
                 switch (datItem.ItemType)
                 {
                     case ItemType.Disk:
                         var disk = datItem as Disk;
-                        sw.Write($"\"disk\"{_delim}");
-                        sw.Write($"\"\"{_delim}");
-                        sw.Write($"\"{disk.GetField(Field.Name, ExcludeFields)}\"{_delim}");
-                        sw.Write($"\"\"{_delim}");
-                        sw.Write($"\"\"{_delim}");
-                        sw.Write($"\"{disk.GetField(Field.MD5, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        //sw.Write($"\"{disk.GetField(Field.RIPEMD160, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{disk.GetField(Field.SHA1, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{disk.GetField(Field.SHA256, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        //sw.Write($"\"{disk.GetField(Field.SHA384, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        //sw.Write($"\"{disk.GetField(Field.SHA512, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{disk.GetField(Field.Status, ExcludeFields)}\"{_delim}");
+                        fields[5] = "disk";
+                        fields[6] = string.Empty;
+                        fields[7] = disk.GetField(Field.Name, ExcludeFields);
+                        fields[8] = string.Empty;
+                        fields[9] = string.Empty;
+                        fields[10] = disk.GetField(Field.MD5, ExcludeFields).ToLowerInvariant();
+                        //fields[11] = disk.GetField(Field.RIPEMD160, ExcludeFields).ToLowerInvariant();
+                        fields[11] = disk.GetField(Field.SHA1, ExcludeFields).ToLowerInvariant();
+                        fields[12] = disk.GetField(Field.SHA256, ExcludeFields).ToLowerInvariant();
+                        //fields[13] = disk.GetField(Field.SHA384, ExcludeFields).ToLowerInvariant();
+                        //fields[14] = disk.GetField(Field.SHA512, ExcludeFields).ToLowerInvariant();
+                        fields[13] = disk.GetField(Field.Status, ExcludeFields);
                         break;
 
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        sw.Write($"\"rom\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.Name, ExcludeFields)}\"{_delim}");
-                        sw.Write($"\"\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.Size, ExcludeFields)}\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.CRC, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.MD5, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        //sw.Write($"\"{rom.GetField(Field.RIPEMD160, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.SHA1, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.SHA256, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        //sw.Write($"\"{rom.GetField(Field.SHA384, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        //sw.Write($"\"{rom.GetField(Field.SHA512, ExcludeFields).ToLowerInvariant()}\"{_delim}");
-                        sw.Write($"\"{rom.GetField(Field.Status, ExcludeFields)}\"{_delim}");
+                        fields[5] = "rom";
+                        fields[6] = rom.GetField(Field.Name, ExcludeFields);
+                        fields[7] = string.Empty;
+                        fields[8] = rom.GetField(Field.Size, ExcludeFields);
+                        fields[9] = rom.GetField(Field.CRC, ExcludeFields).ToLowerInvariant();
+                        fields[10] = rom.GetField(Field.MD5, ExcludeFields).ToLowerInvariant();
+                        //fields[11] = rom.GetField(Field.RIPEMD160, ExcludeFields).ToLowerInvariant();
+                        fields[11] = rom.GetField(Field.SHA1, ExcludeFields).ToLowerInvariant();
+                        fields[12] = rom.GetField(Field.SHA256, ExcludeFields).ToLowerInvariant();
+                        //fields[13] = rom.GetField(Field.SHA384, ExcludeFields).ToLowerInvariant();
+                        //fields[14] = rom.GetField(Field.SHA512, ExcludeFields).ToLowerInvariant();
+                        fields[13] = rom.GetField(Field.Status, ExcludeFields);
                         break;
                 }
 
-                sw.Write(CreatePrefixPostfix(datItem, false));
+                svw.WriteString(CreatePrefixPostfix(datItem, true));
+                svw.WriteValues(fields, false);
+                svw.WriteString(CreatePrefixPostfix(datItem, false));
+                svw.WriteLine();
 
-                sw.Flush();
+                svw.Flush();
             }
             catch (Exception ex)
             {

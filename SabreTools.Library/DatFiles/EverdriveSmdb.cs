@@ -105,7 +105,10 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                SeparatedValueWriter svw = new SeparatedValueWriter(fs, new UTF8Encoding(false));
+                svw.Quotes = false;
+                svw.Separator = "\t";
+                svw.VerifyFieldCount = true;
 
                 // Get a properly sorted set of keys
                 List<string> keys = Keys;
@@ -140,12 +143,12 @@ namespace SabreTools.Library.DatFiles
                             ((Rom)item).Size = Constants.SizeZero;
                         }
 
-                        WriteDatItem(sw, item, ignoreblanks);
+                        WriteDatItem(svw, item, ignoreblanks);
                     }
                 }
 
                 Globals.Logger.Verbose($"File written!{Environment.NewLine}");
-                sw.Dispose();
+                svw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -160,10 +163,10 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="svw">SeparatedValueWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(SeparatedValueWriter svw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
@@ -182,17 +185,23 @@ namespace SabreTools.Library.DatFiles
                 {
                     case ItemType.Rom:
                         var rom = datItem as Rom;
-                        sw.Write($"{rom.GetField(Field.SHA256, ExcludeFields)}\t");
-                        sw.Write($"{rom.GetField(Field.MachineName, ExcludeFields)}/\t");
-                        sw.Write($"{rom.GetField(Field.Name, ExcludeFields)}\t");
-                        sw.Write($"{rom.GetField(Field.SHA1, ExcludeFields)}\t");
-                        sw.Write($"{rom.GetField(Field.MD5, ExcludeFields)}\t");
-                        sw.Write($"{rom.GetField(Field.CRC, ExcludeFields)}");
-                        sw.Write("\n");
+
+                        string[] fields = new string[]
+                        {
+                            rom.GetField(Field.SHA256, ExcludeFields),
+                            $"{rom.GetField(Field.MachineName, ExcludeFields)}/",
+                            rom.GetField(Field.Name, ExcludeFields),
+                            rom.GetField(Field.SHA1, ExcludeFields),
+                            rom.GetField(Field.MD5, ExcludeFields),
+                            rom.GetField(Field.CRC, ExcludeFields),
+                        };
+
+                        svw.WriteValues(fields);
+
                         break;
                 }
 
-                sw.Flush();
+                svw.Flush();
             }
             catch (Exception ex)
             {

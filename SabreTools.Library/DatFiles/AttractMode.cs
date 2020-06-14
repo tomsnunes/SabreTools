@@ -121,10 +121,13 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                SeparatedValueWriter svw = new SeparatedValueWriter(fs, new UTF8Encoding(false));
+                svw.Quotes = false;
+                svw.Separator = ";";
+                svw.VerifyFieldCount = true;
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(svw);
 
                 // Write out each of the machines and roms
                 string lastgame = null;
@@ -153,7 +156,7 @@ namespace SabreTools.Library.DatFiles
 
                         // If we have a new game, output the beginning of the new item
                         if (lastgame == null || lastgame.ToLowerInvariant() != item.MachineName.ToLowerInvariant())
-                            WriteDatItem(sw, item, ignoreblanks);
+                            WriteDatItem(svw, item, ignoreblanks);
 
                         // If we have a "null" game (created by DATFromDir or something similar), log it to file
                         if (item.ItemType == ItemType.Rom
@@ -172,7 +175,7 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 Globals.Logger.Verbose($"File written!{Environment.NewLine}");
-                sw.Dispose();
+                svw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -187,31 +190,36 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="svw">SeparatedValueWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(SeparatedValueWriter svw)
         {
             try
             {
-                sw.Write("#Title;");
-                sw.Write("Name;");
-                sw.Write("Emulator;");
-                sw.Write("CloneOf");
-                sw.Write("Year;");
-                sw.Write("Manufacturer;");
-                sw.Write("Category;");
-                sw.Write("Players;");
-                sw.Write("Rotation;");
-                sw.Write("Control;");
-                sw.Write("Status;");
-                sw.Write("DisplayCount;");
-                sw.Write("DisplayType;");
-                sw.Write("AltRomname;");
-                sw.Write("AltTitle;");
-                sw.Write("Extra;");
-                sw.Write("Buttons\n");
+                string[] headers = new string[]
+                {
+                    "#Title",
+                    "Name",
+                    "Emulator",
+                    "CloneOf",
+                    "Year",
+                    "Manufacturer",
+                    "Category",
+                    "Players",
+                    "Rotation",
+                    "Control",
+                    "Status",
+                    "DisplayCount",
+                    "DisplayType",
+                    "AltRomname",
+                    "AltTitle",
+                    "Extra",
+                    "Buttons",
+                };
 
-                sw.Flush();
+                svw.WriteHeader(headers);
+
+                svw.Flush();
             }
             catch (Exception ex)
             {
@@ -225,11 +233,11 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out Game start using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="svw">SeparatedValueWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(SeparatedValueWriter svw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && (((Rom)datItem).Size == 0 || ((Rom)datItem).Size == -1)))
@@ -243,25 +251,30 @@ namespace SabreTools.Library.DatFiles
                 // Pre-process the item name
                 ProcessItemName(datItem, true);
 
-                sw.Write($"{datItem.GetField(Field.MachineName, ExcludeFields)};");
-                sw.Write($"{datItem.GetField(Field.Description, ExcludeFields)};");
-                sw.Write($"{FileName};");
-                sw.Write($"{datItem.GetField(Field.CloneOf, ExcludeFields)};");
-                sw.Write($"{datItem.GetField(Field.Year, ExcludeFields)};");
-                sw.Write($"{datItem.GetField(Field.Manufacturer, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.Category, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.Players, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.Rotation, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.Control, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.Status, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.DisplayCount, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.DisplayType, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.AltRomname, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.AltTitle, ExcludeFields)};");
-                sw.Write($"{datItem.GetField(Field.Comment, ExcludeFields)};");
-                sw.Write(";"); // $"{datItem.GetField(Field.Buttons, ExcludeFields)};");
+                string[] fields = new string[]
+                {
+                    datItem.GetField(Field.MachineName, ExcludeFields),
+                    datItem.GetField(Field.Description, ExcludeFields),
+                    FileName,
+                    datItem.GetField(Field.CloneOf, ExcludeFields),
+                    datItem.GetField(Field.Year, ExcludeFields),
+                    datItem.GetField(Field.Manufacturer, ExcludeFields),
+                    string.Empty, // datItem.GetField(Field.Category, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.Players, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.Rotation, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.Control, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.Status, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.DisplayCount, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.DisplayType, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.AltRomname, ExcludeFields)
+                    string.Empty, // datItem.GetField(Field.AltTitle, ExcludeFields)
+                    datItem.GetField(Field.Comment, ExcludeFields),
+                    string.Empty, // datItem.GetField(Field.Buttons, ExcludeFields)
+                };
 
-                sw.Flush();
+                svw.WriteValues(fields);
+
+                svw.Flush();
             }
             catch (Exception ex)
             {
