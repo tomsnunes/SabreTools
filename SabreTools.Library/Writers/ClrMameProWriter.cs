@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace SabreTools.Library.Tools
+namespace SabreTools.Library.Writers
 {
     /// <summary>
     /// ClrMamePro writer patterned heavily off of XmlTextWriter

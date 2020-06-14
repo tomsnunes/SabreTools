@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace SabreTools.Library.Tools
+namespace SabreTools.Library.Writers
 {
     public class SeparatedValueWriter : IDisposable
     {
