@@ -35,7 +35,7 @@ namespace SabreTools.Library.Writers
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException(nameof(value));
 
-            sw.WriteLine($"[{value.TrimStart('[').TrimEnd(']')}");
+            sw.WriteLine($"[{value.TrimStart('[').TrimEnd(']')}]");
         }
 
         /// <summary>

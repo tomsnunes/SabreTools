@@ -7,6 +7,7 @@ using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 using SabreTools.Library.Readers;
 using SabreTools.Library.Tools;
+using SabreTools.Library.Writers;
 using NaturalSort;
 
 namespace SabreTools.Library.DatFiles
@@ -355,6 +356,7 @@ namespace SabreTools.Library.DatFiles
                     MachineDescription = rominfo[4],
                     CloneOf = rominfo[1],
                     RomOf = rominfo[8],
+                    MergeTag = rominfo[9],
 
                     SystemID = sysid,
                     SourceID = srcid,
@@ -387,10 +389,10 @@ namespace SabreTools.Library.DatFiles
                     return false;
                 }
 
-                StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+                IniWriter iw = new IniWriter(fs, new UTF8Encoding(false));
 
                 // Write out the header
-                WriteHeader(sw);
+                WriteHeader(iw);
 
                 // Write out each of the machines and roms
                 string lastgame = null;
@@ -437,7 +439,7 @@ namespace SabreTools.Library.DatFiles
                         }
 
                         // Now, output the rom data
-                        WriteDatItem(sw, rom, ignoreblanks);
+                        WriteDatItem(iw, rom, ignoreblanks);
 
                         // Set the new data to compare against
                         lastgame = rom.MachineName;
@@ -445,7 +447,7 @@ namespace SabreTools.Library.DatFiles
                 }
 
                 Globals.Logger.Verbose("File written!" + Environment.NewLine);
-                sw.Dispose();
+                iw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)
@@ -460,26 +462,29 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DAT header using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="iw">IniWriter to output to</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteHeader(StreamWriter sw)
+        private bool WriteHeader(IniWriter iw)
         {
             try
             {
-                sw.Write("[CREDITS]\n");
-                sw.Write($"author={Author}\n");
-                sw.Write($"version={Version}\n");
-                sw.Write($"comment={Comment}\n");
-                sw.Write("[DAT]\n");
-                sw.Write("version=2.50\n");
-                sw.Write($"split={(ForceMerging == ForceMerging.Split ? "1" : "0")}\n");
-                sw.Write($"merge={(ForceMerging == ForceMerging.Full || ForceMerging == ForceMerging.Merged ? "1" : "0")}\n");
-                sw.Write("[EMULATOR]\n");
-                sw.Write($"refname={Name}\n");
-                sw.Write($"version={Description}\n");
-                sw.Write("[GAMES]\n");
+                iw.WriteSection("CREDITS");
+                iw.WriteKeyValuePair("author", Author);
+                iw.WriteKeyValuePair("version", Version);
+                iw.WriteKeyValuePair("comment", Comment);
 
-                sw.Flush();
+                iw.WriteSection("DAT");
+                iw.WriteKeyValuePair("version", "2.50");
+                iw.WriteKeyValuePair("split", ForceMerging == ForceMerging.Split ? "1" : "0");
+                iw.WriteKeyValuePair("merge", ForceMerging == ForceMerging.Full || ForceMerging == ForceMerging.Merged ? "1" : "0");
+
+                iw.WriteSection("EMULATOR");
+                iw.WriteKeyValuePair("refname", Name);
+                iw.WriteKeyValuePair("version", Description);
+
+                iw.WriteSection("GAMES");
+
+                iw.Flush();
             }
             catch (Exception ex)
             {
@@ -493,11 +498,11 @@ namespace SabreTools.Library.DatFiles
         /// <summary>
         /// Write out DatItem using the supplied StreamWriter
         /// </summary>
-        /// <param name="sw">StreamWriter to output to</param>
+        /// <param name="iw">IniWriter to output to</param>
         /// <param name="datItem">DatItem object to be output</param>
         /// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
         /// <returns>True if the data was written, false on error</returns>
-        private bool WriteDatItem(StreamWriter sw, DatItem datItem, bool ignoreblanks = false)
+        private bool WriteDatItem(IniWriter iw, DatItem datItem, bool ignoreblanks = false)
         {
             // If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
             if (ignoreblanks && (datItem.ItemType == ItemType.Rom && ((datItem as Rom).Size == 0 || (datItem as Rom).Size == -1)))
@@ -522,21 +527,22 @@ namespace SabreTools.Library.DatFiles
                 ProcessItemName(datItem, true);
 
                 // Build the state based on excluded fields
-                sw.Write($"¬{datItem.GetField(Field.CloneOf, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.CloneOf, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.CloneOf, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.CloneOf, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
                 if (string.IsNullOrWhiteSpace(datItem.MachineDescription))
-                    sw.Write($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
+                    iw.WriteString($"¬{datItem.GetField(Field.MachineName, ExcludeFields)}");
                 else
-                    sw.Write($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.CRC, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.Size, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.RomOf, ExcludeFields)}");
-                sw.Write($"¬{datItem.GetField(Field.Merge, ExcludeFields)}");
-                sw.Write("¬\n");
+                    iw.WriteString($"¬{datItem.GetField(Field.Description, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.Name, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.CRC, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.Size, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.RomOf, ExcludeFields)}");
+                iw.WriteString($"¬{datItem.GetField(Field.Merge, ExcludeFields)}");
+                iw.WriteString("¬");
+                iw.WriteLine();
 
-                sw.Flush();
+                iw.Flush();
             }
             catch (Exception ex)
             {
