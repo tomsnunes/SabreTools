@@ -623,7 +623,7 @@ namespace SabreTools.Library.DatFiles
                 WriteFooter(cmpw);
 
                 Globals.Logger.Verbose($"File written!{Environment.NewLine}");
-                cmpw.Close();
+                cmpw.Dispose();
                 fs.Dispose();
             }
             catch (Exception ex)

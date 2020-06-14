@@ -8,7 +8,7 @@ namespace SabreTools.Library.Writers
     /// ClrMamePro writer patterned heavily off of XmlTextWriter
     /// </summary>
     /// <see cref="https://referencesource.microsoft.com/#System.Xml/System/Xml/Core/XmlTextWriter.cs"/>
-    public class ClrMameProWriter
+    public class ClrMameProWriter : IDisposable
     {
         /// <summary>
         /// State machine state for use in the table
@@ -297,6 +297,15 @@ namespace SabreTools.Library.Writers
                 currentState = State.Closed;
                 textWriter.Close();
             }
+        }
+
+        /// <summary>
+        /// Close and dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
+            textWriter.Dispose();
         }
 
         /// <summary>

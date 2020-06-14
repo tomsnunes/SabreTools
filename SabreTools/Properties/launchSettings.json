@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SabreTools": {
+      "commandName": "Project",
+      "commandLineArgs": "--update --output-dir=B:\\_TEMP --output-type=xml \"B:\\_TEMP\\DEmul x86 v0.7 BUILD 111117.dat\""
+    }
+  }
+}
