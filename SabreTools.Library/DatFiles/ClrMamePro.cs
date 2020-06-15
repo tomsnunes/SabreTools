@@ -15,7 +15,6 @@ namespace SabreTools.Library.DatFiles
     /// <summary>
     /// Represents parsing and writing of a ClrMamePro DAT
     /// </summary>
-    /// TODO: Can there be a writer like XmlTextWriter for this? Or too inconsistent?
     internal class ClrMamePro : DatFile
     {
         /// <summary>
@@ -66,8 +65,7 @@ namespace SabreTools.Library.DatFiles
                     string normalizedValue = gc[1].Value.ToLowerInvariant();
 
                     // If we have a known header
-                    if (normalizedValue == "clrmamepro"
-                        || normalizedValue == "romvault")
+                    if (normalizedValue == "clrmamepro" || normalizedValue == "romvault")
                     {
                         ReadHeader(sr, keep);
                     }
@@ -240,11 +238,11 @@ namespace SabreTools.Library.DatFiles
                 {
                     containsItems = true;
                     ItemType temptype = ItemType.Rom;
-                    if (line.Trim().StartsWith("rom ("))
+                    if (trimmedline.StartsWith("rom ("))
                         temptype = ItemType.Rom;
-                    else if (line.Trim().StartsWith("disk ("))
+                    else if (trimmedline.StartsWith("disk ("))
                         temptype = ItemType.Disk;
-                    else if (line.Trim().StartsWith("sample"))
+                    else if (trimmedline.StartsWith("sample"))
                         temptype = ItemType.Sample;
 
                     // Create the proper DatItem based on the type

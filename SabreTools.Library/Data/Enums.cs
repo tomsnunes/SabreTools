@@ -441,6 +441,18 @@
     #region Reader related
 
     /// <summary>
+    /// Different types of CMP rows being parsed
+    /// </summary>
+    public enum CmpRowType
+    {
+        None,
+        TopLevel,
+        Standalone,
+        Internal,
+        Comment,
+    }
+
+    /// <summary>
     /// Different types of INI rows being parsed
     /// </summary>
     public enum IniRowType

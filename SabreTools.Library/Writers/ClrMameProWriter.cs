@@ -59,7 +59,7 @@ namespace SabreTools.Library.Writers
         /// <summary>
         /// Internal stream writer
         /// </summary>
-        private StreamWriter textWriter;
+        private StreamWriter sw;
 
         /// <summary>
         /// Stack for tracking current node
@@ -107,20 +107,9 @@ namespace SabreTools.Library.Writers
         /// </summary>
         public ClrMameProWriter(string filename)
         {
-            textWriter = new StreamWriter(filename);
+            sw = new StreamWriter(filename);
             Quotes = true;
-            stack = new TagInfo[10];
-            top = 0;
-        }
 
-        /// <summary>
-        /// Constructor for opening a write from a stream and encoding
-        /// </summary>
-        public ClrMameProWriter(Stream stream, Encoding encoding)
-        {
-            textWriter = new StreamWriter(stream, encoding);
-            Quotes = true;
-            
             // Element stack
             stack = new TagInfo[10];
             top = 0;
@@ -128,11 +117,17 @@ namespace SabreTools.Library.Writers
         }
 
         /// <summary>
-        /// Base stream for easy access
+        /// Constructor for opening a write from a stream and encoding
         /// </summary>
-        public Stream BaseStream
+        public ClrMameProWriter(Stream stream, Encoding encoding)
         {
-            get { return textWriter?.BaseStream ?? null; }
+            sw = new StreamWriter(stream, encoding);
+            Quotes = true;
+            
+            // Element stack
+            stack = new TagInfo[10];
+            top = 0;
+            stack[top].Init();
         }
 
         /// <summary>
@@ -145,8 +140,8 @@ namespace SabreTools.Library.Writers
                 AutoComplete(Token.StartElement);
                 PushStack();
                 stack[top].Name = name;
-                textWriter.Write(name);
-                textWriter.Write(" (");
+                sw.Write(name);
+                sw.Write(" (");
             }
             catch
             {
@@ -189,10 +184,10 @@ namespace SabreTools.Library.Writers
             try
             {
                 AutoComplete(Token.StartAttribute);
-                textWriter.Write(name);
-                textWriter.Write(" ");
+                sw.Write(name);
+                sw.Write(" ");
                 if (Quotes)
-                    textWriter.Write("\"");
+                    sw.Write("\"");
             }
             catch
             {
@@ -238,18 +233,18 @@ namespace SabreTools.Library.Writers
                     throw new ArgumentException();
 
                 AutoComplete(Token.Standalone);
-                textWriter.Write(name);
-                textWriter.Write(" ");
+                sw.Write(name);
+                sw.Write(" ");
                 if ((quoteOverride == null && Quotes)
                     || (quoteOverride == true))
                 {
-                    textWriter.Write("\"");
+                    sw.Write("\"");
                 }
-                textWriter.Write(value);
+                sw.Write(value);
                 if ((quoteOverride == null && Quotes)
                     || (quoteOverride == true))
                 {
-                    textWriter.Write("\"");
+                    sw.Write("\"");
                 }
             }
             catch
@@ -269,7 +264,7 @@ namespace SabreTools.Library.Writers
                 if (!string.IsNullOrEmpty(value))
                 {
                     AutoComplete(Token.Content);
-                    textWriter.Write(value);
+                    sw.Write(value);
                 }
             }
             catch
@@ -295,7 +290,7 @@ namespace SabreTools.Library.Writers
             finally
             {
                 currentState = State.Closed;
-                textWriter.Close();
+                sw.Close();
             }
         }
 
@@ -305,7 +300,7 @@ namespace SabreTools.Library.Writers
         public void Dispose()
         {
             Close();
-            textWriter.Dispose();
+            sw.Dispose();
         }
 
         /// <summary>
@@ -313,7 +308,7 @@ namespace SabreTools.Library.Writers
         /// </summary>
         public void Flush()
         {
-            textWriter.Flush();
+            sw.Flush();
         }
 
         /// <summary>
@@ -367,11 +362,11 @@ namespace SabreTools.Library.Writers
                     if (currentState == State.Attribute)
                     {
                         WriteEndAttributeQuote();
-                        textWriter.Write(' ');
+                        sw.Write(' ');
                     }
                     else if (currentState == State.Element)
                     {
-                        textWriter.Write(' ');
+                        sw.Write(' ');
                     }
 
                     break;
@@ -422,7 +417,7 @@ namespace SabreTools.Library.Writers
                 if (this.lastToken == Token.LongEndElement)
                 {
                     Indent(true);
-                    textWriter.Write(')');
+                    sw.Write(')');
                 }
 
                 top--;
@@ -440,7 +435,7 @@ namespace SabreTools.Library.Writers
         private void WriteEndStartTag(bool empty)
         {
             if (empty)
-                textWriter.Write(" )");
+                sw.Write(" )");
         }
 
         /// <summary>
@@ -449,7 +444,7 @@ namespace SabreTools.Library.Writers
         private void WriteEndAttributeQuote()
         {
             if (Quotes)
-                textWriter.Write("\"");
+                sw.Write("\"");
         }
 
         /// <summary>
@@ -459,15 +454,15 @@ namespace SabreTools.Library.Writers
         {
             if (top == 0)
             {
-                textWriter.WriteLine();
+                sw.WriteLine();
             }
             else if (!stack[top].Mixed)
             {
-                textWriter.WriteLine();
+                sw.WriteLine();
                 int i = beforeEndElement ? top - 1 : top;
                 for (; i > 0; i--)
                 {
-                    textWriter.Write('\t');
+                    sw.Write('\t');
                 }
             }
         }

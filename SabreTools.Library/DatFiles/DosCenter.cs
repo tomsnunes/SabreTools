@@ -96,7 +96,7 @@ namespace SabreTools.Library.DatFiles
                 // Some dats don't have the space between "Name:" and the dat name
                 if (line.Trim().StartsWith("Name:"))
                 {
-                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring(6).Trim() : Name);
+                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring("Name:".Length).Trim() : Name);
                     line = reader.ReadLine();
                     continue;
                 }
@@ -198,7 +198,7 @@ namespace SabreTools.Library.DatFiles
                                 && linegc[i] != "date"
                                 && linegc[i] != "crc")
                             {
-                                item.Name += "{linegc[i]}";
+                                item.Name += $"{linegc[i]}";
                             }
 
                             // Perform correction
