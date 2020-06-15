@@ -734,11 +734,11 @@ namespace SabreTools.Library.DatFiles
                 
                 if (!ExcludeFields[(int)Field.Infos] && datItem.Infos != null && datItem.Infos.Count > 0)
                 {
-                    foreach (Tuple<string, string> kvp in datItem.Infos)
+                    foreach (KeyValuePair<string, string> kvp in datItem.Infos)
                     {
                         xtw.WriteStartElement("info");
-                        xtw.WriteAttributeString("name", kvp.Item1);
-                        xtw.WriteAttributeString("value", kvp.Item2);
+                        xtw.WriteAttributeString("name", kvp.Key);
+                        xtw.WriteAttributeString("value", kvp.Value);
                         xtw.WriteEndElement();
                     }
                 }

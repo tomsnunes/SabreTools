@@ -699,8 +699,8 @@ namespace SabreTools.Library.DatFiles
             bool remUnicode)
         {
             // Prepare all internal variables
-            List<Tuple<string, string>> extensionToCrc = new List<Tuple<string, string>>();
-            List<Rom> roms = new List<Rom>();
+            var extensionToCrc = new List<KeyValuePair<string, string>>();
+            var roms = new List<Rom>();
 
             // If there's no subtree to the configuration, skip it
             if (reader == null)
@@ -724,7 +724,7 @@ namespace SabreTools.Library.DatFiles
                 {
                     case "romcrc":
                         extensionToCrc.Add(
-                            new Tuple<string, string>(
+                            new KeyValuePair<string, string>(
                                 reader.GetAttribute("extension") ?? string.Empty,
                                 reader.ReadElementContentAsString().ToLowerInvariant()));
                         break;
@@ -736,12 +736,12 @@ namespace SabreTools.Library.DatFiles
             }
 
             // Now process the roms with the proper information
-            foreach (Tuple<string, string> pair in extensionToCrc)
+            foreach (KeyValuePair<string, string> pair in extensionToCrc)
             {
                 roms.Add(new Rom()
                 {
-                    Name = (releaseNumber != "0" ? releaseNumber + " - " : string.Empty) + machineName + pair.Item1,
-                    CRC = Utilities.CleanHashData(pair.Item2, Constants.CRCLength),
+                    Name = (releaseNumber != "0" ? releaseNumber + " - " : string.Empty) + machineName + pair.Key,
+                    CRC = Utilities.CleanHashData(pair.Value, Constants.CRCLength),
 
                     ItemStatus = ItemStatus.None,
                 });

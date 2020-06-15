@@ -97,7 +97,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// List of info items
         /// </summary>
-        public List<Tuple<string, string>> Infos { get; set; }
+        public List<KeyValuePair<string, string>> Infos { get; set; }
 
         /// <summary>
         /// Type of the machine

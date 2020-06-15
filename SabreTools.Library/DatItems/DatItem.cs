@@ -450,7 +450,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// List of info items
         /// </summary>
-        public List<Tuple<string, string>> Infos
+        public List<KeyValuePair<string, string>> Infos
         {
             get
             {
@@ -514,7 +514,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Features provided to/by the item
         /// </summary>
-        public List<Tuple<string, string>> Features { get; set; }
+        public List<KeyValuePair<string, string>> Features { get; set; }
 
         /// <summary>
         /// Original hardware part name within an item
@@ -585,7 +585,7 @@ namespace SabreTools.Library.DatItems
                     fieldValue = this.PartInterface;
                     break;
                 case Field.Features:
-                    fieldValue = string.Join(", ", (this.Features ?? new List<Tuple<string, string>>()).Select(f => $"{f.Item1}={f.Item2}"));
+                    fieldValue = string.Join(";", (this.Features ?? new List<KeyValuePair<string, string>>()).Select(f => $"{f.Key}={f.Value}"));
                     break;
                 case Field.AreaName:
                     fieldValue = this.AreaName;
@@ -637,13 +637,13 @@ namespace SabreTools.Library.DatItems
                     fieldValue = this.RebuildTo;
                     break;
                 case Field.Devices:
-                    fieldValue = string.Join(", ", this.Devices ?? new List<string>());
+                    fieldValue = string.Join(";", this.Devices ?? new List<string>());
                     break;
                 case Field.SlotOptions:
-                    fieldValue = string.Join(", ", this.SlotOptions ?? new List<string>());
+                    fieldValue = string.Join(";", this.SlotOptions ?? new List<string>());
                     break;
                 case Field.Infos:
-                    fieldValue = string.Join(", ", (this.Infos ?? new List<Tuple<string, string>>()).Select(i => $"{i.Item1}={i.Item2}"));
+                    fieldValue = string.Join(";", (this.Infos ?? new List<KeyValuePair<string, string>>()).Select(i => $"{i.Key}={i.Value}"));
                     break;
                 case Field.MachineType:
                     fieldValue = this.MachineType.ToString();

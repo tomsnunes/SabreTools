@@ -161,7 +161,7 @@ namespace SabreTools.Library.DatFiles
                 Supported = Utilities.GetYesNo(reader.GetAttribute("supported")), // (yes|partial|no) "yes"
 
                 CloneOf = reader.GetAttribute("cloneof") ?? string.Empty,
-                Infos = new List<Tuple<string, string>>(),
+                Infos = new List<KeyValuePair<string, string>>(),
 
                 MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
             };
@@ -191,7 +191,7 @@ namespace SabreTools.Library.DatFiles
                         break;
 
                     case "info":
-                        machine.Infos.Add(new Tuple<string, string>(reader.GetAttribute("name"), reader.GetAttribute("value")));
+                        machine.Infos.Add(new KeyValuePair<string, string>(reader.GetAttribute("name"), reader.GetAttribute("value")));
                         reader.Read();
                         break;
 
@@ -258,7 +258,7 @@ namespace SabreTools.Library.DatFiles
             string key = string.Empty, areaname = string.Empty, partname = string.Empty, partinterface = string.Empty;
             string temptype = reader.Name;
             long? areasize = null;
-            List<Tuple<string, string>> features = new List<Tuple<string, string>>();
+            var features = new List<KeyValuePair<string, string>>();
             bool containsItems = false;
 
             while (!reader.EOF)
@@ -270,7 +270,7 @@ namespace SabreTools.Library.DatFiles
                     {
                         partname = string.Empty;
                         partinterface = string.Empty;
-                        features = new List<Tuple<string, string>>();
+                        features = new List<KeyValuePair<string, string>>();
                     }
 
                     if (reader.NodeType == XmlNodeType.EndElement && (reader.Name == "dataarea" || reader.Name == "diskarea"))
@@ -293,7 +293,7 @@ namespace SabreTools.Library.DatFiles
                         break;
 
                     case "feature":
-                        features.Add(new Tuple<string, string>(reader.GetAttribute("name"), reader.GetAttribute("feature")));
+                        features.Add(new KeyValuePair<string, string>(reader.GetAttribute("name"), reader.GetAttribute("feature")));
                         reader.Read();
                         break;
 
@@ -366,7 +366,7 @@ namespace SabreTools.Library.DatFiles
         private bool ReadDataArea(
             XmlReader reader,
             Machine machine,
-            List<Tuple<string, string>> features,
+            List<KeyValuePair<string, string>> features,
             string areaname,
             long? areasize,
             string partname,
@@ -479,7 +479,7 @@ namespace SabreTools.Library.DatFiles
         private bool ReadDiskArea(
             XmlReader reader,
             Machine machine,
-            List<Tuple<string, string>> features,
+            List<KeyValuePair<string, string>> features,
             string areaname,
             long? areasize,
             string partname,
@@ -755,11 +755,11 @@ namespace SabreTools.Library.DatFiles
 
                 if (!ExcludeFields[(int)Field.Infos] && datItem.Infos != null && datItem.Infos.Count > 0)
                 {
-                    foreach (Tuple<string, string> kvp in datItem.Infos)
+                    foreach (KeyValuePair<string, string> kvp in datItem.Infos)
                     {
                         xtw.WriteStartElement("info");
-                        xtw.WriteAttributeString("name", kvp.Item1);
-                        xtw.WriteAttributeString("value", kvp.Item2);
+                        xtw.WriteAttributeString("name", kvp.Key);
+                        xtw.WriteAttributeString("value", kvp.Value);
                         xtw.WriteEndElement();
                     }
                 }
@@ -823,11 +823,11 @@ namespace SabreTools.Library.DatFiles
 
                 if (!ExcludeFields[(int)Field.Features] && datItem.Features != null && datItem.Features.Count > 0)
                 {
-                    foreach (Tuple<string, string> kvp in datItem.Features)
+                    foreach (KeyValuePair<string, string> kvp in datItem.Features)
                     {
                         xtw.WriteStartElement("feature");
-                        xtw.WriteAttributeString("name", kvp.Item1);
-                        xtw.WriteAttributeString("value", kvp.Item2);
+                        xtw.WriteAttributeString("name", kvp.Key);
+                        xtw.WriteAttributeString("value", kvp.Value);
                         xtw.WriteEndElement();
                     }
                 }

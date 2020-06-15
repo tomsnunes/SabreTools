@@ -109,7 +109,7 @@ namespace SabreTools.Library.DatFiles
                 long size = -1;
                 ItemType itemType = ItemType.Rom;
                 ItemStatus status = ItemStatus.None;
-                List<Tuple<string, string>> features = null;
+                List<KeyValuePair<string, string>> features = null;
 
                 // Now we loop through and get values for everything
                 for (int i = 0; i < svr.HeaderValues.Count; i++)
@@ -293,12 +293,12 @@ namespace SabreTools.Library.DatFiles
                             break;
 
                         case "Machine.Infos":
-                            machine.Infos = new List<Tuple<string, string>>();
+                            machine.Infos = new List<KeyValuePair<string, string>>();
                             var infos = value.Split(';');
                             foreach (var info in infos)
                             {
                                 var infoPair = info.Split('=');
-                                machine.Infos.Add(new Tuple<string, string>(infoPair[0], infoPair[1]));
+                                machine.Infos.Add(new KeyValuePair<string, string>(infoPair[0], infoPair[1]));
                             }
 
                             break;
@@ -328,12 +328,12 @@ namespace SabreTools.Library.DatFiles
                             break;
 
                         case "DatItem.Features":
-                            features = new List<Tuple<string, string>>();
+                            features = new List<KeyValuePair<string, string>>();
                             var splitFeatures = value.Split(';');
                             foreach (var splitFeature in splitFeatures)
                             {
                                 var featurePair = splitFeature.Split('=');
-                                features.Add(new Tuple<string, string>(featurePair[0], featurePair[1]));
+                                features.Add(new KeyValuePair<string, string>(featurePair[0], featurePair[1]));
                             }
 
                             break;
