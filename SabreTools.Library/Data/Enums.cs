@@ -450,6 +450,7 @@
         Standalone,
         Internal,
         Comment,
+        EndTopLevel,
     }
 
     /// <summary>

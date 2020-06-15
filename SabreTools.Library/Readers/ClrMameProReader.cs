@@ -158,6 +158,11 @@ namespace SabreTools.Library.Readers
                         {
                             value = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
                         }
+                        // Default case
+                        else
+                        {
+                            value = linegc[++i].Replace("\"", string.Empty);
+                        }
                     }
                     else
                     {
@@ -167,6 +172,13 @@ namespace SabreTools.Library.Readers
                             value = key;
                             key = "status";
                         }
+                        // Special case for standalone sample
+                        else if (normalizedValue == "sample")
+                        {
+                            value = key;
+                            key = "name";
+                        }
+                        // Default case
                         else
                         {
                             value = linegc[++i].Replace("\"", string.Empty);
@@ -198,7 +210,7 @@ namespace SabreTools.Library.Readers
             {
                 Internal = null;
                 InternalName = null;
-                RowType = CmpRowType.None;
+                RowType = CmpRowType.EndTopLevel;
                 Standalone = null;
                 TopLevel = null;
             }

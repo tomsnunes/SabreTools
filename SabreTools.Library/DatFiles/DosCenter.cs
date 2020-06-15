@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
+using SabreTools.Library.Readers;
 using SabreTools.Library.Tools;
 using SabreTools.Library.Writers;
 using NaturalSort;
@@ -49,98 +50,107 @@ namespace SabreTools.Library.DatFiles
         {
             // Open a file reader
             Encoding enc = Utilities.GetEncoding(filename);
-            StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
+            ClrMameProReader cmpr = new ClrMameProReader(Utilities.TryOpenRead(filename), enc);
+            cmpr.DosCenter = true;
 
-            while (!sr.EndOfStream)
+            while (!cmpr.EndOfStream)
             {
-                string line = sr.ReadLine();
+                cmpr.ReadNextLine();
 
-                // If the line is the header or a game
-                if (Regex.IsMatch(line, Constants.HeaderPatternCMP))
+                // Ignore everything not top-level
+                if (cmpr.RowType != CmpRowType.TopLevel)
+                    continue;
+
+                // Switch on the top-level name
+                switch (cmpr.TopLevel.ToLowerInvariant())
                 {
-                    GroupCollection gc = Regex.Match(line, Constants.HeaderPatternCMP).Groups;
-                    string normalizedValue = gc[1].Value.ToLowerInvariant();
+                    // Header values
+                    case "doscenter":
+                        ReadHeader(cmpr);
+                        break;
 
-                    // If we have a known header
-                    if (normalizedValue == "doscenter")
-                        ReadHeader(sr, keep);
+                    // Sets
+                    case "game":
+                        ReadGame(cmpr, filename, sysid, srcid, clean, remUnicode);
+                        break;
 
-                    // If we have a game
-                    else if (normalizedValue == "game" )
-                        ReadGame(sr, filename, sysid, srcid, clean, remUnicode);
+                    default:
+                        break;
                 }
             }
 
-            sr.Dispose();
+            cmpr.Dispose();
         }
 
         /// <summary>
         /// Read header information
         /// </summary>
-        /// <param name="reader">StreamReader to use to parse the header</param>
-        /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
-        private void ReadHeader(StreamReader reader, bool keep)
+        /// <param name="cmpr">ClrMameProReader to use to parse the header</param>
+        private void ReadHeader(ClrMameProReader cmpr)
         {
             // If there's no subtree to the header, skip it
-            if (reader == null || reader.EndOfStream)
+            if (cmpr == null || cmpr.EndOfStream)
                 return;
 
-            // Otherwise, add what is possible
-            string line = reader.ReadLine();
-            while (!Regex.IsMatch(line, Constants.EndPatternCMP))
+            // While we don't hit an end element or end of stream
+            while (!cmpr.EndOfStream)
             {
-                // Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-                GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
-                string itemval = gc[2].Value.Replace("\"", string.Empty);
+                cmpr.ReadNextLine();
 
-                // Some dats don't have the space between "Name:" and the dat name
-                if (line.Trim().StartsWith("Name:"))
-                {
-                    Name = (string.IsNullOrWhiteSpace(Name) ? line.Substring("Name:".Length).Trim() : Name);
-                    line = reader.ReadLine();
+                // Ignore comments, internal items, and nothingness
+                if (cmpr.RowType == CmpRowType.None || cmpr.RowType == CmpRowType.Comment || cmpr.RowType == CmpRowType.Internal)
                     continue;
-                }
 
-                switch (gc[1].Value)
+                // If we reached the end of a section, break
+                if (cmpr.RowType == CmpRowType.EndTopLevel)
+                    break;
+
+                // If the standalone value is null, we skip
+                if (cmpr.Standalone == null)
+                    continue;
+
+                string itemKey = cmpr.Standalone?.Key.ToLowerInvariant().TrimEnd(':');
+                string itemVal = cmpr.Standalone?.Value;
+
+                // For all other cases
+                switch (itemKey)
                 {
-                    case "Name:":
-                        Name = (string.IsNullOrWhiteSpace(Name) ? itemval : Name);
+                    case "name":
+                        Name = (string.IsNullOrWhiteSpace(Name) ? itemVal : Name);
                         break;
-                    case "Description:":
-                        Description = (string.IsNullOrWhiteSpace(Description) ? itemval : Description);
+                    case "description":
+                        Description = (string.IsNullOrWhiteSpace(Description) ? itemVal : Description);
                         break;
-                    case "Version:":
-                        Version = (string.IsNullOrWhiteSpace(Version) ? itemval : Version);
+                    case "dersion":
+                        Version = (string.IsNullOrWhiteSpace(Version) ? itemVal : Version);
                         break;
-                    case "Date:":
-                        Date = (string.IsNullOrWhiteSpace(Date) ? itemval : Date);
+                    case "date":
+                        Date = (string.IsNullOrWhiteSpace(Date) ? itemVal : Date);
                         break;
-                    case "Author:":
-                        Author = (string.IsNullOrWhiteSpace(Author) ? itemval : Author);
+                    case "author":
+                        Author = (string.IsNullOrWhiteSpace(Author) ? itemVal : Author);
                         break;
-                    case "Homepage:":
-                        Homepage = (string.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
+                    case "homepage":
+                        Homepage = (string.IsNullOrWhiteSpace(Homepage) ? itemVal : Homepage);
                         break;
-                    case "Comment:":
-                        Comment = (string.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
+                    case "comment":
+                        Comment = (string.IsNullOrWhiteSpace(Comment) ? itemVal : Comment);
                         break;
                 }
-
-                line = reader.ReadLine();
             }
         }
 
         /// <summary>
         /// Read set information
         /// </summary>
-        /// <param name="reader">StreamReader to use to parse the header</param>
+        /// <param name="cmpr">ClrMameProReader to use to parse the header</param>
         /// <param name="filename">Name of the file to be parsed</param>
         /// <param name="sysid">System ID for the DAT</param>
         /// <param name="srcid">Source ID for the DAT</param>
         /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
         /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
         private void ReadGame(
-            StreamReader reader,
+            ClrMameProReader cmpr,
 
             // Standard Dat parsing
             string filename,
@@ -159,22 +169,46 @@ namespace SabreTools.Library.DatFiles
             };
 
             // If there's no subtree to the header, skip it
-            if (reader == null || reader.EndOfStream)
+            if (cmpr == null || cmpr.EndOfStream)
                 return;
 
-            // Otherwise, add what is possible
-            string line = reader.ReadLine();
-            while (!Regex.IsMatch(line, Constants.EndPatternCMP))
+            // While we don't hit an end element or end of stream
+            while (!cmpr.EndOfStream)
             {
-                // Item-specific lines have a known pattern
-                string trimmedline = line.Trim();
-                if (trimmedline.StartsWith("file ("))
+                cmpr.ReadNextLine();
+
+                // Ignore comments and nothingness
+                if (cmpr.RowType == CmpRowType.None || cmpr.RowType == CmpRowType.Comment)
+                    continue;
+
+                // If we reached the end of a section, break
+                if (cmpr.RowType == CmpRowType.EndTopLevel)
+                    break;
+
+                // Handle any standalone items
+                if (cmpr.RowType == CmpRowType.Standalone && cmpr.Standalone != null)
+                {
+                    string itemKey = cmpr.Standalone?.Key.ToLowerInvariant();
+                    string itemVal = cmpr.Standalone?.Value;
+
+                    switch (itemKey)
+                    {
+                        case "name":
+                            machine.Name = (itemVal.ToLowerInvariant().EndsWith(".zip") ? itemVal.Remove(itemVal.Length - 4) : itemVal);
+                            machine.Description = (itemVal.ToLowerInvariant().EndsWith(".zip") ? itemVal.Remove(itemVal.Length - 4) : itemVal);
+                            break;
+                    }
+                }
+
+                // Handle any internal items
+                else if (cmpr.RowType == CmpRowType.Internal
+                    && string.Equals(cmpr.InternalName, "file", StringComparison.OrdinalIgnoreCase)
+                    && cmpr.Internal != null)
                 {
                     containsItems = true;
-                    ItemType temptype = ItemType.Rom;
 
                     // Create the proper DatItem based on the type
-                    DatItem item = Utilities.GetDatItem(temptype);
+                    Rom item = Utilities.GetDatItem(ItemType.Rom) as Rom;
 
                     // Then populate it with information
                     item.CopyMachineInformation(machine);
@@ -183,71 +217,43 @@ namespace SabreTools.Library.DatFiles
                     item.System = filename;
                     item.SourceID = srcid;
 
-                    // Get the line split by spaces and quotes
-                    string[] linegc = Utilities.SplitLineAsCMP(line);
-
-                    // Loop over the specifics
-                    for (int i = 0; i < linegc.Length; i++)
+                    // Loop through all of the attributes
+                    foreach (var kvp in cmpr.Internal)
                     {
-                        // Names are not quoted, for some stupid reason
-                        if (linegc[i] == "name")
+                        string attrKey = kvp.Key;
+                        string attrVal = kvp.Value;
+
+                        switch (attrKey)
                         {
-                            // Get the name in order until we find the next flag
-                            while (++i < linegc.Length
-                                && linegc[i] != "size"
-                                && linegc[i] != "date"
-                                && linegc[i] != "crc")
-                            {
-                                item.Name += $"{linegc[i]}";
-                            }
+                            //If the item is empty, we automatically skip it because it's a fluke
+                            case "":
+                                continue;
 
-                            // Perform correction
-                            item.Name = item.Name.TrimStart();
-                            i--;
-                        }
+                            // Regular attributes
+                            case "name":
+                                item.Name = attrVal;
+                                break;
 
-                        // Get the size from the next part
-                        else if (linegc[i] == "size")
-                        {
-                            if (!Int64.TryParse(linegc[++i], out long tempsize))
-                                tempsize = 0;
+                            case "size":
+                                if (Int64.TryParse(attrVal, out long size))
+                                    item.Size = size;
+                                else
+                                    item.Size = -1;
 
-                            ((Rom)item).Size = tempsize;
-                        }
+                                break;
 
-                        // Get the date from the next part
-                        else if (linegc[i] == "date")
-                        {
-                            ((Rom)item).Date = $"{linegc[++i].Replace("\"", string.Empty)} {linegc[++i].Replace("\"", string.Empty)}";
-                        }
-
-                        // Get the CRC from the next part
-                        else if (linegc[i] == "crc")
-                        {
-                            ((Rom)item).CRC = linegc[++i].Replace("\"", string.Empty).ToLowerInvariant();
+                            case "crc":
+                                item.CRC = Utilities.CleanHashData(attrVal, Constants.CRCLength);
+                                break;
+                            case "date":
+                                item.Date = attrVal;
+                                break;
                         }
                     }
 
                     // Now process and add the rom
                     ParseAddHelper(item, clean, remUnicode);
-
-                    line = reader.ReadLine();
-                    continue;
                 }
-
-                // Game-specific lines have a known pattern
-                GroupCollection setgc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
-                string itemval = setgc[2].Value.Replace("\"", string.Empty);
-
-                switch (setgc[1].Value)
-                {
-                    case "name":
-                        machine.Name = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
-                        machine.Description = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
-                        break;
-                }
-
-                line = reader.ReadLine();
             }
 
             // If no items were found for this machine, add a Blank placeholder
