@@ -8,6 +8,7 @@ using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
 using SabreTools.Library.Writers;
 using NaturalSort;
+using SabreTools.Library.Readers;
 
 namespace SabreTools.Library.DatFiles
 {
@@ -52,159 +53,72 @@ namespace SabreTools.Library.DatFiles
         {
             // Open a file reader
             Encoding enc = Utilities.GetEncoding(filename);
-            StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
+            SeparatedValueReader svr = new SeparatedValueReader(Utilities.TryOpenRead(filename), enc);
+            svr.Header = true;
+            svr.Quotes = true;
+            svr.Separator = _delim;
+            svr.VerifyFieldCount = true;
 
-            // Create an empty list of columns to parse though
-            List<string> columns = new List<string>();
+            // If we're somehow at the end of the stream already, we can't do anything
+            if (svr.EndOfStream)
+                return;
 
-            long linenum = -1;
-            while (!sr.EndOfStream)
+            // Read in the header
+            svr.ReadHeader();
+
+            // Loop through all of the data lines
+            while (!svr.EndOfStream)
             {
-                string line = sr.ReadLine();
-                linenum++;
-
-                // Parse the first line, getting types from the column names
-                if (linenum == 0)
+                try
                 {
-                    string[] parsedColumns = line.Split(_delim);
-                    foreach (string parsed in parsedColumns)
-                    {
-                        switch (parsed.ToLowerInvariant().Trim('"'))
-                        {
-                            case "file":
-                            case "filename":
-                            case "file name":
-                                columns.Add("DatFile.FileName");
-                                break;
-
-                            case "internal name":
-                                columns.Add("DatFile.Name");
-                                break;
-
-                            case "description":
-                            case "dat description":
-                                columns.Add("DatFile.Description");
-                                break;
-
-                            case "game name":
-                            case "game":
-                            case "machine":
-                                columns.Add("Machine.Name");
-                                break;
-
-                            case "game description":
-                                columns.Add("Description");
-                                break;
-
-                            case "type":
-                                columns.Add("DatItem.Type");
-                                break;
-
-                            case "rom":
-                            case "romname":
-                            case "rom name":
-                            case "name":
-                                columns.Add("Rom.Name");
-                                break;
-
-                            case "disk":
-                            case "diskname":
-                            case "disk name":
-                                columns.Add("Disk.Name");
-                                break;
-
-                            case "size":
-                                columns.Add("DatItem.Size");
-                                break;
-
-                            case "crc":
-                            case "crc hash":
-                                columns.Add("DatItem.CRC");
-                                break;
-
-                            case "md5":
-                            case "md5 hash":
-                                columns.Add("DatItem.MD5");
-                                break;
-
-                            case "ripemd":
-                            case "ripemd160":
-                            case "ripemd hash":
-                            case "ripemd160 hash":
-                                columns.Add("DatItem.RIPEMD160");
-                                break;
-
-                            case "sha1":
-                            case "sha-1":
-                            case "sha1 hash":
-                            case "sha-1 hash":
-                                columns.Add("DatItem.SHA1");
-                                break;
-
-                            case "sha256":
-                            case "sha-256":
-                            case "sha256 hash":
-                            case "sha-256 hash":
-                                columns.Add("DatItem.SHA256");
-                                break;
-
-                            case "sha384":
-                            case "sha-384":
-                            case "sha384 hash":
-                            case "sha-384 hash":
-                                columns.Add("DatItem.SHA384");
-                                break;
-
-                            case "sha512":
-                            case "sha-512":
-                            case "sha512 hash":
-                            case "sha-512 hash":
-                                columns.Add("DatItem.SHA512");
-                                break;
-
-                            case "nodump":
-                            case "no dump":
-                            case "status":
-                            case "item status":
-                                columns.Add("DatItem.Nodump");
-                                break;
-
-                            case "date":
-                                columns.Add("DatItem.Date");
-                                break;
-
-                            default:
-                                columns.Add("INVALID");
-                                break;
-                        }
-                    }
-
-                    continue;
+                    // Get the current line, split and parse
+                    svr.ReadNextLine();
                 }
-
-                // Otherwise, we want to split the line and parse
-                string[] parsedLine = line.Split(_delim);
-
-                // If the line doesn't have the correct number of columns, we log and skip
-                if (parsedLine.Length != columns.Count)
+                catch (InvalidDataException)
                 {
-                    Globals.Logger.Warning($"Malformed line found in '{filename}' at line {linenum}");
+                    Globals.Logger.Warning($"Malformed line found in '{filename}' at line {svr.LineNumber}");
                     continue;
                 }
 
                 // Set the output item information
-                string machineName = null, machineDesc = null, name = null, crc = null, md5 = null,
-                    ripemd160 = null, sha1 = null, sha256 = null, sha384 = null, sha512 = null, date = null;
+                Machine machine = new Machine();
+
+                bool? def = null,
+                    writable = null,
+                    optional = null;
+                string name = null,
+                    partName = null,
+                    partInterface = null,
+                    areaName = null,
+                    biosDescription = null,
+                    crc = null,
+                    md5 = null,
+                    ripemd160 = null,
+                    sha1 = null,
+                    sha256 = null,
+                    sha384 = null,
+                    sha512 = null,
+                    merge = null,
+                    region = null,
+                    index = null,
+                    language = null,
+                    date = null,
+                    bios = null,
+                    offset = null;
+                long? areaSize = null;
                 long size = -1;
                 ItemType itemType = ItemType.Rom;
                 ItemStatus status = ItemStatus.None;
+                List<Tuple<string, string>> features = null;
 
                 // Now we loop through and get values for everything
-                for (int i = 0; i < columns.Count; i++)
+                for (int i = 0; i < svr.HeaderValues.Count; i++)
                 {
-                    string value = parsedLine[i].Trim('"');
-                    switch (columns[i])
+                    string value = svr.Line[i];
+                    switch (GetNormalizedHeader(svr.HeaderValues[i]))
                     {
+                        #region DatFile
+
                         case "DatFile.FileName":
                             FileName = (string.IsNullOrWhiteSpace(FileName) ? value : FileName);
                             break;
@@ -217,21 +131,243 @@ namespace SabreTools.Library.DatFiles
                             Description = (string.IsNullOrWhiteSpace(Description) ? value : Description);
                             break;
 
-                        case "Machine.Name":
-                            machineName = value;
+                        case "DatFile.RootDir":
+                            RootDir = (string.IsNullOrWhiteSpace(RootDir) ? value : RootDir);
                             break;
 
-                        case "Description":
-                            machineDesc = value;
+                        case "DatFile.Category":
+                            Category = (string.IsNullOrWhiteSpace(Category) ? value : Category);
                             break;
+
+                        case "DatFile.Version":
+                            Version = (string.IsNullOrWhiteSpace(Version) ? value : Version);
+                            break;
+
+                        case "DatFile.Date":
+                            Date = (string.IsNullOrWhiteSpace(Date) ? value : Date);
+                            break;
+
+                        case "DatFile.Author":
+                            Author = (string.IsNullOrWhiteSpace(Author) ? value : Author);
+                            break;
+
+                        case "DatFile.Email":
+                            Email = (string.IsNullOrWhiteSpace(Email) ? value : Email);
+                            break;
+
+                        case "DatFile.Homepage":
+                            Homepage = (string.IsNullOrWhiteSpace(Homepage) ? value : Homepage);
+                            break;
+
+                        case "DatFile.Url":
+                            Url = (string.IsNullOrWhiteSpace(Url) ? value : Url);
+                            break;
+
+                        case "DatFile.Comment":
+                            Comment = (string.IsNullOrWhiteSpace(Comment) ? value : Comment);
+                            break;
+
+                        case "DatFile.Header":
+                            Header = (string.IsNullOrWhiteSpace(Header) ? value : Header);
+                            break;
+
+                        case "DatFile.Type":
+                            Type = (string.IsNullOrWhiteSpace(Type) ? value : Type);
+                            break;
+
+                        case "DatFile.ForceMerging":
+                            ForceMerging = (ForceMerging == ForceMerging.None ? Utilities.GetForceMerging(value) : ForceMerging);
+                            break;
+
+                        case "DatFile.ForceNodump":
+                            ForceNodump = (ForceNodump == ForceNodump.None ? Utilities.GetForceNodump(value) : ForceNodump);
+                            break;
+
+                        case "DatFile.ForcePacking":
+                            ForcePacking = (ForcePacking == ForcePacking.None ? Utilities.GetForcePacking(value) : ForcePacking);
+                            break;
+
+                        #endregion
+
+                        #region Machine
+
+                        case "Machine.Name":
+                            machine.Name = value;
+                            break;
+
+                        case "Machine.Comment":
+                            machine.Comment = value;
+                            break;
+
+                        case "Machine.Description":
+                            machine.Description = value;
+                            break;
+
+                        case "Machine.Year":
+                            machine.Year = value;
+                            break;
+
+                        case "Machine.Manufacturer":
+                            machine.Manufacturer = value;
+                            break;
+
+                        case "Machine.Publisher":
+                            machine.Publisher = value;
+                            break;
+
+                        case "Machine.RomOf":
+                            machine.RomOf = value;
+                            break;
+
+                        case "Machine.CloneOf":
+                            machine.CloneOf = value;
+                            break;
+
+                        case "Machine.SampleOf":
+                            machine.SampleOf = value;
+                            break;
+
+                        case "Machine.Supported":
+                            switch (value.ToLowerInvariant())
+                            {
+                                case "yes":
+                                    machine.Supported = true;
+                                    break;
+                                case "no":
+                                    machine.Supported = false;
+                                    break;
+                                case "partial":
+                                default:
+                                    machine.Supported = null;
+                                    break;
+                            }
+
+                            break;
+
+                        case "Machine.SourceFile":
+                            machine.SourceFile = value;
+                            break;
+
+                        case "Machine.Runnable":
+                            switch (value.ToLowerInvariant())
+                            {
+                                case "yes":
+                                    machine.Runnable = true;
+                                    break;
+                                case "no":
+                                    machine.Runnable = false;
+                                    break;
+                                default:
+                                    machine.Runnable = null;
+                                    break;
+                            }
+
+                            break;
+
+                        case "Machine.Board":
+                            machine.Board = value;
+                            break;
+
+                        case "Machine.RebuildTo":
+                            machine.RebuildTo = value;
+                            break;
+
+                        case "Machine.Devices":
+                            machine.Devices = new List<string>();
+                            var devices = value.Split(';');
+                            foreach (var device in devices)
+                            {
+                                machine.Devices.Add(device);
+                            }
+
+                            break;
+
+                        case "Machine.SlotOptions":
+                            machine.SlotOptions = new List<string>();
+                            var slotOptions = value.Split(';');
+                            foreach (var slotOption in slotOptions)
+                            {
+                                machine.SlotOptions.Add(slotOption);
+                            }
+
+                            break;
+
+                        case "Machine.Infos":
+                            machine.Infos = new List<Tuple<string, string>>();
+                            var infos = value.Split(';');
+                            foreach (var info in infos)
+                            {
+                                var infoPair = info.Split('=');
+                                machine.Infos.Add(new Tuple<string, string>(infoPair[0], infoPair[1]));
+                            }
+
+                            break;
+
+                        case "Machine.MachineType":
+                            machine.MachineType = Utilities.GetMachineType(value);
+                            break;
+
+                        #endregion
+
+                        #region DatItem
 
                         case "DatItem.Type":
                             itemType = Utilities.GetItemType(value) ?? ItemType.Rom;
                             break;
 
-                        case "Rom.Name":
-                        case "Disk.Name":
+                        case "DatItem.Name":
                             name = string.IsNullOrWhiteSpace(value) ? name : value;
+                            break;
+
+                        case "DatItem.PartName":
+                            partName = string.IsNullOrWhiteSpace(value) ? partName : value;
+                            break;
+
+                        case "DatItem.PartInterface":
+                            partInterface = string.IsNullOrWhiteSpace(value) ? partInterface : value;
+                            break;
+
+                        case "DatItem.Features":
+                            features = new List<Tuple<string, string>>();
+                            var splitFeatures = value.Split(';');
+                            foreach (var splitFeature in splitFeatures)
+                            {
+                                var featurePair = splitFeature.Split('=');
+                                features.Add(new Tuple<string, string>(featurePair[0], featurePair[1]));
+                            }
+
+                            break;
+
+                        case "DatItem.AreaName":
+                            areaName = string.IsNullOrWhiteSpace(value) ? areaName : value;
+                            break;
+
+                        case "DatItem.AreaSize":
+                            if (Int64.TryParse(value, out long tempAreaSize))
+                                areaSize = tempAreaSize;
+                            else
+                                areaSize = null;
+
+                            break;
+
+                        case "DatItem.Default":
+                            switch (value.ToLowerInvariant())
+                            {
+                                case "yes":
+                                    def = true;
+                                    break;
+                                case "no":
+                                    def = false;
+                                    break;
+                                default:
+                                    def = null;
+                                    break;
+                            }
+
+                            break;
+
+                        case "DatItem.Description":
+                            biosDescription = string.IsNullOrWhiteSpace(value) ? biosDescription : value;
                             break;
 
                         case "DatItem.Size":
@@ -268,12 +404,75 @@ namespace SabreTools.Library.DatFiles
                             sha512 = Utilities.CleanHashData(value, Constants.SHA512Length);
                             break;
 
-                        case "DatItem.Nodump":
+                        case "DatItem.Merge":
+                            merge = string.IsNullOrWhiteSpace(value) ? merge : value;
+                            break;
+
+                        case "DatItem.Region":
+                            region = string.IsNullOrWhiteSpace(value) ? region : value;
+                            break;
+
+                        case "DatItem.Index":
+                            index = string.IsNullOrWhiteSpace(value) ? index : value;
+                            break;
+
+                        case "DatItem.Writable":
+                            switch (value.ToLowerInvariant())
+                            {
+                                case "yes":
+                                    writable = true;
+                                    break;
+                                case "no":
+                                    writable = false;
+                                    break;
+                                default:
+                                    writable = null;
+                                    break;
+                            }
+
+                            break;
+
+                        case "DatItem.Optional":
+                            switch (value.ToLowerInvariant())
+                            {
+                                case "yes":
+                                    optional = true;
+                                    break;
+                                case "no":
+                                    optional = false;
+                                    break;
+                                default:
+                                    optional = null;
+                                    break;
+                            }
+
+                            break;
+
+                        case "DatItem.Status":
                             status = Utilities.GetItemStatus(value);
+                            break;
+
+                        case "DatItem.Language":
+                            language = string.IsNullOrWhiteSpace(value) ? language : value;
                             break;
 
                         case "DatItem.Date":
                             date = value;
+                            break;
+
+                        case "DatItem.Bios":
+                            bios = string.IsNullOrWhiteSpace(value) ? bios : value;
+                            break;
+
+                        case "DatItem.Offset":
+                            offset = string.IsNullOrWhiteSpace(value) ? offset : value;
+                            break;
+
+                        #endregion
+
+                        case "INVALID":
+                        default:
+                            // No-op, we don't even care right now
                             break;
                     }
                 }
@@ -285,11 +484,14 @@ namespace SabreTools.Library.DatFiles
                         Archive archive = new Archive()
                         {
                             Name = name,
-
-                            MachineName = machineName,
-                            MachineDescription = machineDesc,
+                            PartName = partName,
+                            PartInterface = partInterface,
+                            Features = features,
+                            AreaName = areaName,
+                            AreaSize = areaSize,
                         };
 
+                        archive.CopyMachineInformation(machine);
                         ParseAddHelper(archive, clean, remUnicode);
                         break;
 
@@ -297,11 +499,17 @@ namespace SabreTools.Library.DatFiles
                         BiosSet biosset = new BiosSet()
                         {
                             Name = name,
+                            PartName = partName,
+                            PartInterface = partInterface,
+                            Features = features,
+                            AreaName = areaName,
+                            AreaSize = areaSize,
 
-                            MachineName = machineName,
-                            Description = machineDesc,
+                            Description = biosDescription,
+                            Default = def,
                         };
 
+                        biosset.CopyMachineInformation(machine);
                         ParseAddHelper(biosset, clean, remUnicode);
                         break;
 
@@ -309,19 +517,27 @@ namespace SabreTools.Library.DatFiles
                         Disk disk = new Disk()
                         {
                             Name = name,
+                            PartName = partName,
+                            PartInterface = partInterface,
+                            Features = features,
+                            AreaName = areaName,
+                            AreaSize = areaSize,
+
                             MD5 = md5,
                             RIPEMD160 = ripemd160,
                             SHA1 = sha1,
                             SHA256 = sha256,
                             SHA384 = sha384,
                             SHA512 = sha512,
-
-                            MachineName = machineName,
-                            MachineDescription = machineDesc,
-
+                            MergeTag = merge,
+                            Region = region,
+                            Index = index,
+                            Writable = writable,
                             ItemStatus = status,
+                            Optional = optional,
                         };
 
+                        disk.CopyMachineInformation(machine);
                         ParseAddHelper(disk, clean, remUnicode);
                         break;
 
@@ -329,11 +545,19 @@ namespace SabreTools.Library.DatFiles
                         Release release = new Release()
                         {
                             Name = name,
+                            PartName = partName,
+                            PartInterface = partInterface,
+                            Features = features,
+                            AreaName = areaName,
+                            AreaSize = areaSize,
 
-                            MachineName = machineName,
-                            MachineDescription = machineDesc,
+                            Region = region,
+                            Language = language,
+                            Date = date,
+                            Default = default,
                         };
 
+                        release.CopyMachineInformation(machine);
                         ParseAddHelper(release, clean, remUnicode);
                         break;
 
@@ -341,6 +565,13 @@ namespace SabreTools.Library.DatFiles
                         Rom rom = new Rom()
                         {
                             Name = name,
+                            PartName = partName,
+                            PartInterface = partInterface,
+                            Features = features,
+                            AreaName = areaName,
+                            AreaSize = areaSize,
+
+                            Bios = bios,
                             Size = size,
                             CRC = crc,
                             MD5 = md5,
@@ -349,14 +580,15 @@ namespace SabreTools.Library.DatFiles
                             SHA256 = sha256,
                             SHA384 = sha384,
                             SHA512 = sha512,
+                            MergeTag = merge,
+                            Region = region,
+                            Offset = offset,
                             Date = date,
-
-                            MachineName = machineName,
-                            MachineDescription = machineDesc,
-
                             ItemStatus = status,
+                            Optional = optional,
                         };
 
+                        rom.CopyMachineInformation(machine);
                         ParseAddHelper(rom, clean, remUnicode);
                         break;
 
@@ -364,14 +596,294 @@ namespace SabreTools.Library.DatFiles
                         Sample sample = new Sample()
                         {
                             Name = name,
-
-                            MachineName = machineName,
-                            MachineDescription = machineDesc,
+                            PartName = partName,
+                            PartInterface = partInterface,
+                            Features = features,
+                            AreaName = areaName,
+                            AreaSize = areaSize,
                         };
 
+                        sample.CopyMachineInformation(machine);
                         ParseAddHelper(sample, clean, remUnicode);
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Get normalized header value for a given separated value header field
+        /// </summary>
+        private string GetNormalizedHeader(string header)
+        {
+            switch (header.ToLowerInvariant())
+            {
+                #region DatFile
+
+                case "file":
+                case "filename":
+                case "file name":
+                    return "DatFile.FileName";
+
+                case "datname":
+                case "dat name":
+                case "internalname":
+                case "internal name":
+                    return "DatFile.Name";
+
+                case "description":
+                case "dat description":
+                    return "DatFile.Description";
+
+                case "rootdir":
+                case "root dir":
+                    return "DatFile.RootDir";
+
+                case "category":
+                    return "DatFile.Category";
+
+                case "version":
+                    return "DatFile.Version";
+
+                case "datdate":
+                case "dat date":
+                    return "DatFile.Date";
+
+                case "author":
+                    return "DatFile.Author";
+
+                case "email":
+                    return "DatFile.Email";
+
+                case "homepage":
+                    return "DatFile.Homepage";
+
+                case "url":
+                    return "DatFile.Url";
+
+                case "datcomment":
+                case "dat comment":
+                    return "DatFile.Comment";
+
+                case "header":
+                    return "DatFile.Header";
+
+                case "dattype":
+                case "dat type":
+                    return "DatFile.Type";
+
+                case "forcemerging":
+                case "force merging":
+                    return "DatFile.ForceMerging";
+
+                case "forcenodump":
+                case "force nodump":
+                    return "DatFile.ForceNodump";
+
+                case "forcepacking":
+                case "force packing":
+                    return "DatFile.ForcePacking";
+
+                #endregion
+
+                #region Machine
+
+                case "game":
+                case "gamename":
+                case "game name":
+                case "machine":
+                case "machinename":
+                case "machine name":
+                    return "Machine.Name";
+
+                case "comment":
+                    return "Machine.Comment";
+
+                case "gamedescription":
+                case "game description":
+                case "machinedescription":
+                case "machine description":
+                    return "Machine.Description";
+
+                case "year":
+                    return "Machine.Year";
+
+                case "manufacturer":
+                    return "Machine.Manufacturer";
+
+                case "publisher":
+                    return "Machine.Publisher";
+
+                case "romof":
+                    return "Machine.RomOf";
+
+                case "cloneof":
+                    return "Machine.CloneOf";
+
+                case "sampleof":
+                    return "Machine.SampleOf";
+
+                case "supported":
+                    return "Machine.Supported";
+
+                case "sourcefile":
+                case "source file":
+                    return "Machine.SourceFile";
+
+                case "runnable":
+                    return "Machine.Runnable";
+
+                case "board":
+                    return "Machine.Board";
+
+                case "rebuildto":
+                case "rebuild to":
+                    return "Machine.RebuildTo";
+
+                case "devices":
+                    return "Machine.Devices";
+
+                case "slotoptions":
+                case "slot options":
+                    return "Machine.SlotOptions";
+
+                case "infos":
+                    return "Machine.Infos";
+
+                case "gametype":
+                case "game type":
+                case "machinetype":
+                case "machine type":
+                    return "Machine.MachineType";
+
+                #endregion
+
+                #region DatItem
+
+                case "itemtype":
+                case "item type":
+                case "type":
+                    return "DatItem.Type";
+
+                case "disk":
+                case "diskname":
+                case "disk name":
+                case "item":
+                case "itemname":
+                case "item name":
+                case "name":
+                case "rom":
+                case "romname":
+                case "rom name":
+                    return "DatItem.Name";
+
+                case "partname":
+                case "part name":
+                    return "DatItem.PartName";
+
+                case "partinterface":
+                case "part interface":
+                    return "DatItem.PartInterface";
+
+                case "features":
+                    return "DatItem.Features";
+
+                case "areaname":
+                case "area name":
+                    return "DatItem.AreaName";
+
+                case "areasize":
+                case "area size":
+                    return "DatItem.AreaSize";
+
+                case "default":
+                    return "DatItem.Default";
+
+                case "biosdescription":
+                case "bios description":
+                    return "DatItem.Description";
+
+                case "itemsize":
+                case "item size":
+                case "size":
+                    return "DatItem.Size";
+
+                case "crc":
+                case "crc hash":
+                    return "DatItem.CRC";
+
+                case "md5":
+                case "md5 hash":
+                    return "DatItem.MD5";
+
+                case "ripemd":
+                case "ripemd160":
+                case "ripemd hash":
+                case "ripemd160 hash":
+                    return "DatItem.RIPEMD160";
+
+                case "sha1":
+                case "sha-1":
+                case "sha1 hash":
+                case "sha-1 hash":
+                    return "DatItem.SHA1";
+
+                case "sha256":
+                case "sha-256":
+                case "sha256 hash":
+                case "sha-256 hash":
+                    return "DatItem.SHA256";
+
+                case "sha384":
+                case "sha-384":
+                case "sha384 hash":
+                case "sha-384 hash":
+                    return "DatItem.SHA384";
+
+                case "sha512":
+                case "sha-512":
+                case "sha512 hash":
+                case "sha-512 hash":
+                    return "DatItem.SHA512";
+
+                case "merge":
+                case "mergetag":
+                case "merge tag":
+                    return "DatItem.Merge";
+
+                case "region":
+                    return "DatItem.Region";
+
+                case "index":
+                    return "DatItem.Index";
+
+                case "writable":
+                    return "DatItem.Writable";
+
+                case "optional":
+                    return "DatItem.Optional";
+
+                case "nodump":
+                case "no dump":
+                case "status":
+                case "item status":
+                    return "DatItem.Status";
+
+                case "language":
+                    return "DatItem.Language";
+
+                case "date":
+                    return "DatItem.Date";
+
+                case "bios":
+                    return "DatItem.Bios";
+
+                case "offset":
+                    return "DatItem.Offset";
+
+                #endregion
+
+                default:
+                    return "INVALID";
             }
         }
 

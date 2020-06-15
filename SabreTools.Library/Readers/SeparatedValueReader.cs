@@ -46,6 +46,11 @@ namespace SabreTools.Library.Readers
         public List<string> Line { get; private set; } = null;
 
         /// <summary>
+        /// Get the current line number
+        /// </summary>
+        public long LineNumber { get; private set; } = -1;
+
+        /// <summary>
         /// Assume that values are wrapped in quotes
         /// </summary>
         public bool Quotes { get; set; } = true;
@@ -99,6 +104,7 @@ namespace SabreTools.Library.Readers
                 return false;
 
             string fullLine = sr.ReadLine();
+            LineNumber++;
 
             // If we have quotes, we need to split specially
             if (Quotes)
