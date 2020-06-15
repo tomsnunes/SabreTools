@@ -397,7 +397,7 @@ namespace SabreTools.Library.DatFiles
 
                 SeparatedValueWriter svw = new SeparatedValueWriter(fs, new UTF8Encoding(false));
                 svw.Quotes = true;
-                svw.Separator = this._delim.ToString();
+                svw.Separator = this._delim;
                 svw.VerifyFieldCount = true;
 
                 // Write out the header

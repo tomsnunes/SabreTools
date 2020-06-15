@@ -32,9 +32,9 @@ namespace SabreTools.Library.Writers
         public bool Quotes { get; set; } = true;
 
         /// <summary>
-        /// Set what string should be used as a separator
+        /// Set what character should be used as a separator
         /// </summary>
-        public string Separator { get; set; } = ",";
+        public char Separator { get; set; } = ',';
 
         /// <summary>
         /// Set if field count should be verified from the first row
@@ -79,7 +79,7 @@ namespace SabreTools.Library.Writers
                 throw new ArgumentException(nameof(sw));
 
             // If the separator character is invalid, we error
-            if (string.IsNullOrEmpty(Separator))
+            if (Separator == default(char))
                 throw new ArgumentException(nameof(Separator));
 
             // If we have the first row, set the bool and the field count

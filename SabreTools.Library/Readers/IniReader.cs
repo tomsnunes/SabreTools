@@ -134,7 +134,7 @@ namespace SabreTools.Library.Readers
         }
 
         /// <summary>
-        /// Dispose of the reader
+        /// Dispose of the underlying reader
         /// </summary>
         public void Dispose()
         {

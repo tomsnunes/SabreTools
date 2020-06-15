@@ -124,7 +124,7 @@ namespace SabreTools.Library.DatFiles
 
                 SeparatedValueWriter svw = new SeparatedValueWriter(fs, new UTF8Encoding(false));
                 svw.Quotes = false;
-                svw.Separator = "  ";
+                svw.Separator = ' ';
                 svw.VerifyFieldCount = true;
 
                 // Get a properly sorted set of keys
