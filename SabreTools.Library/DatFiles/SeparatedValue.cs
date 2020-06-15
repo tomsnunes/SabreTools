@@ -1026,6 +1026,7 @@ namespace SabreTools.Library.DatFiles
                     return true;
 
                 // Build the state based on excluded fields
+                // TODO: Can we have some way of saying what fields to write out? Support for read extends to all fields now
                 string[] fields = new string[14]; // 17;
                 fields[0] = FileName;
                 fields[1] = Name;
