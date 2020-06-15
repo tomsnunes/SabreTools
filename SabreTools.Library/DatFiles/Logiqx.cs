@@ -847,8 +847,12 @@ namespace SabreTools.Library.DatFiles
                     if (!string.IsNullOrWhiteSpace(Header))
                         xtw.WriteAttributeString("header", Header);
 
+                    // End clrmamepro
                     xtw.WriteEndElement();
                 }
+
+                // End header
+                xtw.WriteEndElement();
 
                 xtw.Flush();
             }
