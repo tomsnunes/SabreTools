@@ -7,6 +7,7 @@ using SabreTools.Library.Data;
 using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
 using NaturalSort;
+using Newtonsoft.Json;
 
 namespace SabreTools.Library.DatItems
 {
@@ -17,7 +18,7 @@ namespace SabreTools.Library.DatItems
     {
         #region Protected instance variables
 
-        // Machine information
+        [JsonIgnore]
         protected Machine _machine = new Machine();
 
         #endregion
@@ -29,16 +30,19 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Name of the item
         /// </summary>
+        [JsonProperty("name")]
         public string Name { get; set; }
 
         /// <summary>
         /// Item type for outputting
         /// </summary>
+        [JsonIgnore]
         public ItemType ItemType { get; set; }
 
         /// <summary>
         /// Duplicate type when compared to another item
         /// </summary>
+        [JsonIgnore]
         public DupeType DupeType { get; set; }
 
         #endregion
@@ -48,6 +52,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Name of the machine associated with the item
         /// </summary>
+        [JsonIgnore]
         public string MachineName
         {
             get
@@ -73,6 +78,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Additional notes on the machine
         /// </summary>
+        [JsonIgnore]
         public string Comment
         {
             get
@@ -98,6 +104,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Extended description of the machine
         /// </summary>
+        [JsonIgnore]
         public string MachineDescription
         {
             get
@@ -123,6 +130,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine year(s) of release/manufacture
         /// </summary>
+        [JsonIgnore]
         public string Year
         {
             get
@@ -148,6 +156,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine manufacturer, if available
         /// </summary>
+        [JsonIgnore]
         public string Manufacturer
         {
             get
@@ -173,6 +182,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine publisher, if available
         /// </summary>
+        [JsonIgnore]
         public string Publisher
         {
             get
@@ -198,6 +208,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine romof parent
         /// </summary>
+        [JsonIgnore]
         public string RomOf
         {
             get
@@ -223,6 +234,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine cloneof parent
         /// </summary>
+        [JsonIgnore]
         public string CloneOf
         {
             get
@@ -248,6 +260,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine sampleof parent
         /// </summary>
+        [JsonIgnore]
         public string SampleOf
         {
             get
@@ -274,6 +287,7 @@ namespace SabreTools.Library.DatItems
         /// Machine support status
         /// </summary>
         /// <remarks>yes = true, partial = null, no = false</remarks>
+        [JsonIgnore]
         public bool? Supported
         {
             get
@@ -299,6 +313,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Emulator source file related to the machine
         /// </summary>
+        [JsonIgnore]
         public string SourceFile
         {
             get
@@ -325,6 +340,7 @@ namespace SabreTools.Library.DatItems
         /// Machine runnable status
         /// </summary>
         /// <remarks>yes = true, partial = null, no = false</remarks>
+        [JsonIgnore]
         public bool? Runnable
         {
             get
@@ -350,6 +366,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Machine board name
         /// </summary>
+        [JsonIgnore]
         public string Board
         {
             get
@@ -375,6 +392,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Rebuild location if different than machine name
         /// </summary>
+        [JsonIgnore]
         public string RebuildTo
         {
             get
@@ -400,6 +418,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// List of associated device names
         /// </summary>
+        [JsonIgnore]
         public List<string> Devices
         {
             get
@@ -425,6 +444,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// List of slot options
         /// </summary>
+        [JsonIgnore]
         public List<string> SlotOptions
         {
             get
@@ -450,6 +470,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// List of info items
         /// </summary>
+        [JsonIgnore]
         public List<KeyValuePair<string, string>> Infos
         {
             get
@@ -475,6 +496,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Type of the associated machine
         /// </summary>
+        [JsonIgnore]
         public MachineType MachineType
         {
             get
@@ -504,26 +526,31 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Original hardware part associated with the item
         /// </summary>
+        [JsonProperty("partname")]
         public string PartName { get; set; }
 
         /// <summary>
         /// Original hardware interface associated with the item
         /// </summary>
+        [JsonProperty("partinterface")]
         public string PartInterface { get; set; }
 
         /// <summary>
         /// Features provided to/by the item
         /// </summary>
+        [JsonProperty("features")]
         public List<KeyValuePair<string, string>> Features { get; set; }
 
         /// <summary>
         /// Original hardware part name within an item
         /// </summary>
+        [JsonProperty("areaname")]
         public string AreaName { get; set; }
 
         /// <summary>
         /// Original hardware size within the part
         /// </summary>
+        [JsonProperty("areasize")]
         public long? AreaSize { get; set; }
 
         #endregion
@@ -533,26 +560,31 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Internal system ID for organization
         /// </summary>
+        [JsonIgnore]
         public int SystemID { get; set; }
 
         /// <summary>
         /// Internal system name for organization
         /// </summary>
+        [JsonIgnore]
         public string System { get; set; }
 
         /// <summary>
         /// Internal source ID for organization
         /// </summary>
+        [JsonIgnore]
         public int SourceID { get; set; }
 
         /// <summary>
         /// Internal source name for organization
         /// </summary>
+        [JsonIgnore]
         public string Source { get; set; }
 
         /// <summary>
         /// Flag if item should be removed
         /// </summary>
+        [JsonIgnore]
         public bool Remove { get; set; }
 
         #endregion

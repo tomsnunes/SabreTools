@@ -1,4 +1,5 @@
 ﻿using SabreTools.Library.Data;
+using Newtonsoft.Json;
 
 namespace SabreTools.Library.DatItems
 {
@@ -12,21 +13,25 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Release region(s)
         /// </summary>
+        [JsonProperty("region")]
         public string Region { get; set; }
 
         /// <summary>
         /// Release language(s)
         /// </summary>
+        [JsonProperty("language")]
         public string Language { get; set; }
 
         /// <summary>
         /// Date of release
         /// </summary>
+        [JsonProperty("date")]
         public string Date { get; set; }
 
         /// <summary>
         /// Default release, if applicable
         /// </summary>
+        [JsonProperty("default")]
         public bool? Default { get; set; }
 
         #endregion

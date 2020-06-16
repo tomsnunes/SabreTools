@@ -3,6 +3,7 @@
 using SabreTools.Library.Data;
 using SabreTools.Library.FileTypes;
 using SabreTools.Library.Tools;
+using Newtonsoft.Json;
 
 namespace SabreTools.Library.DatItems
 {
@@ -28,16 +29,19 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// What BIOS is required for this rom
         /// </summary>
+        [JsonProperty("bios")]
         public string Bios { get; set; }
 
         /// <summary>
         /// Byte size of the rom
         /// </summary>
+        [JsonProperty("size")]
         public long Size { get; set; }
 
         /// <summary>
         /// File CRC32 hash
         /// </summary>
+        [JsonProperty("crc")]
         public string CRC
         {
             get { return _crc.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_crc); }
@@ -47,6 +51,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// File MD5 hash
         /// </summary>
+        [JsonProperty("md5")]
         public string MD5
         {
             get { return _md5.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_md5); }
@@ -56,6 +61,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// File RIPEMD160 hash
         /// </summary>
+        [JsonProperty("ripemd160")]
         public string RIPEMD160
         {
             get { return _ripemd160.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_ripemd160); }
@@ -65,6 +71,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// File SHA-1 hash
         /// </summary>
+        [JsonProperty("sha1")]
         public string SHA1
         {
             get { return _sha1.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha1); }
@@ -74,6 +81,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// File SHA-256 hash
         /// </summary>
+        [JsonProperty("sha256")]
         public string SHA256
         {
             get { return _sha256.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha256); }
@@ -83,6 +91,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// File SHA-384 hash
         /// </summary>
+        [JsonProperty("sha384")]
         public string SHA384
         {
             get { return _sha384.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha384); }
@@ -92,6 +101,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// File SHA-512 hash
         /// </summary>
+        [JsonProperty("sha512")]
         public string SHA512
         {
             get { return _sha512.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha512); }
@@ -101,31 +111,37 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Rom name to merge from parent
         /// </summary>
+        [JsonProperty("merge")]
         public string MergeTag { get; set; }
 
         /// <summary>
         /// Rom region
         /// </summary>
+        [JsonProperty("region")]
         public string Region { get; set; }
 
         /// <summary>
         /// Data offset within rom
         /// </summary>
+        [JsonProperty("offset")]
         public string Offset { get; set; }
 
         /// <summary>
         /// File created date
         /// </summary>
+        [JsonProperty("date")]
         public string Date { get; set; }
 
         /// <summary>
         /// Rom dump status
         /// </summary>
+        [JsonProperty("status")]
         public ItemStatus ItemStatus { get; set; }
 
         /// <summary>
         /// Determine if the rom is optional in the set
         /// </summary>
+        [JsonProperty("optional")]
         public bool? Optional { get; set; }
 
         #endregion

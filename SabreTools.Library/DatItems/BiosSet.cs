@@ -1,4 +1,5 @@
 ﻿using SabreTools.Library.Data;
+using Newtonsoft.Json;
 
 namespace SabreTools.Library.DatItems
 {
@@ -12,11 +13,13 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Description of the BIOS
         /// </summary>
+        [JsonProperty("description")]
         public string Description { get; set; }
 
         /// <summary>
         /// Determine whether the BIOS is default
         /// </summary>
+        [JsonProperty("default")]
         public bool? Default { get; set; }
 
         #endregion

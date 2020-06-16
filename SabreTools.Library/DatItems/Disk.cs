@@ -3,6 +3,7 @@
 using SabreTools.Library.Data;
 using SabreTools.Library.FileTypes;
 using SabreTools.Library.Tools;
+using Newtonsoft.Json;
 
 namespace SabreTools.Library.DatItems
 {
@@ -27,6 +28,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Data MD5 hash
         /// </summary>
+        [JsonProperty("md5")]
         public string MD5
         {
             get { return _md5.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_md5); }
@@ -36,6 +38,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Data RIPEMD160 hash
         /// </summary>
+        [JsonProperty("ripemd160")]
         public string RIPEMD160
         {
             get { return _ripemd160.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_ripemd160); }
@@ -45,6 +48,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Data SHA-1 hash
         /// </summary>
+        [JsonProperty("sha1")]
         public string SHA1
         {
             get { return _sha1.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha1); }
@@ -54,6 +58,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Data SHA-256 hash
         /// </summary>
+        [JsonProperty("sha256")]
         public string SHA256
         {
             get { return _sha256.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha256); }
@@ -63,6 +68,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Data SHA-384 hash
         /// </summary>
+        [JsonProperty("sha384")]
         public string SHA384
         {
             get { return _sha384.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha384); }
@@ -72,6 +78,7 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Data SHA-512 hash
         /// </summary>
+        [JsonProperty("sha512")]
         public string SHA512
         {
             get { return _sha512.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha512); }
@@ -81,31 +88,37 @@ namespace SabreTools.Library.DatItems
         /// <summary>
         /// Disk name to merge from parent
         /// </summary>
+        [JsonProperty("merge")]
         public string MergeTag { get; set; }
 
         /// <summary>
         /// Disk region
         /// </summary>
+        [JsonProperty("region")]
         public string Region { get; set; }
 
         /// <summary>
         /// Disk index
         /// </summary>
+        [JsonProperty("index")]
         public string Index { get; set; }
 
         /// <summary>
         /// Disk writable flag
         /// </summary>
+        [JsonProperty("writable")]
         public bool? Writable { get; set; }
 
         /// <summary>
         /// Disk dump status
         /// </summary>
+        [JsonProperty("status")]
         public ItemStatus ItemStatus { get; set; }
 
         /// <summary>
         /// Determine if the disk is optional in the set
         /// </summary>
+        [JsonProperty("optional")]
         public bool? Optional { get; set; }
 
         #endregion
