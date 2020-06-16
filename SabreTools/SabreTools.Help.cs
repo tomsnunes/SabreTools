@@ -1710,6 +1710,7 @@ Possible values are:
     cmp, clrmamepro  - ClrMamePro
     csv              - Standardized Comma-Separated Value
     dc, doscenter    - DOSCenter
+    json             - JSON
     lr, listrom      - MAME Listrom
     lx, listxml      - MAME Listxml
     miss, missfile   - GoodTools Missfile

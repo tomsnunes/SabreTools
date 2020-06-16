@@ -619,6 +619,9 @@ namespace SabreTools.Library.Tools
                 case DatFormat.EverdriveSMDB:
                     return new EverdriveSMDB(baseDat);
 
+                case DatFormat.Json:
+                    return new Json(baseDat);
+
                 case DatFormat.Listrom:
                     return new Listrom(baseDat);
 
@@ -763,6 +766,8 @@ namespace SabreTools.Library.Tools
                 case "dc":
                 case "doscenter":
                     return DatFormat.DOSCenter;
+                case "json":
+                    return DatFormat.Json;
                 case "lr":
                 case "listrom":
                     return DatFormat.Listrom;
@@ -1271,6 +1276,8 @@ namespace SabreTools.Library.Tools
             {
                 case "csv":
                     return DatFormat.CSV;
+                case "json":
+                    return DatFormat.Json;
                 case "md5":
                     return DatFormat.RedumpMD5;
                 case "ripemd160":

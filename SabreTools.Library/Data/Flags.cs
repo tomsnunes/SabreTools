@@ -336,6 +336,11 @@ namespace SabreTools.Library.Data
         /// </summary>
         EverdriveSMDB =         1 << 16,
 
+        /// <summary>
+        /// JSON
+        /// </summary>
+        Json =                  1 << 17,
+
         #endregion
 
         #region SFV-similar Formats
@@ -343,41 +348,39 @@ namespace SabreTools.Library.Data
         /// <summary>
         /// CRC32 hash list
         /// </summary>
-        RedumpSFV =             1 << 17,
+        RedumpSFV =             1 << 18,
 
         /// <summary>
         /// MD5 hash list
         /// </summary>
-        RedumpMD5 =             1 << 18,
+        RedumpMD5 =             1 << 19,
 
         /// <summary>
         /// RIPEMD160 hash list
         /// </summary>
-        RedumpRIPEMD160 =       1 << 19,
+        RedumpRIPEMD160 =       1 << 20,
 
         /// <summary>
         /// SHA-1 hash list
         /// </summary>
-        RedumpSHA1 =            1 << 20,
+        RedumpSHA1 =            1 << 21,
 
         /// <summary>
         /// SHA-256 hash list
         /// </summary>
-        RedumpSHA256 =          1 << 21,
+        RedumpSHA256 =          1 << 22,
 
         /// <summary>
         /// SHA-384 hash list
         /// </summary>
-        RedumpSHA384 =          1 << 22,
+        RedumpSHA384 =          1 << 23,
 
         /// <summary>
         /// SHA-512 hash list
         /// </summary>
-        RedumpSHA512 =          1 << 23,
+        RedumpSHA512 =          1 << 24,
 
         #endregion
-
-        // TODO: Add JSON output. Just for kicks
 
         // Specialty combinations
         ALL = Int32.MaxValue,

@@ -5658,6 +5658,12 @@ namespace SabreTools.Library.DatFiles
                 outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", overwrite));
             }
 
+            // JSON
+            if((DatFormat & DatFormat.Json) != 0)
+            {
+                outfileNames.Add(DatFormat.Json, CreateOutfileNamesHelper(outDir, ".json", overwrite));
+            }
+
             // Logiqx XML
             if ((DatFormat & DatFormat.Logiqx) != 0)
             {
