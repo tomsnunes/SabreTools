@@ -2806,6 +2806,7 @@ namespace SabreTools.Library.Tools
             {
                 case "csv":
                 case "dat":
+                case "json":
                 case "md5":
                 case "ripemd160":
                 case "sfv":

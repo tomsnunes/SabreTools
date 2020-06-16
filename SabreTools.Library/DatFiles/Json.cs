@@ -26,6 +26,735 @@ namespace SabreTools.Library.DatFiles
         }
 
         /// <summary>
+        /// Parse a Logiqx XML DAT and return all found games and roms within
+        /// </summary>
+        /// <param name="filename">Name of the file to be parsed</param>
+        /// <param name="sysid">System ID for the DAT</param>
+        /// <param name="srcid">Source ID for the DAT</param>
+        /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        public override void ParseFile(
+            // Standard Dat parsing
+            string filename,
+            int sysid,
+            int srcid,
+
+            // Miscellaneous
+            bool keep,
+            bool clean,
+            bool remUnicode)
+        {
+            // Prepare all internal variables
+            Encoding enc = Utilities.GetEncoding(filename);
+            StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), new UTF8Encoding(false));
+            JsonTextReader jtr = new JsonTextReader(sr);
+
+            // If we got a null reader, just return
+            if (jtr == null)
+                return;
+
+            // Otherwise, read the file to the end
+            try
+            {
+                jtr.Read();
+                while (!sr.EndOfStream)
+                {
+                    // Skip everything not a property name
+                    if (jtr.TokenType != JsonToken.PropertyName)
+                    {
+                        jtr.Read();
+                        continue;
+                    }
+
+                    switch (jtr.Value)
+                    {
+                        // Header value
+                        case "header":
+                            ReadHeader(sr, jtr, keep);
+                            jtr.Read();
+                            break;
+
+                        // Machine array
+                        case "machines":
+                            ReadMachines(sr, jtr, clean, remUnicode);
+                            jtr.Read();
+                            break;
+
+                        default:
+                            jtr.Read();
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Globals.Logger.Warning($"Exception found while parsing '{filename}': {ex}");
+            }
+
+            jtr.Close();
+        }
+
+        /// <summary>
+        /// Read header information
+        /// </summary>
+        /// <param name="sr">StreamReader to use to parse the header</param>
+        /// <param name="jtr">JsonTextReader to use to parse the header</param>
+        /// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+        private void ReadHeader(StreamReader sr, JsonTextReader jtr, bool keep)
+        {
+            bool superdat = false;
+
+            // If the reader is invalid, skip
+            if (jtr == null)
+                return;
+
+            jtr.Read();
+            while (!sr.EndOfStream)
+            {
+                // If we hit the end of the header, return
+                if (jtr.TokenType == JsonToken.EndObject)
+                    return;
+
+                // We don't care about anything except property names
+                if (jtr.TokenType != JsonToken.PropertyName)
+                {
+                    jtr.Read();
+                    continue;
+                }
+
+                // Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+                string content = string.Empty;
+                switch (jtr.Value)
+                {
+                    case "name":
+                        content = jtr.ReadAsString();
+                        Name = (string.IsNullOrWhiteSpace(Name) ? content : Name);
+                        superdat = superdat || content.Contains(" - SuperDAT");
+                        if (keep && superdat)
+                        {
+                            Type = (string.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+                        }
+                        break;
+
+                    case "description":
+                        content = jtr.ReadAsString();
+                        Description = (string.IsNullOrWhiteSpace(Description) ? content : Description);
+                        break;
+
+                    case "rootdir": // This is exclusive to TruRip XML
+                        content = jtr.ReadAsString();
+                        RootDir = (string.IsNullOrWhiteSpace(RootDir) ? content : RootDir);
+                        break;
+
+                    case "category":
+                        content = jtr.ReadAsString();
+                        Category = (string.IsNullOrWhiteSpace(Category) ? content : Category);
+                        break;
+
+                    case "version":
+                        content = jtr.ReadAsString();
+                        Version = (string.IsNullOrWhiteSpace(Version) ? content : Version);
+                        break;
+
+                    case "date":
+                        content = jtr.ReadAsString();
+                        Date = (string.IsNullOrWhiteSpace(Date) ? content.Replace(".", "/") : Date);
+                        break;
+
+                    case "author":
+                        content = jtr.ReadAsString();
+                        Author = (string.IsNullOrWhiteSpace(Author) ? content : Author);
+                        break;
+
+                    case "email":
+                        content = jtr.ReadAsString();
+                        Email = (string.IsNullOrWhiteSpace(Email) ? content : Email);
+                        break;
+
+                    case "homepage":
+                        content = jtr.ReadAsString();
+                        Homepage = (string.IsNullOrWhiteSpace(Homepage) ? content : Homepage);
+                        break;
+
+                    case "url":
+                        content = jtr.ReadAsString();
+                        Url = (string.IsNullOrWhiteSpace(Url) ? content : Url);
+                        break;
+
+                    case "comment":
+                        content = jtr.ReadAsString();
+                        Comment = (string.IsNullOrWhiteSpace(Comment) ? content : Comment);
+                        break;
+
+                    case "type": // This is exclusive to TruRip XML
+                        content = jtr.ReadAsString();
+                        Type = (string.IsNullOrWhiteSpace(Type) ? content : Type);
+                        superdat = superdat || content.Contains("SuperDAT");
+                        break;
+
+                    case "forcemerging":
+                        if (ForceMerging == ForceMerging.None)
+                            ForceMerging = Utilities.GetForceMerging(jtr.ReadAsString());
+
+                        break;
+
+                    case "forcepacking":
+                        if (ForcePacking == ForcePacking.None)
+                            ForcePacking = Utilities.GetForcePacking(jtr.ReadAsString());
+
+                        break;
+
+                    case "forcenodump":
+                        if (ForceNodump == ForceNodump.None)
+                            ForceNodump = Utilities.GetForceNodump(jtr.ReadAsString());
+
+                        break;
+
+                    case "header":
+                        content = jtr.ReadAsString();
+                        Header = (string.IsNullOrWhiteSpace(Header) ? content : Header);
+                        break;
+
+                    default:
+                        break;
+                }
+
+                jtr.Read();
+            }
+        }
+
+        /// <summary>
+        /// Read machine array information
+        /// </summary>
+        /// <param name="sr">StreamReader to use to parse the header</param>
+        /// <param name="itr">JsonTextReader to use to parse the machine</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        private void ReadMachines(
+            StreamReader sr,
+            JsonTextReader jtr,
+
+            // Miscellaneous
+            bool clean,
+            bool remUnicode)
+        {
+            // If the reader is invalid, skip
+            if (jtr == null)
+                return;
+
+            jtr.Read();
+            while (!sr.EndOfStream)
+            {
+                // If we hit the end of an array, we want to return
+                if (jtr.TokenType == JsonToken.EndArray)
+                    return;
+
+                // We don't care about anything except start object
+                if (jtr.TokenType != JsonToken.StartObject)
+                {
+                    jtr.Read();
+                    continue;
+                }
+
+                ReadMachine(sr, jtr, clean, remUnicode);
+                jtr.Read();
+            }
+        }
+
+        /// <summary>
+        /// Read machine information
+        /// </summary>
+        /// <param name="sr">StreamReader to use to parse the header</param>
+        /// <param name="itr">JsonTextReader to use to parse the machine</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        private void ReadMachine(
+            StreamReader sr,
+            JsonTextReader jtr,
+
+            // Miscellaneous
+            bool clean,
+            bool remUnicode)
+        {
+            // If we have an empty machine, skip it
+            if (jtr == null)
+                return;
+
+            // Prepare internal variables
+            Machine machine = new Machine();
+
+            jtr.Read();
+            while (!sr.EndOfStream)
+            {
+                // If we hit the end of the machine, return
+                if (jtr.TokenType == JsonToken.EndObject)
+                    return;
+
+                // We don't care about anything except properties
+                if (jtr.TokenType != JsonToken.PropertyName)
+                {
+                    jtr.Read();
+                    continue;
+                }
+
+                switch (jtr.Value)
+                {
+                    case "name":
+                        machine.Name = jtr.ReadAsString();
+                        break;
+
+                    case "comment":
+                        machine.Comment = jtr.ReadAsString();
+                        break;
+
+                    case "description":
+                        machine.Description = jtr.ReadAsString();
+                        break;
+
+                    case "year":
+                        machine.Year = jtr.ReadAsString();
+                        break;
+
+                    case "manufacturer":
+                        machine.Manufacturer = jtr.ReadAsString();
+                        break;
+
+                    case "publisher":
+                        machine.Publisher = jtr.ReadAsString();
+                        break;
+
+                    case "romof":
+                        machine.RomOf = jtr.ReadAsString();
+                        break;
+
+                    case "cloneof":
+                        machine.CloneOf = jtr.ReadAsString();
+                        break;
+
+                    case "sampleof":
+                        machine.SampleOf = jtr.ReadAsString();
+                        break;
+
+                    case "supported":
+                        string supported = jtr.ReadAsString();
+                        switch (supported)
+                        {
+                            case "yes":
+                                machine.Supported = true;
+                                break;
+                            case "no":
+                                machine.Supported = false;
+                                break;
+                            case "partial":
+                                machine.Supported = null;
+                                break;
+                        }
+                        break;
+
+                    case "sourcefile":
+                        machine.SourceFile = jtr.ReadAsString();
+                        break;
+
+                    case "runnable":
+                        string runnable = jtr.ReadAsString();
+                        switch (runnable)
+                        {
+                            case "yes":
+                                machine.Runnable = true;
+                                break;
+                            case "no":
+                                machine.Runnable = false;
+                                break;
+                        }
+                        break;
+
+                    case "board":
+                        machine.Board = jtr.ReadAsString();
+                        break;
+
+                    case "rebuildto":
+                        machine.RebuildTo = jtr.ReadAsString();
+                        break;
+
+                    case "devices":
+                        machine.Devices = new List<string>();
+                        jtr.Read(); // Start Array
+                        while (!sr.EndOfStream && jtr.TokenType != JsonToken.EndArray)
+                        {
+                            machine.Devices.Add(jtr.ReadAsString());
+                        }
+
+                        break;
+
+                    case "slotoptions":
+                        machine.SlotOptions = new List<string>();
+                        jtr.Read(); // Start Array
+                        while (!sr.EndOfStream && jtr.TokenType != JsonToken.EndArray)
+                        {
+                            machine.SlotOptions.Add(jtr.ReadAsString());
+                        }
+
+                        break;
+
+                    case "infos":
+                        machine.Infos = new List<KeyValuePair<string, string>>();
+                        jtr.Read(); // Start Array
+                        while (!sr.EndOfStream)
+                        {
+                            jtr.Read(); // Start object (or end array)
+                            if (jtr.TokenType == JsonToken.EndArray)
+                                break;
+
+                            jtr.Read(); // Key
+                            string key = jtr.Value as string;
+                            string value = jtr.ReadAsString();
+                            jtr.Read(); // End object
+
+                            machine.Infos.Add(new KeyValuePair<string, string>(key, value));
+                        }
+
+                        break;
+
+                    case "isbios":
+                        string isbios = jtr.ReadAsString();
+                        if (string.Equals(isbios, "yes", StringComparison.OrdinalIgnoreCase))
+                            machine.MachineType &= MachineType.Bios;
+
+                        break;
+
+                    case "isdevice":
+                        string isdevice = jtr.ReadAsString();
+                        if (string.Equals(isdevice, "yes", StringComparison.OrdinalIgnoreCase))
+                            machine.MachineType &= MachineType.Device;
+
+                        break;
+
+                    case "ismechanical":
+                        string ismechanical = jtr.ReadAsString();
+                        if (string.Equals(ismechanical, "yes", StringComparison.OrdinalIgnoreCase))
+                            machine.MachineType &= MachineType.Mechanical;
+
+                        break;
+
+                    case "items":
+                        ReadItems(sr, jtr, clean, remUnicode, machine);
+                        break;
+
+                    default:
+                        break;
+                }
+
+                jtr.Read();
+            }
+        }
+
+        /// <summary>
+        /// Read item array information
+        /// </summary>
+        /// <param name="sr">StreamReader to use to parse the header</param>
+        /// <param name="itr">JsonTextReader to use to parse the machine</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        private void ReadItems(
+            StreamReader sr,
+            JsonTextReader jtr,
+
+            // Miscellaneous
+            bool clean,
+            bool remUnicode,
+            Machine machine)
+        {
+            // If the reader is invalid, skip
+            if (jtr == null)
+                return;
+
+            jtr.Read();
+            while (!sr.EndOfStream)
+            {
+                // If we hit the end of an array, we want to return
+                if (jtr.TokenType == JsonToken.EndArray)
+                    return;
+
+                // We don't care about anything except start object
+                if (jtr.TokenType != JsonToken.StartObject)
+                {
+                    jtr.Read();
+                    continue;
+                }
+
+                ReadItem(sr, jtr, clean, remUnicode, machine);
+                jtr.Read();
+            }
+        }
+
+        /// <summary>
+        /// Read item information
+        /// </summary>
+        /// <param name="sr">StreamReader to use to parse the header</param>
+        /// <param name="itr">JsonTextReader to use to parse the machine</param>
+        /// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+        /// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+        private void ReadItem(
+            StreamReader sr,
+            JsonTextReader jtr,
+
+            // Miscellaneous
+            bool clean,
+            bool remUnicode,
+            Machine machine)
+        {
+            // If we have an empty machine, skip it
+            if (jtr == null)
+                return;
+
+            // Prepare internal variables
+            bool? def = null,
+                writable = null,
+                optional = null;
+            long size = -1;
+            long? areaSize = null;
+            string name = null,
+                partName = null,
+                partInterface = null,
+                areaName = null,
+                biosDescription = null,
+                region = null,
+                language = null,
+                date = null,
+                crc = null,
+                md5 = null,
+                ripemd160 = null,
+                sha1 = null,
+                sha256 = null,
+                sha384 = null,
+                sha512 = null,
+                merge = null,
+                index = null,
+                offset = null,
+                bios = null;
+            ItemStatus? itemStatus = null;
+            ItemType? itemType = null;
+            List<KeyValuePair<string, string>> features = null;
+
+            jtr.Read();
+            while (!sr.EndOfStream)
+            {
+                // If we hit the end of the machine - create, add, and return
+                if (jtr.TokenType == JsonToken.EndObject)
+                {
+                    // If we didn't read something valid, just return
+                    if (itemType == null)
+                        return;
+
+                    DatItem datItem = Utilities.GetDatItem(itemType.Value);
+                    datItem.CopyMachineInformation(machine);
+
+                    datItem.Name = name;
+                    datItem.PartName = partName;
+                    datItem.PartInterface = partInterface;
+                    datItem.Features = features;
+                    datItem.AreaName = areaName;
+                    datItem.AreaSize = areaSize;
+
+                    if (itemType == ItemType.BiosSet)
+                    {
+                        (datItem as BiosSet).Description = biosDescription;
+                        (datItem as BiosSet).Default = def;
+                    }
+                    else if (itemType == ItemType.Disk)
+                    {
+                        (datItem as Disk).MD5 = md5;
+                        (datItem as Disk).RIPEMD160 = ripemd160;
+                        (datItem as Disk).SHA1 = sha1;
+                        (datItem as Disk).SHA256 = sha256;
+                        (datItem as Disk).SHA384 = sha384;
+                        (datItem as Disk).SHA512 = sha512;
+                        (datItem as Disk).MergeTag = merge;
+                        (datItem as Disk).Region = region;
+                        (datItem as Disk).Index = index;
+                        (datItem as Disk).Writable = writable;
+                        (datItem as Disk).ItemStatus = itemStatus ?? ItemStatus.None;
+                        (datItem as Disk).Optional = optional;
+                    }
+                    else if (itemType == ItemType.Release)
+                    {
+                        (datItem as Release).Region = region;
+                        (datItem as Release).Language = language;
+                        (datItem as Release).Date = date;
+                        (datItem as Release).Default = def;
+                    }
+                    else if (itemType == ItemType.Rom)
+                    {
+                        (datItem as Rom).Bios = bios;
+                        (datItem as Rom).Size = size;
+                        (datItem as Rom).CRC = crc;
+                        (datItem as Rom).MD5 = md5;
+                        (datItem as Rom).RIPEMD160 = ripemd160;
+                        (datItem as Rom).SHA1 = sha1;
+                        (datItem as Rom).SHA256 = sha256;
+                        (datItem as Rom).SHA384 = sha384;
+                        (datItem as Rom).SHA512 = sha512;
+                        (datItem as Rom).MergeTag = merge;
+                        (datItem as Rom).Region = region;
+                        (datItem as Rom).Offset = offset;
+                        (datItem as Rom).Date = date;
+                        (datItem as Rom).ItemStatus = itemStatus ?? ItemStatus.None;
+                        (datItem as Rom).Optional = optional;
+                    }
+
+                    ParseAddHelper(datItem, clean, remUnicode);
+
+                    return;
+                }
+
+                // We don't care about anything except properties
+                if (jtr.TokenType != JsonToken.PropertyName)
+                {
+                    jtr.Read();
+                    continue;
+                }
+
+                switch (jtr.Value)
+                {
+                    case "type":
+                        itemType = Utilities.GetItemType(jtr.ReadAsString());
+                        break;
+
+                    case "name":
+                        name = jtr.ReadAsString();
+                        break;
+
+                    case "partname":
+                        partName = jtr.ReadAsString();
+                        break;
+
+                    case "partinterface":
+                        partInterface = jtr.ReadAsString();
+                        break;
+
+                    case "features":
+                        features = new List<KeyValuePair<string, string>>();
+                        jtr.Read(); // Start Array
+                        while (!sr.EndOfStream)
+                        {
+                            jtr.Read(); // Start object (or end array)
+                            if (jtr.TokenType == JsonToken.EndArray)
+                                break;
+
+                            jtr.Read(); // Key
+                            string key = jtr.Value as string;
+                            string value = jtr.ReadAsString();
+                            jtr.Read(); // End object
+
+                            features.Add(new KeyValuePair<string, string>(key, value));
+                        }
+
+                        break;
+
+                    case "areaname":
+                        areaName = jtr.ReadAsString();
+                        break;
+
+                    case "areasize":
+                        if (Int64.TryParse(jtr.ReadAsString(), out long tempAreaSize))
+                            areaSize = tempAreaSize;
+                        else
+                            areaSize = null;
+
+                        break;
+
+                    case "description":
+                        biosDescription = jtr.ReadAsString();
+                        break;
+
+                    case "default":
+                        def = jtr.ReadAsBoolean();
+                        break;
+
+                    case "region":
+                        region = jtr.ReadAsString();
+                        break;
+
+                    case "language":
+                        language = jtr.ReadAsString();
+                        break;
+
+                    case "date":
+                        date = jtr.ReadAsString();
+                        break;
+
+                    case "size":
+                        if (!Int64.TryParse(jtr.ReadAsString(), out size))
+                            size = -1;
+
+                        break;
+
+                    case "crc":
+                        crc = jtr.ReadAsString();
+                        break;
+
+                    case "md5":
+                        md5 = jtr.ReadAsString();
+                        break;
+
+                    case "ripemd160":
+                        ripemd160 = jtr.ReadAsString();
+                        break;
+
+                    case "sha1":
+                        sha1 = jtr.ReadAsString();
+                        break;
+
+                    case "sha256":
+                        sha256 = jtr.ReadAsString();
+                        break;
+
+                    case "sha384":
+                        sha384 = jtr.ReadAsString();
+                        break;
+
+                    case "sha512":
+                        sha512 = jtr.ReadAsString();
+                        break;
+
+                    case "merge":
+                        merge = jtr.ReadAsString();
+                        break;
+
+                    case "index":
+                        index = jtr.ReadAsString();
+                        break;
+
+                    case "writable":
+                        writable = jtr.ReadAsBoolean();
+                        break;
+
+                    case "status":
+                        itemStatus = Utilities.GetItemStatus(jtr.ReadAsString());
+                        break;
+
+                    case "optional":
+                        optional = jtr.ReadAsBoolean();
+                        break;
+
+                    case "offset":
+                        offset = jtr.ReadAsString();
+                        break;
+
+                    case "bios":
+                        bios = jtr.ReadAsString();
+                        break;
+
+                    default:
+                        break;
+                }
+
+                jtr.Read();
+            }
+        }
+
+        /// <summary>
         /// Create and open an output file for writing direct from a dictionary
         /// </summary>
         /// <param name="outfile">Name of the file to write to</param>
