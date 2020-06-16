@@ -293,7 +293,7 @@ namespace SabreTools.Library.DatFiles
                         break;
 
                     case "feature":
-                        features.Add(new KeyValuePair<string, string>(reader.GetAttribute("name"), reader.GetAttribute("feature")));
+                        features.Add(new KeyValuePair<string, string>(reader.GetAttribute("name"), reader.GetAttribute("value")));
                         reader.Read();
                         break;
 
